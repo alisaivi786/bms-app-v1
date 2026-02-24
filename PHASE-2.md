@@ -195,3 +195,53 @@ service cloud.firestore {
 - Added System Config with lookup data grid and CRUD controls.
 - Changed income source to lookup-driven dropdown.
 - Standardized lookup model to enum-based `typeId` with integer `id`.
+
+---
+
+## 9. Hot Fixes (Phase 2)
+
+Applied iterative hot fixes during Phase 2 stabilization:
+
+1. Firestore write failures (`Could not save initial balance`)
+- Root cause: Firestore was not provisioned/rules not published initially.
+- Fix: Firestore created in Production mode and user-scoped rules published.
+
+2. Auth/permissions behavior on Users page
+- Root cause: app attempted collection-wide users read while rules were user-scoped.
+- Fix: documented constraint and aligned behavior expectation for per-user privacy model.
+
+3. Dark mode rendering defects
+- Root cause: background and custom theme variable overrides conflicted with dark palette.
+- Fix:
+  - moved full-page background handling to `body`
+  - improved header icon contrast
+  - prevented light custom palette from overriding dark readability
+
+4. Lookup values not persisting after refresh
+- Root cause: lookup path/rules mismatch and evolving storage model.
+- Fix:
+  - stabilized persistence on user document
+  - normalized lookup read/write behavior across System Config and Income screens
+
+5. Lookup model inconsistency in Firestore
+- Root cause: mixed legacy and new fields (`incomeSourceLookups` + `lookupItems`).
+- Fix:
+  - adopted canonical `lookupItems`
+  - removed legacy field on save
+  - standardized integer `id`
+  - switched to enum-based numeric `typeId`
+
+6. Backward compatibility for migrated lookup data
+- Root cause: existing rows contained legacy string type fields.
+- Fix: added safe fallback mapping from old `type` string to enum `typeId` during reads.
+
+7. New-user bootstrap defaults
+- Root cause: some accounts started without lookup seed values.
+- Fix:
+  - added login-time bootstrap check per UID
+  - auto-seeds default income source lookups when none exist
+  - avoids overwrite for existing user data
+
+8. UX stability fixes
+- Profile dropdown opening caused layout shifts.
+- Fix: dropdown anchored as overlay above profile row; row content frozen/ellipsized.

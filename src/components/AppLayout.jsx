@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import {
   collection,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -14,6 +15,7 @@ import { useAuth } from "../state/AuthContext";
 import { useFinanceStore } from "../state/financeStore";
 import { CURRENCY_OPTIONS, usePreferencesStore } from "../state/preferencesStore";
 import { useThemeStore } from "../state/themeStore";
+import { buildDefaultLookupItems } from "../constants/lookupTypes";
 
 export default function AppLayout() {
   const { user, signOut } = useAuth();
@@ -34,20 +36,32 @@ export default function AppLayout() {
       orderBy("createdAt", "desc")
     );
 
-    // Ensure core profile fields exist for admin/user listing screens.
-    setDoc(
-      userRef,
-      {
-        uid: user.uid,
-        email: user.email || "",
-        displayName: user.displayName || "",
-        photoURL: user.photoURL || "",
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
-    ).catch((err) => {
-      console.error("Could not sync user profile", err);
-    });
+    const bootstrapUserProfile = async () => {
+      try {
+        const snap = await getDoc(userRef);
+        const data = snap.exists() ? snap.data() : {};
+        const hasLookupItems = Array.isArray(data.lookupItems) && data.lookupItems.length > 0;
+        const hasLegacyLookups =
+          Array.isArray(data.incomeSourceLookups) && data.incomeSourceLookups.length > 0;
+
+        await setDoc(
+          userRef,
+          {
+            uid: user.uid,
+            email: user.email || "",
+            displayName: user.displayName || "",
+            photoURL: user.photoURL || "",
+            lookupItems: hasLookupItems || hasLegacyLookups ? data.lookupItems || [] : buildDefaultLookupItems(),
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Could not bootstrap user profile", err);
+      }
+    };
+
+    bootstrapUserProfile();
 
     const unsubUser = onSnapshot(userRef, (snapshot) => {
       const data = snapshot.exists() ? snapshot.data() : {};
