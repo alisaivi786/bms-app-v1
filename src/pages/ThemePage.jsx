@@ -1,4 +1,8 @@
 import { useThemeStore, defaultTheme } from "../state/themeStore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../state/AuthContext";
+import CustomSelect from "../components/CustomSelect";
 
 const fields = [
   { key: "text", label: "Primary Text" },
@@ -11,11 +15,45 @@ const fields = [
 ];
 
 export default function ThemePage() {
+  const { user } = useAuth();
   const mode = useThemeStore((state) => state.mode);
   const setMode = useThemeStore((state) => state.setMode);
   const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
   const setThemeValue = useThemeStore((state) => state.setThemeValue);
-  const resetTheme = useThemeStore((state) => state.resetTheme);
+
+  const persistTheme = async (nextMode, nextTheme) => {
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          uid: user.uid,
+          themeMode: nextMode,
+          themeColors: nextTheme,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error("Could not save theme settings", err);
+    }
+  };
+
+  const handleModeChange = async (nextMode) => {
+    setMode(nextMode);
+    await persistTheme(nextMode, theme);
+  };
+
+  const handleThemeValueChange = async (key, value) => {
+    const nextTheme = { ...theme, [key]: value };
+    setThemeValue(key, value);
+    await persistTheme(mode, nextTheme);
+  };
+
+  const handleReset = async () => {
+    setTheme(defaultTheme);
+    await persistTheme(mode, defaultTheme);
+  };
 
   return (
     <section>
@@ -24,10 +62,14 @@ export default function ThemePage() {
       <div className="form-card">
         <div className="field">
           <label htmlFor="themeMode">Theme Mode</label>
-          <select id="themeMode" value={mode} onChange={(event) => setMode(event.target.value)}>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
+          <CustomSelect
+            value={mode}
+            onChange={handleModeChange}
+            options={[
+              { value: "light", label: "Light" },
+              { value: "dark", label: "Dark" }
+            ]}
+          />
         </div>
         {fields.map((field) => (
           <div className="field row-field" key={field.key}>
@@ -37,16 +79,16 @@ export default function ThemePage() {
                 id={field.key}
                 type="color"
                 value={theme[field.key]}
-                onChange={(event) => setThemeValue(field.key, event.target.value)}
+                onChange={(event) => handleThemeValueChange(field.key, event.target.value)}
               />
               <input
                 value={theme[field.key]}
-                onChange={(event) => setThemeValue(field.key, event.target.value)}
+                onChange={(event) => handleThemeValueChange(field.key, event.target.value)}
               />
             </div>
           </div>
         ))}
-        <button className="btn" onClick={resetTheme}>
+        <button className="btn" onClick={handleReset}>
           Reset Default Theme
         </button>
       </div>

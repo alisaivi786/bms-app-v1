@@ -13,6 +13,8 @@ import { useAuth } from "../state/AuthContext";
 import { useFinanceStore } from "../state/financeStore";
 import { usePreferencesStore } from "../state/preferencesStore";
 import { LOOKUP_TYPE_ENUM, getLookupTypeByKey } from "../constants/lookupTypes";
+import CustomSelect from "../components/CustomSelect";
+import AlertMessage from "../components/AlertMessage";
 
 const yearOptions = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - 2 + i);
 const incomeSchema = z.object({
@@ -86,6 +88,10 @@ export default function IncomePage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const setField = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -175,39 +181,37 @@ export default function IncomePage() {
           <h2>New Income Entry</h2>
           <div className="field">
             <label htmlFor="month">Month</label>
-            <select id="month" name="month" value={formData.month} onChange={handleChange}>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
+            <CustomSelect
+              value={formData.month}
+              onChange={(value) => setField("month", Number(value))}
+              options={Array.from({ length: 12 }, (_, i) => i + 1).map((month) => ({
+                value: month,
+                label: String(month)
+              }))}
+            />
           </div>
           <div className="field">
             <label htmlFor="year">Year</label>
-            <select id="year" name="year" value={formData.year} onChange={handleChange}>
-              {yearOptions.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+            <CustomSelect
+              value={formData.year}
+              onChange={(value) => setField("year", Number(value))}
+              options={yearOptions.map((year) => ({
+                value: year,
+                label: String(year)
+              }))}
+            />
           </div>
           <div className="field">
             <label htmlFor="source">Income Source</label>
-            <select
-              id="source"
-              name="source"
+            <CustomSelect
               value={formData.source}
-              onChange={handleChange}
-            >
-              <option value="">Select source</option>
-              {incomeSourceOptions.map((item) => (
-                <option key={item.id} value={item.name}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setField("source", value)}
+              placeholder="Select source"
+              options={incomeSourceOptions.map((item) => ({
+                value: item.name,
+                label: item.name
+              }))}
+            />
             {incomeSourceOptions.length === 0 ? (
               <small className="muted">
                 No lookup found. Add sources from System Configuration first.
@@ -231,8 +235,8 @@ export default function IncomePage() {
         </form>
       </div>
 
-      {status && <p className="success">{status}</p>}
-      {error && <p className="error">{error}</p>}
+      <AlertMessage type="success" message={status} />
+      <AlertMessage type="error" message={error} />
     </section>
   );
 }

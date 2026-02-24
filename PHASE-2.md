@@ -40,6 +40,10 @@ Phase Date: 2026-02-25
 - Theme settings page supports:
   - mode selection
   - color customization
+- Theme preferences persisted to Firestore per user:
+  - `themeMode`
+  - `themeColors`
+- New users default to `light` mode unless overridden by saved profile preferences.
 - Dark mode visibility and contrast issues fixed across:
   - body background
   - cards/forms
@@ -132,6 +136,8 @@ service cloud.firestore {
 - `photoURL`
 - `initialBalance`
 - `currency`
+- `themeMode`
+- `themeColors`
 - `lookupItems` (array of maps)
 - `updatedAt`
 
@@ -257,3 +263,12 @@ Applied iterative hot fixes during Phase 2 stabilization:
 - Symptom: outline action buttons (for example Delete/Cancel) appeared as rounded borders without readable text in light mode.
 - Fix: set `.btn-outline { color: var(--app-text); }`.
 - Outcome: outline buttons are readable in both light and dark themes.
+
+11. Theme preference persistence per user
+- Root cause: theme state was previously local-browser persisted only, causing inconsistent experience across devices/logins.
+- Fix:
+  - added Firestore persistence for `themeMode` and `themeColors` under `users/{uid}`
+  - load saved theme on login
+  - default to `light` for new users when no theme preference exists
+  - persist changes from both header toggle and Theme Settings page
+- Outcome: consistent user-specific theme across sessions/devices.

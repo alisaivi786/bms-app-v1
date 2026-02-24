@@ -1,7 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
+  EmailAuthProvider,
+  createUserWithEmailAndPassword,
+  linkWithCredential,
+  linkWithPopup,
   onAuthStateChanged,
   reload,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut
 } from "firebase/auth";
@@ -26,6 +32,19 @@ export function AuthProvider({ children }) {
       user,
       loading,
       signInWithGoogle: () => signInWithPopup(auth, googleProvider),
+      signInWithEmail: (email, password) =>
+        signInWithEmailAndPassword(auth, email, password),
+      signUpWithEmail: (email, password) =>
+        createUserWithEmailAndPassword(auth, email, password),
+      sendPasswordReset: (email) => sendPasswordResetEmail(auth, email),
+      linkEmailPassword: (email, password) =>
+        auth.currentUser
+          ? linkWithCredential(auth.currentUser, EmailAuthProvider.credential(email, password))
+          : Promise.reject(new Error("No active user session.")),
+      linkGoogleProvider: () =>
+        auth.currentUser
+          ? linkWithPopup(auth.currentUser, googleProvider)
+          : Promise.reject(new Error("No active user session.")),
       signOut: () => firebaseSignOut(auth),
       refreshUser: async () => {
         if (auth.currentUser) {

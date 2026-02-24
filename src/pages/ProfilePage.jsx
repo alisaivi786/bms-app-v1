@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { updatePassword, updateProfile } from "firebase/auth";
 import { useAuth } from "../state/AuthContext";
+import AlertMessage from "../components/AlertMessage";
 
 const profileSchema = z.object({
   displayName: z.string().trim().min(2, "Display name must be at least 2 characters."),
@@ -19,7 +20,7 @@ const passwordSchema = z
   });
 
 export default function ProfilePage() {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, linkEmailPassword, linkGoogleProvider } = useAuth();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
   const [newPassword, setNewPassword] = useState("");
@@ -32,6 +33,7 @@ export default function ProfilePage() {
     [user?.providerData]
   );
   const supportsPasswordUpdate = providerList.includes("password");
+  const supportsGoogle = providerList.includes("google.com");
 
   const handleProfileUpdate = async (event) => {
     event.preventDefault();
@@ -62,13 +64,6 @@ export default function ProfilePage() {
     setError("");
     setStatus("");
 
-    if (!supportsPasswordUpdate) {
-      setError(
-        "Password change is unavailable for Google-only accounts. Sign in with Google password settings instead."
-      );
-      return;
-    }
-
     const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message || "Invalid password.");
@@ -76,8 +71,18 @@ export default function ProfilePage() {
     }
 
     try {
-      await updatePassword(user, parsed.data.newPassword);
-      setStatus("Password changed successfully.");
+      if (supportsPasswordUpdate) {
+        await updatePassword(user, parsed.data.newPassword);
+        setStatus("Password changed successfully.");
+      } else {
+        if (!user.email) {
+          setError("No email found for this account.");
+          return;
+        }
+        await linkEmailPassword(user.email, parsed.data.newPassword);
+        await refreshUser();
+        setStatus("Email/Password linked successfully. You can now sign in using password.");
+      }
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
@@ -86,7 +91,33 @@ export default function ProfilePage() {
         setError("For security, please log out and log in again before changing password.");
         return;
       }
+      if (code === "auth/provider-already-linked") {
+        setError("Password provider is already linked.");
+        return;
+      }
       setError("Could not change password.");
+      console.error(err);
+    }
+  };
+
+  const handleLinkGoogle = async () => {
+    setError("");
+    setStatus("");
+    try {
+      await linkGoogleProvider();
+      await refreshUser();
+      setStatus("Google provider linked successfully.");
+    } catch (err) {
+      const code = err?.code || "";
+      if (code === "auth/provider-already-linked") {
+        setError("Google provider is already linked.");
+        return;
+      }
+      if (code === "auth/popup-closed-by-user") {
+        setError("Google linking popup was closed.");
+        return;
+      }
+      setError("Could not link Google provider.");
       console.error(err);
     }
   };
@@ -123,11 +154,11 @@ export default function ProfilePage() {
         </form>
 
         <form className="form-card" onSubmit={handlePasswordUpdate}>
-          <h2>Change Password</h2>
+          <h2>{supportsPasswordUpdate ? "Change Password" : "Set Password"}</h2>
           <p className="muted">
             {supportsPasswordUpdate
               ? "Set a new password for your account."
-              : "Google account detected. Password update may be unavailable here."}
+              : "Google-only account detected. Set password to enable Email/Password sign-in."}
           </p>
           <div className="field">
             <label htmlFor="newPassword">New Password</label>
@@ -150,13 +181,27 @@ export default function ProfilePage() {
             />
           </div>
           <button className="btn" type="submit">
-            Change Password
+            {supportsPasswordUpdate ? "Change Password" : "Set Password"}
           </button>
         </form>
+
+        <div className="form-card">
+          <h2>Provider Linking</h2>
+          <p className="muted">
+            Linked providers: {providerList.length ? providerList.join(", ") : "None"}
+          </p>
+          {supportsGoogle ? (
+            <p className="muted">Google provider already linked.</p>
+          ) : (
+            <button className="btn" type="button" onClick={handleLinkGoogle}>
+              Link Google Provider
+            </button>
+          )}
+        </div>
       </div>
 
-      {status && <p className="success">{status}</p>}
-      {error && <p className="error">{error}</p>}
+      <AlertMessage type="success" message={status} />
+      <AlertMessage type="error" message={error} />
     </section>
   );
 }

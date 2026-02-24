@@ -9,6 +9,7 @@ import {
   getLookupTypeById,
   getLookupTypeByKey
 } from "../constants/lookupTypes";
+import AlertMessage from "../components/AlertMessage";
 
 const lookupSchema = z.object({
   name: z.string().trim().min(2, "Lookup name must be at least 2 characters.")
@@ -289,8 +290,8 @@ export default function SystemConfigPage() {
         )}
       </div>
 
-      {status && <p className="success">{status}</p>}
-      {error && <p className="error">{error}</p>}
+      <AlertMessage type="success" message={status} />
+      <AlertMessage type="error" message={error} />
     </section>
   );
 }
