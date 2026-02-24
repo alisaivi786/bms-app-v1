@@ -11,6 +11,8 @@ const fields = [
 ];
 
 export default function ThemePage() {
+  const mode = useThemeStore((state) => state.mode);
+  const setMode = useThemeStore((state) => state.setMode);
   const theme = useThemeStore((state) => state.theme);
   const setThemeValue = useThemeStore((state) => state.setThemeValue);
   const resetTheme = useThemeStore((state) => state.resetTheme);
@@ -20,6 +22,13 @@ export default function ThemePage() {
       <h1>Theme Settings</h1>
       <p className="muted">Customize colors for the full app.</p>
       <div className="form-card">
+        <div className="field">
+          <label htmlFor="themeMode">Theme Mode</label>
+          <select id="themeMode" value={mode} onChange={(event) => setMode(event.target.value)}>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
         {fields.map((field) => (
           <div className="field row-field" key={field.key}>
             <label htmlFor={field.key}>{field.label}</label>

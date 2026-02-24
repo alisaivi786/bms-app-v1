@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { useAuth } from "../state/AuthContext";
 import { useFinanceStore } from "../state/financeStore";
+import { usePreferencesStore } from "../state/preferencesStore";
+import { formatCurrency } from "../utils/currency";
 
 const now = new Date();
 const currentMonth = now.getMonth() + 1;
@@ -9,6 +11,7 @@ const currentYear = now.getFullYear();
 export default function DashboardPage() {
   const { user } = useAuth();
   const userData = useFinanceStore((state) => state.userDataByUid[user.uid]);
+  const currency = usePreferencesStore((state) => state.currency);
   const initialBalance = Number(userData?.initialBalance || 0);
   const incomes = userData?.incomes || [];
 
@@ -34,17 +37,17 @@ export default function DashboardPage() {
       <div className="cards">
         <article className="card">
           <h2>Account Balance</h2>
-          <p>${accountBalance.toLocaleString()}</p>
+          <p>{formatCurrency(accountBalance, currency)}</p>
           <small>Initial balance + all incomes</small>
         </article>
         <article className="card">
           <h2>This Month Income</h2>
-          <p>${monthlyIncome.toLocaleString()}</p>
+          <p>{formatCurrency(monthlyIncome, currency)}</p>
           <small>Entries in current month</small>
         </article>
         <article className="card">
           <h2>Initial Balance</h2>
-          <p>${initialBalance.toLocaleString()}</p>
+          <p>{formatCurrency(initialBalance, currency)}</p>
           <small>Set once, can be updated later</small>
         </article>
       </div>
@@ -69,7 +72,7 @@ export default function DashboardPage() {
                   <td>{item.month}</td>
                   <td>{item.year}</td>
                   <td>{item.source}</td>
-                  <td>${Number(item.amount).toLocaleString()}</td>
+                  <td>{formatCurrency(Number(item.amount), currency)}</td>
                 </tr>
               ))}
             </tbody>

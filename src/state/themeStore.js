@@ -14,7 +14,11 @@ export const defaultTheme = {
 export const useThemeStore = create(
   persist(
     (set) => ({
+      mode: "light",
       theme: defaultTheme,
+      setMode: (mode) => set({ mode }),
+      toggleMode: () =>
+        set((state) => ({ mode: state.mode === "light" ? "dark" : "light" })),
       setThemeValue: (key, value) =>
         set((state) => ({ theme: { ...state.theme, [key]: value } })),
       resetTheme: () => set({ theme: defaultTheme })

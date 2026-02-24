@@ -1,0 +1,162 @@
+import { useMemo, useState } from "react";
+import { z } from "zod";
+import { updatePassword, updateProfile } from "firebase/auth";
+import { useAuth } from "../state/AuthContext";
+
+const profileSchema = z.object({
+  displayName: z.string().trim().min(2, "Display name must be at least 2 characters."),
+  photoURL: z.string().trim().url("Avatar must be a valid URL.")
+});
+
+const passwordSchema = z
+  .object({
+    newPassword: z.string().min(6, "Password must be at least 6 characters."),
+    confirmPassword: z.string().min(6, "Confirm password is required.")
+  })
+  .refine((value) => value.newPassword === value.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"]
+  });
+
+export default function ProfilePage() {
+  const { user, refreshUser } = useAuth();
+  const [displayName, setDisplayName] = useState(user?.displayName || "");
+  const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+
+  const providerList = useMemo(
+    () => (user?.providerData || []).map((item) => item.providerId),
+    [user?.providerData]
+  );
+  const supportsPasswordUpdate = providerList.includes("password");
+
+  const handleProfileUpdate = async (event) => {
+    event.preventDefault();
+    setError("");
+    setStatus("");
+
+    const parsed = profileSchema.safeParse({ displayName, photoURL });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message || "Invalid profile data.");
+      return;
+    }
+
+    try {
+      await updateProfile(user, {
+        displayName: parsed.data.displayName,
+        photoURL: parsed.data.photoURL
+      });
+      await refreshUser();
+      setStatus("Profile updated successfully.");
+    } catch (err) {
+      setError("Could not update profile.");
+      console.error(err);
+    }
+  };
+
+  const handlePasswordUpdate = async (event) => {
+    event.preventDefault();
+    setError("");
+    setStatus("");
+
+    if (!supportsPasswordUpdate) {
+      setError(
+        "Password change is unavailable for Google-only accounts. Sign in with Google password settings instead."
+      );
+      return;
+    }
+
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message || "Invalid password.");
+      return;
+    }
+
+    try {
+      await updatePassword(user, parsed.data.newPassword);
+      setStatus("Password changed successfully.");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      const code = err?.code || "";
+      if (code === "auth/requires-recent-login") {
+        setError("For security, please log out and log in again before changing password.");
+        return;
+      }
+      setError("Could not change password.");
+      console.error(err);
+    }
+  };
+
+  return (
+    <section>
+      <h1>Profile Settings</h1>
+      <p className="muted">Update your display name, avatar URL, and password.</p>
+
+      <div className="form-grid">
+        <form className="form-card" onSubmit={handleProfileUpdate}>
+          <h2>Profile Info</h2>
+          <div className="field">
+            <label htmlFor="displayName">Display Name</label>
+            <input
+              id="displayName"
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Your display name"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="photoURL">Avatar URL</label>
+            <input
+              id="photoURL"
+              value={photoURL}
+              onChange={(event) => setPhotoURL(event.target.value)}
+              placeholder="https://example.com/avatar.png"
+            />
+          </div>
+          <button className="btn" type="submit">
+            Save Profile
+          </button>
+        </form>
+
+        <form className="form-card" onSubmit={handlePasswordUpdate}>
+          <h2>Change Password</h2>
+          <p className="muted">
+            {supportsPasswordUpdate
+              ? "Set a new password for your account."
+              : "Google account detected. Password update may be unavailable here."}
+          </p>
+          <div className="field">
+            <label htmlFor="newPassword">New Password</label>
+            <input
+              id="newPassword"
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              placeholder="Enter new password"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder="Confirm new password"
+            />
+          </div>
+          <button className="btn" type="submit">
+            Change Password
+          </button>
+        </form>
+      </div>
+
+      {status && <p className="success">{status}</p>}
+      {error && <p className="error">{error}</p>}
+    </section>
+  );
+}

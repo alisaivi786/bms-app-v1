@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   onAuthStateChanged,
+  reload,
   signInWithPopup,
   signOut as firebaseSignOut
 } from "firebase/auth";
@@ -25,7 +26,13 @@ export function AuthProvider({ children }) {
       user,
       loading,
       signInWithGoogle: () => signInWithPopup(auth, googleProvider),
-      signOut: () => firebaseSignOut(auth)
+      signOut: () => firebaseSignOut(auth),
+      refreshUser: async () => {
+        if (auth.currentUser) {
+          await reload(auth.currentUser);
+          setUser({ ...auth.currentUser });
+        }
+      }
     }),
     [user, loading]
   );
