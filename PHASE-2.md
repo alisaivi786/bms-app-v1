@@ -251,3 +251,9 @@ Applied iterative hot fixes during Phase 2 stabilization:
 - Symptom: `404: NOT_FOUND` on reload for deployed routes.
 - Fix: added `vercel.json` rewrite routing all paths to `index.html`.
 - Outcome: direct route access and browser refresh now work on Vercel.
+
+10. Light mode outline button text visibility
+- Root cause: `.btn` base style forced white text and `.btn-outline` did not override text color.
+- Symptom: outline action buttons (for example Delete/Cancel) appeared as rounded borders without readable text in light mode.
+- Fix: set `.btn-outline { color: var(--app-text); }`.
+- Outcome: outline buttons are readable in both light and dark themes.
