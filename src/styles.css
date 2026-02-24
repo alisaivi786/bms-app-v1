@@ -1,7 +1,14 @@
 :root {
   font-family: "Manrope", "Segoe UI", sans-serif;
-  color: #0f172a;
-  background: radial-gradient(circle at top right, #fde68a, #f8fafc 45%);
+  --app-text: #0f172a;
+  --app-bg-start: #fde68a;
+  --app-bg-end: #f8fafc;
+  --app-sidebar-bg: #0f172a;
+  --app-sidebar-text: #f8fafc;
+  --app-accent: #fbbf24;
+  --app-button: #0ea5e9;
+  color: var(--app-text);
+  background: radial-gradient(circle at top right, var(--app-bg-start), var(--app-bg-end) 45%);
 }
 
 * {
@@ -52,8 +59,8 @@ a {
 }
 
 .sidebar {
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--app-sidebar-bg);
+  color: var(--app-sidebar-text);
   padding: 22px;
   display: flex;
   flex-direction: column;
@@ -61,7 +68,7 @@ a {
 }
 
 .brand {
-  color: #f8fafc;
+  color: var(--app-sidebar-text);
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -78,8 +85,8 @@ a {
 }
 
 .menu-link.active {
-  color: #0f172a;
-  background: #fbbf24;
+  color: var(--app-sidebar-bg);
+  background: var(--app-accent);
   font-weight: 700;
 }
 
@@ -94,7 +101,7 @@ a {
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  border: 2px solid #fbbf24;
+  border: 2px solid var(--app-accent);
 }
 
 .profile p {
@@ -189,7 +196,7 @@ select {
   padding: 11px 14px;
   font: inherit;
   font-weight: 700;
-  background: #0ea5e9;
+  background: var(--app-button);
   color: white;
   cursor: pointer;
 }
@@ -209,6 +216,25 @@ select {
 
 .error {
   color: #b91c1c;
+}
+
+.row-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.color-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-input-wrap input[type="color"] {
+  width: 44px;
+  height: 36px;
+  padding: 4px;
 }
 
 @media (max-width: 900px) {

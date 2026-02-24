@@ -4,6 +4,7 @@ import AppLayout from "./components/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import IncomePage from "./pages/IncomePage";
+import ThemePage from "./pages/ThemePage";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="income" element={<IncomePage />} />
+        <Route path="theme" element={<ThemePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

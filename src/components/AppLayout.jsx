@@ -48,6 +48,9 @@ export default function AppLayout() {
           <NavLink to="/income" className="menu-link">
             Add Income
           </NavLink>
+          <NavLink to="/theme" className="menu-link">
+            Theme Settings
+          </NavLink>
         </nav>
         <div className="profile">
           <img src={user.photoURL || ""} alt={user.displayName || "User"} />
