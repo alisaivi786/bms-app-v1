@@ -10,6 +10,7 @@ export default function LoginPage() {
     return <Navigate to="/" replace />;
   }
 
+  
   const handleLogin = async () => {
     setError("");
     try {
