@@ -245,3 +245,9 @@ Applied iterative hot fixes during Phase 2 stabilization:
 8. UX stability fixes
 - Profile dropdown opening caused layout shifts.
 - Fix: dropdown anchored as overlay above profile row; row content frozen/ellipsized.
+
+9. Vercel route reload 404 fix
+- Root cause: client-side React Router paths were refreshed directly without SPA rewrite support.
+- Symptom: `404: NOT_FOUND` on reload for deployed routes.
+- Fix: added `vercel.json` rewrite routing all paths to `index.html`.
+- Outcome: direct route access and browser refresh now work on Vercel.
