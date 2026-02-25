@@ -18,6 +18,10 @@ function toNumber(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function monthIndex(year, month) {
+  return Number(year) * 12 + (Number(month) - 1);
+}
+
 function BarsChartCard({ title, rows, currency }) {
   const width = 640;
   const height = 260;
@@ -275,6 +279,46 @@ export default function DashboardPage() {
     [incomes, year]
   );
 
+  const monthlyDebitRows = useMemo(
+    () =>
+      MONTH_OPTIONS.map((opt) => {
+        const targetIndex = monthIndex(year, opt.value);
+        const value = emis.reduce((sum, emi) => {
+          const monthlyEmi = toNumber(emi.monthlyEmi);
+          const tenorMonths = Math.max(0, Math.trunc(toNumber(emi.tenorMonths)));
+          const startYear = Math.trunc(toNumber(emi.startYear));
+          const startMonth = Math.trunc(toNumber(emi.startMonth));
+
+          if (monthlyEmi <= 0 || tenorMonths <= 0 || startYear <= 0 || startMonth < 1 || startMonth > 12) {
+            return sum;
+          }
+
+          const startIndex = monthIndex(startYear, startMonth);
+          const endIndexExclusive = startIndex + tenorMonths;
+          const isActiveInMonth = targetIndex >= startIndex && targetIndex < endIndexExclusive;
+          return sum + (isActiveInMonth ? monthlyEmi : 0);
+        }, 0);
+
+        return { label: opt.label, value };
+      }),
+    [emis, year]
+  );
+
+  const monthlyBudgetEstimatedRows = useMemo(
+    () =>
+      MONTH_OPTIONS.map((opt) => {
+        const budgetDoc = budgetDocs.find(
+          (item) => Number(item.year) === year && Number(item.month) === Number(opt.value)
+        );
+        const items = Array.isArray(budgetDoc?.items) ? budgetDoc.items : [];
+        return {
+          label: opt.label,
+          value: items.reduce((sum, item) => sum + toNumber(item.estimatedAmount), 0)
+        };
+      }),
+    [budgetDocs, year]
+  );
+
   const categoryRows = useMemo(() => {
     const byCategory = new Map();
     budgetItems.forEach((item) => {
@@ -341,6 +385,15 @@ export default function DashboardPage() {
         <BarsChartCard
           title={`${monthLabel(month)} ${year}: Income vs Budget vs EMI`}
           rows={incomeVsBudgetVsEmi}
+          currency={currency}
+        />
+      </div>
+
+      <div className="admin-grid">
+        <LineChartCard title={`Monthly Debit Trend (${year})`} rows={monthlyDebitRows} currency={currency} />
+        <BarsChartCard
+          title={`Monthly Budget Estimated (${year})`}
+          rows={monthlyBudgetEstimatedRows}
           currency={currency}
         />
       </div>

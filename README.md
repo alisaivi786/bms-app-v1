@@ -31,6 +31,8 @@ This app includes:
 - User-specific data in Firestore (`users/{uid}` + `users/{uid}/incomes`)
 - Admin-style sidebar layout
 - Dashboard: Account Balance + Current Month Income
+- Dashboard charts: Income Trend, Income vs Budget vs EMI, Budget by Category
+- Dashboard yearly charts: Monthly Debit Trend (EMI schedule-based) and Monthly Budget Estimated (Jan-Dec by selected year)
 - Add Income screen: month, year, source, amount
 - Mandatory initial balance setup
 

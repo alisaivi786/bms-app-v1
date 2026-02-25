@@ -29,6 +29,8 @@ Last Updated: 2026-02-25
   - Income Trend (12 months for selected year)
   - Income vs Budget Estimated vs EMI Paid (selected month)
   - Budget by Category (Estimated, selected month)
+  - Monthly Debit Trend (12 months for selected year, EMI schedule-based)
+  - Monthly Budget Estimated (12 months for selected year)
 - Income Trend supports hover tooltip on points (month + amount).
 - Removed long inline summary text below charts for cleaner UI.
 
@@ -60,6 +62,12 @@ Last Updated: 2026-02-25
 - Budget chart and KPI calculations are currently based on selected month/year budget document:
   - `users/{uid}/budgets/{YYYY-MM}`
 - Income trend uses all income records for selected year.
+- Monthly Budget Estimated chart aggregates `estimatedAmount` month-wise from yearly budget docs.
+- Monthly Debit Trend chart aggregates EMI planned monthly debit from EMI docs using:
+  - `startMonth`
+  - `startYear`
+  - `tenorMonths`
+  - `monthlyEmi`
 - Debt calculations use EMI docs:
   - `totalPlanned` (fallback: `monthlyEmi * tenorMonths`)
   - `paidAmount`
@@ -74,3 +82,6 @@ Last Updated: 2026-02-25
 - Enhancement: Added hover tooltip on Income Trend points.
 - Enhancement: Removed verbose chart summary strings and moved value visibility into chart visuals.
 - Enhancement: Finalized KPI set to `Account Balance`, `This Month Income`, `Budget Estimated`.
+- Enhancement: Added `Monthly Debit Trend (Yearly)` chart using EMI month schedule.
+- Enhancement: Added `Monthly Budget Estimated (Yearly)` chart across Jan-Dec for selected year.
+- Hotfix: Updated debit chart data source from budget actuals to EMI month-wise totals for correct yearly visibility.
