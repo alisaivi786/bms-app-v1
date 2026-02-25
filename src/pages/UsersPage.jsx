@@ -174,7 +174,9 @@ export default function UsersPage() {
                           }
                         }}
                       >
-                        {Object.keys(ROLE_PRESETS).map((role) => (
+                        {Object.keys(ROLE_PRESETS)
+                          .filter((role) => role !== "admin")
+                          .map((role) => (
                           <option
                             key={role}
                             value={role}
@@ -182,7 +184,10 @@ export default function UsersPage() {
                           >
                             {role}
                           </option>
-                        ))}
+                          ))}
+                        {isLockedAdmin ? (
+                          <option value="admin">admin</option>
+                        ) : null}
                         {customRoles.map((role) => (
                           <option key={role.name} value={role.name}>
                             {role.name}

@@ -1068,6 +1068,139 @@ select:focus {
   gap: 10px;
 }
 
+.emi-card {
+  border-radius: 16px;
+}
+
+.emi-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.emi-card-head h2 {
+  margin: 0;
+}
+
+.emi-type-badge {
+  text-transform: capitalize;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 4px 9px;
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+  background: color-mix(in srgb, var(--app-accent) 18%, transparent);
+}
+
+.emi-type-loan {
+  background: color-mix(in srgb, #22c55e 22%, transparent);
+}
+
+.emi-type-credit_card {
+  background: color-mix(in srgb, #0ea5e9 22%, transparent);
+}
+
+.emi-type-other {
+  background: color-mix(in srgb, #a78bfa 18%, transparent);
+}
+
+.emi-amount {
+  margin: 8px 0 10px;
+}
+
+.emi-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.emi-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.emi-meta-row span {
+  color: var(--app-muted);
+  font-size: 0.78rem;
+}
+
+.emi-meta-row strong {
+  font-size: 0.86rem;
+}
+
+.emi-top-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.emi-top-stat {
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--app-card-bg) 88%, transparent);
+}
+
+.emi-top-stat span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--app-muted);
+  margin-bottom: 3px;
+}
+
+.emi-top-stat strong {
+  font-size: 1rem;
+}
+
+.saving-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 6, 23, 0.35);
+  backdrop-filter: blur(2px);
+}
+
+.saving-overlay-card {
+  min-width: 300px;
+  max-width: 440px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 32px rgba(2, 6, 23, 0.18);
+}
+
+.saving-overlay-card p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.saving-spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--app-button) 30%, transparent);
+  border-top-color: var(--app-button);
+  animation: spin 0.85s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 900px) {
   .layout {
     height: 100vh;

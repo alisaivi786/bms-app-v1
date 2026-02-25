@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { doc, getDoc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { z } from "zod";
 import { db } from "../firebase";
 import { useAuth } from "../state/AuthContext";
@@ -180,6 +180,7 @@ export default function BudgetPage() {
       seenIds.add(normalizedId);
       return {
         id: normalizedId,
+        emiId: item.emiId ? String(item.emiId) : null,
         categoryId: Number(derivedCategoryId),
         name: parsed.data.name,
         estimatedAmount: Number(parsed.data.estimatedAmount),
@@ -257,6 +258,7 @@ export default function BudgetPage() {
                 return {
                   _rowKey: prevMatch?._rowKey || makeRuntimeRowKey(),
                   id: resolvedId,
+                  emiId: item.emiId ? String(item.emiId) : null,
                   categoryId: resolvedCategoryId,
                   category: resolveCategoryName(resolvedCategoryId, fallbackName),
                   name: String(item.name || ""),
@@ -291,8 +293,27 @@ export default function BudgetPage() {
 
   const saveItems = async (nextItems, nextStatus = "Budget updated.") => {
     try {
+      const currentBudgetSnap = await getDoc(doc(db, "users", user.uid, "budgets", budgetKey));
+      const currentBudgetItems =
+        currentBudgetSnap.exists() && Array.isArray(currentBudgetSnap.data().items)
+          ? currentBudgetSnap.data().items
+          : [];
       const rowsWithCategoryIds = await ensureBudgetCategoryIds(nextItems);
       const normalizedItems = normalizeBudgetItemsForSave(rowsWithCategoryIds);
+
+      const sumActualByEmiId = (rows) =>
+        rows.reduce((acc, row) => {
+          const emiId = String(row?.emiId || "").trim();
+          if (!emiId) return acc;
+          const amount = toNumber(row?.actualAmount);
+          if (!Number.isFinite(amount)) return acc;
+          acc.set(emiId, (acc.get(emiId) || 0) + amount);
+          return acc;
+        }, new Map());
+
+      const before = sumActualByEmiId(currentBudgetItems);
+      const after = sumActualByEmiId(normalizedItems);
+      const affectedEmiIds = new Set([...before.keys(), ...after.keys()]);
 
       await setDoc(
         doc(db, "users", user.uid, "budgets", budgetKey),
@@ -305,6 +326,28 @@ export default function BudgetPage() {
         },
         { merge: true }
       );
+
+      for (const emiId of affectedEmiIds) {
+        const delta = (after.get(emiId) || 0) - (before.get(emiId) || 0);
+        if (!delta) continue;
+        try {
+          const emiRef = doc(db, "users", user.uid, "emis", emiId);
+          const emiSnap = await getDoc(emiRef);
+          if (!emiSnap.exists()) continue;
+          const emiData = emiSnap.data() || {};
+          const currentPaid = Number(emiData.paidAmount || 0);
+          const totalPlanned = Number(emiData.totalPlanned || 0);
+          const nextPaid = Math.max(0, currentPaid + delta);
+          await updateDoc(emiRef, {
+            paidAmount: nextPaid,
+            completed: nextPaid >= totalPlanned,
+            updatedAt: serverTimestamp()
+          });
+        } catch (syncErr) {
+          console.error("Could not sync EMI payment from budget update", syncErr);
+        }
+      }
+
       setStatus(nextStatus);
       setError("");
     } catch (err) {

@@ -110,7 +110,6 @@ export default function RolesPage() {
               <tr>
                 <th>Role</th>
                 <th>Permissions</th>
-                <th>Type</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -121,7 +120,6 @@ export default function RolesPage() {
                     <strong>{role.name}</strong>
                   </td>
                   <td className="role-perm-cell">{(role.permissions || []).join(", ")}</td>
-                  <td>{role.preset ? "Preset" : "Custom"}</td>
                   <td>
                     <Link className="btn btn-inline" to={`/roles/${role.name}`}>
                       View

@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import IncomePage from "./pages/IncomePage";
 import BudgetPage from "./pages/BudgetPage";
+import EmiPage from "./pages/EmiPage";
 import ThemePage from "./pages/ThemePage";
 import ProfilePage from "./pages/ProfilePage";
 import CurrencyPage from "./pages/CurrencyPage";
@@ -57,6 +58,14 @@ export default function App() {
           element={
             <PermissionRoute permission={PERMISSIONS.MANAGE_BUDGET}>
               <BudgetPage />
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="emi"
+          element={
+            <PermissionRoute permission={PERMISSIONS.MANAGE_EMI}>
+              <EmiPage />
             </PermissionRoute>
           }
         />

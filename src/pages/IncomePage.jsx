@@ -212,7 +212,7 @@ export default function IncomePage() {
 
   return (
     <section>
-      <h1>Income Grid</h1>
+      <h1>Income Details</h1>
       <p className="muted">
         All records are saved under your own Google user ID. Current currency: {currency}
       </p>
@@ -244,7 +244,7 @@ export default function IncomePage() {
       </div>
 
       <div className="table-card">
-        <h3>Income Grid</h3>
+        <h3>Income Details</h3>
         {incomes.length === 0 ? (
           <p className="muted">No income records yet.</p>
         ) : (

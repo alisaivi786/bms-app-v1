@@ -19,6 +19,7 @@ import {
 } from "../constants/lookupTypes";
 import AlertMessage from "../components/AlertMessage";
 import CustomSelect from "../components/CustomSelect";
+import { isAdminEmail } from "../constants/admin";
 
 const lookupSchema = z.object({
   name: z.string().trim().min(2, "Lookup name must be at least 2 characters.")
@@ -33,11 +34,13 @@ export default function SystemConfigPage() {
   const [editName, setEditName] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const userRef = doc(db, "users", user.uid);
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
       const data = snapshot.exists() ? snapshot.data() : {};
+      setIsAdmin(Boolean(data.isAdmin) || isAdminEmail(user.email));
       const fromNew = Array.isArray(data.lookupItems) ? data.lookupItems : [];
       const normalizedNew = fromNew
         .map((item) => {
@@ -76,7 +79,7 @@ export default function SystemConfigPage() {
     });
 
     return unsubscribe;
-  }, [user.uid]);
+  }, [user.email, user.uid]);
 
   const persistLookupItems = async (nextItems) => {
     await setDoc(
@@ -219,32 +222,42 @@ export default function SystemConfigPage() {
       </p>
 
       <div className="form-grid">
-        <form className="form-card" onSubmit={handleAddLookup}>
-          <h2>Add Lookup</h2>
-          <div className="field">
-            <label htmlFor="lookupType">Lookup Type</label>
-            <CustomSelect
-              value={selectedTypeId}
-              onChange={(value) => setSelectedTypeId(Number(value))}
-              options={LOOKUP_TYPES.map((type) => ({
-                value: type.id,
-                label: type.label
-              }))}
-            />
+        {!isAdmin ? (
+          <form className="form-card" onSubmit={handleAddLookup}>
+            <h2>Add Lookup</h2>
+            <div className="field">
+              <label htmlFor="lookupType">Lookup Type</label>
+              <CustomSelect
+                value={selectedTypeId}
+                onChange={(value) => setSelectedTypeId(Number(value))}
+                options={LOOKUP_TYPES.map((type) => ({
+                  value: type.id,
+                  label: type.label
+                }))}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="lookupName">Lookup Name</label>
+              <input
+                id="lookupName"
+                value={newLookup}
+                onChange={(event) => setNewLookup(event.target.value)}
+                placeholder="e.g. Salary, Freelance, Bonus"
+              />
+            </div>
+            <button className="btn" type="submit">
+              Save Lookup
+            </button>
+          </form>
+        ) : (
+          <div className="form-card">
+            <h2>Lookup Management</h2>
+            <p className="muted">
+              Lookup configuration is hidden for admin users. This section is for portal user
+              data setup.
+            </p>
           </div>
-          <div className="field">
-            <label htmlFor="lookupName">Lookup Name</label>
-            <input
-              id="lookupName"
-              value={newLookup}
-              onChange={(event) => setNewLookup(event.target.value)}
-              placeholder="e.g. Salary, Freelance, Bonus"
-            />
-          </div>
-          <button className="btn" type="submit">
-            Save Lookup
-          </button>
-        </form>
+        )}
 
         <div className="form-card">
           <h2>Future Configuration Modules</h2>
@@ -258,64 +271,66 @@ export default function SystemConfigPage() {
         </div>
       </div>
 
-      <div className="table-card">
-        <h3>Lookup Data Grid</h3>
-        {filteredLookups.length === 0 ? (
-          <p className="muted">No lookups added yet.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredLookups.map((item) => (
-                <tr key={item.id}>
-                  <td>{getLookupTypeById(item.typeId)?.label || String(item.typeId)}</td>
-                  <td>
-                    {editId === item.id ? (
-                      <input
-                        value={editName}
-                        onChange={(event) => setEditName(event.target.value)}
-                      />
-                    ) : (
-                      item.name
-                    )}
-                  </td>
-                  <td>
-                    {editId === item.id ? (
-                      <>
-                        <button className="btn btn-inline" type="button" onClick={saveEdit}>
-                          Save
-                        </button>
-                        <button className="btn btn-inline btn-outline" type="button" onClick={cancelEdit}>
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button className="btn btn-inline" type="button" onClick={() => startEdit(item)}>
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-inline btn-outline"
-                          type="button"
-                          onClick={() => deleteLookup(item.id)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </td>
+      {!isAdmin ? (
+        <div className="table-card">
+          <h3>Lookup Data Grid</h3>
+          {filteredLookups.length === 0 ? (
+            <p className="muted">No lookups added yet.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Name</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {filteredLookups.map((item) => (
+                  <tr key={item.id}>
+                    <td>{getLookupTypeById(item.typeId)?.label || String(item.typeId)}</td>
+                    <td>
+                      {editId === item.id ? (
+                        <input
+                          value={editName}
+                          onChange={(event) => setEditName(event.target.value)}
+                        />
+                      ) : (
+                        item.name
+                      )}
+                    </td>
+                    <td>
+                      {editId === item.id ? (
+                        <>
+                          <button className="btn btn-inline" type="button" onClick={saveEdit}>
+                            Save
+                          </button>
+                          <button className="btn btn-inline btn-outline" type="button" onClick={cancelEdit}>
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="btn btn-inline" type="button" onClick={() => startEdit(item)}>
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-inline btn-outline"
+                            type="button"
+                            onClick={() => deleteLookup(item.id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      ) : null}
 
       <AlertMessage type="success" message={status} />
       <AlertMessage type="error" message={error} />

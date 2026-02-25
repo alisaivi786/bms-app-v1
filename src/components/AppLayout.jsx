@@ -50,7 +50,9 @@ export default function AppLayout() {
   const profileEmail = user.email || "No email";
   const profileAvatar = user.photoURL || "/default-avatar.svg";
   const dataActive =
-    location.pathname.startsWith("/income") || location.pathname.startsWith("/budget");
+    location.pathname.startsWith("/income") ||
+    location.pathname.startsWith("/budget") ||
+    location.pathname.startsWith("/emi");
   const userMgmtActive = location.pathname.startsWith("/roles") || location.pathname.startsWith("/users");
   const settingActive = location.pathname.startsWith("/system-config");
 
@@ -255,7 +257,9 @@ export default function AppLayout() {
               Admin Dashboard
             </NavLink>
           ) : null}
-          {can(PERMISSIONS.MANAGE_INCOME) || can(PERMISSIONS.MANAGE_BUDGET) ? (
+          {can(PERMISSIONS.MANAGE_INCOME) ||
+          can(PERMISSIONS.MANAGE_BUDGET) ||
+          can(PERMISSIONS.MANAGE_EMI) ? (
             <div className="menu-group">
               <button
                 className={`menu-group-toggle ${dataActive ? "active" : ""}`}
@@ -279,6 +283,11 @@ export default function AppLayout() {
                   {can(PERMISSIONS.MANAGE_BUDGET) ? (
                     <NavLink to="/budget" className="menu-sublink">
                       Budget
+                    </NavLink>
+                  ) : null}
+                  {can(PERMISSIONS.MANAGE_EMI) ? (
+                    <NavLink to="/emi" className="menu-sublink">
+                      EMI
                     </NavLink>
                   ) : null}
                 </>

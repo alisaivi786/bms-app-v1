@@ -22,7 +22,7 @@ const PERMISSION_GROUPS = [
   },
   {
     title: "Data",
-    items: [PERMISSIONS.MANAGE_INCOME, PERMISSIONS.MANAGE_BUDGET]
+    items: [PERMISSIONS.MANAGE_INCOME, PERMISSIONS.MANAGE_BUDGET, PERMISSIONS.MANAGE_EMI]
   },
   {
     title: "User Management",
@@ -62,9 +62,12 @@ export default function RoleDetailPage() {
 
   const mergedRole = useMemo(() => {
     if (isCreateMode) return [];
-    const base = ROLE_PRESETS[roleName] || [];
     const custom = customRoles.find((r) => r.name === roleName);
-    return normalizePermissions(roleName, custom?.permissions || base);
+    if (custom && Array.isArray(custom.permissions)) {
+      return [...new Set(custom.permissions)];
+    }
+    const base = ROLE_PRESETS[roleName] || [];
+    return [...new Set(base)];
   }, [customRoles, isCreateMode, roleName]);
 
   useEffect(() => {
@@ -83,10 +86,6 @@ export default function RoleDetailPage() {
     }
     if (isAdminRole && isCreateMode) {
       setError("Admin role is reserved and cannot be created manually.");
-      return;
-    }
-    if (isAdminRole && !isCreateMode) {
-      setError("Admin role is locked and cannot be modified.");
       return;
     }
     if (selectedPerms.length === 0) {
@@ -132,9 +131,6 @@ export default function RoleDetailPage() {
       </div>
       <AlertMessage type="success" message={status} />
       <AlertMessage type="error" message={error} />
-      {isAdminRole && !isCreateMode ? (
-        <p className="muted">Admin role is protected and cannot be edited.</p>
-      ) : null}
 
       <div className="form-card role-detail-card">
         <h2>Role Info</h2>
@@ -157,13 +153,12 @@ export default function RoleDetailPage() {
               <div className="perm-grid perm-group-items">
                 {group.items.map((perm) => (
                   <label className="perm-item" key={perm}>
-                    <input
-                      type="checkbox"
-                      checked={selectedPerms.includes(perm)}
-                      disabled={isAdminRole && !isCreateMode}
-                      onChange={(event) =>
-                        setSelectedPerms((prev) =>
-                          event.target.checked
+              <input
+                type="checkbox"
+                checked={selectedPerms.includes(perm)}
+                onChange={(event) =>
+                  setSelectedPerms((prev) =>
+                    event.target.checked
                             ? [...new Set([...prev, perm])]
                             : prev.filter((item) => item !== perm)
                         )
@@ -177,7 +172,7 @@ export default function RoleDetailPage() {
           ))}
         </div>
         <div className="role-detail-actions">
-          <button className="btn" type="button" onClick={saveRole} disabled={isAdminRole && !isCreateMode}>
+          <button className="btn" type="button" onClick={saveRole}>
             Save Permissions
           </button>
         </div>
