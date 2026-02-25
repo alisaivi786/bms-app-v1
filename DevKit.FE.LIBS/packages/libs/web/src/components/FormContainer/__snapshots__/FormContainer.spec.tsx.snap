@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormContainer Component should render correctly with children 1`] = `
+<div>
+  <div
+    class="grid w-full gap-5"
+    style="grid-template-columns: repeat(1, minmax(0, 1fr));"
+  >
+    hello world
+  </div>
+</div>
+`;
+
+exports[`FormContainer Component should render correctly with children and columnsCount 1`] = `
+<div>
+  <div
+    class="grid w-full gap-5"
+    style="grid-template-columns: repeat(2, minmax(0, 1fr));"
+  >
+    <div>
+      hello world
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,11 @@
+{
+	"extends": ["@react-native", "@devkit/eslint-config"],
+	"settings": {
+		"import/ignore": ["react-native"],
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		}
+	}
+}

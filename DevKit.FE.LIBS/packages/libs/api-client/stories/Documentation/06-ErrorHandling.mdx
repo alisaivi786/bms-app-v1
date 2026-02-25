@@ -1,0 +1,635 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/06 - Error Handling" />
+
+# Error Handling
+
+Learn how to handle errors effectively in your API requests.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Error Structure](#error-structure)
+- [Handling Errors](#handling-errors)
+- [Custom Error Codes](#custom-error-codes)
+- [Error Transformation](#error-transformation)
+- [Best Practices](#best-practices)
+
+## Overview
+
+@devkit/api-client provides comprehensive error handling with:
+
+- Structured error format
+- HTTP status code mapping
+- Custom error codes
+- Error transformation
+- Retry on specific errors
+- Automatic token refresh on 401
+
+## Error Structure
+
+### Default Error Format
+
+```typescript
+interface APIError {
+	mapped: Array<{
+		code: string;
+		message: string;
+		field?: string;
+	}>;
+	original?: any;
+}
+```
+
+### Example Error
+
+```typescript
+{
+  mapped: [
+    {
+      code: 'VALIDATION_ERROR',
+      message: 'Email is required',
+      field: 'email'
+    },
+    {
+      code: 'VALIDATION_ERROR',
+      message: 'Password must be at least 8 characters',
+      field: 'password'
+    }
+  ],
+  original: {
+    // Original error response from server
+    status: 400,
+    data: { ... }
+  }
+}
+```
+
+## Handling Errors
+
+### In React Hooks
+
+```typescript
+import { useApiOnMount, useLazyApi } from '@devkit/api-client';
+
+function UserProfile({ userId }: { userId: number }) {
+	const { result, isLoading, errors } = useApiOnMount(getUserApi, [userId]);
+
+	if (errors) {
+		return (
+			<div className="error">
+				<h2>Error Loading User</h2>
+				{errors.mapped.map((error, index) => (
+					<div key={index}>
+						<strong>{error.code}</strong>: {error.message}
+					</div>
+				))}
+			</div>
+		);
+	}
+
+	if (isLoading) return <div>Loading...</div>;
+
+	return <div>{result?.name}</div>;
+}
+```
+
+### With Toast Notifications
+
+```typescript
+import { toast } from 'react-toastify';
+
+function CreateUserForm() {
+	const { callApi, errors } = useLazyApi(createUserApi);
+
+	React.useEffect(() => {
+		if (errors) {
+			errors.mapped.forEach((error) => {
+				toast.error(`${error.code}: ${error.message}`);
+			});
+		}
+	}, [errors]);
+
+	const handleSubmit = async (data: any) => {
+		await callApi(data);
+	};
+
+	return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+### Field-Specific Errors
+
+```typescript
+function LoginForm() {
+	const { callApi, errors } = useLazyApi(loginApi);
+	const [email, setEmail] = React.useState('');
+	const [password, setPassword] = React.useState('');
+
+	// Get field-specific errors
+	const emailError = errors?.mapped.find((e) => e.field === 'email');
+	const passwordError = errors?.mapped.find((e) => e.field === 'password');
+
+	return (
+		<form>
+			<div>
+				<input value={email} onChange={(e) => setEmail(e.target.value)} />
+				{emailError && <span className="error">{emailError.message}</span>}
+			</div>
+
+			<div>
+				<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+				{passwordError && <span className="error">{passwordError.message}</span>}
+			</div>
+		</form>
+	);
+}
+```
+
+### Try-Catch Pattern
+
+```typescript
+function DataManager() {
+	const { callApi } = useLazyApi(deleteUserApi);
+
+	const handleDelete = async (userId: number) => {
+		try {
+			await callApi({ parameters: { userId } });
+			toast.success('User deleted successfully');
+		} catch (error: any) {
+			if (error.mapped) {
+				error.mapped.forEach((err: any) => {
+					toast.error(err.message);
+				});
+			} else {
+				toast.error('An unexpected error occurred');
+			}
+		}
+	};
+
+	return <button onClick={() => handleDelete(123)}>Delete User</button>;
+}
+```
+
+## Custom Error Codes
+
+### HTTP Status Code Mapping
+
+The library automatically maps HTTP status codes to error codes:
+
+```typescript
+// 400 Bad Request
+{
+  code: 'BAD_REQUEST',
+  message: 'The request was invalid'
+}
+
+// 401 Unauthorized
+{
+  code: 'UNAUTHORIZED',
+  message: 'Authentication required'
+}
+
+// 403 Forbidden
+{
+  code: 'FORBIDDEN',
+  message: 'You do not have permission'
+}
+
+// 404 Not Found
+{
+  code: 'NOT_FOUND',
+  message: 'The requested resource was not found'
+}
+
+// 500 Internal Server Error
+{
+  code: 'INTERNAL_SERVER_ERROR',
+  message: 'An internal server error occurred'
+}
+```
+
+### Custom Error Detection
+
+```typescript
+const api = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+	requestSchema: UserSchema,
+	responseSchema: UserSchema,
+
+	// Detect errors in successful responses
+	isErrorResponse: (data) => {
+		return data.success === false || data.error !== undefined;
+	},
+});
+```
+
+### Error Response Transformation
+
+```typescript
+const api = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+	requestSchema: UserSchema,
+
+	// Transform error responses
+	transformErrorResponse: (error) => {
+		if (error.response?.data?.errors) {
+			return {
+				mapped: error.response.data.errors.map((err: any) => ({
+					code: err.code || 'UNKNOWN_ERROR',
+					message: err.message || 'An error occurred',
+					field: err.field,
+				})),
+				original: error,
+			};
+		}
+
+		return {
+			mapped: [
+				{
+					code: 'API_ERROR',
+					message: error.message || 'An error occurred',
+				},
+			],
+			original: error,
+		};
+	},
+});
+```
+
+## Error Transformation
+
+### Backend Error Format Mapping
+
+```typescript
+// Backend returns:
+{
+  "success": false,
+  "errors": [
+    { "field": "email", "message": "Email already exists" }
+  ]
+}
+
+// Transform to standard format:
+const api = createAPIDefinition({
+  method: 'POST',
+  url: '/users',
+
+  isErrorResponse: (data) => data.success === false,
+
+  transformErrorResponse: (error) => {
+    const backendErrors = error.response?.data?.errors || [];
+
+    return {
+      mapped: backendErrors.map((err: any) => ({
+        code: err.code || 'VALIDATION_ERROR',
+        message: err.message,
+        field: err.field,
+      })),
+      original: error,
+    };
+  },
+});
+```
+
+### Nested Error Handling
+
+```typescript
+// Backend returns nested errors:
+{
+  "error": {
+    "type": "validation_error",
+    "details": [
+      { "path": "user.email", "msg": "Invalid email" }
+    ]
+  }
+}
+
+// Transform:
+const api = createAPIDefinition({
+  method: 'POST',
+  url: '/users',
+
+  transformErrorResponse: (error) => {
+    const details = error.response?.data?.error?.details || [];
+
+    return {
+      mapped: details.map((detail: any) => ({
+        code: error.response?.data?.error?.type?.toUpperCase() || 'ERROR',
+        message: detail.msg,
+        field: detail.path,
+      })),
+      original: error,
+    };
+  },
+});
+```
+
+## Error Recovery
+
+### Retry on Error
+
+```typescript
+const api = createAPIDefinition({
+	method: 'GET',
+	url: '/data',
+
+	// Global retry configuration
+	retries: 3,
+	retryDelay: 1000,
+
+	// Retry only on specific errors
+	retryCondition: (error) => {
+		// Retry on network errors or 5xx status codes
+		return !error.response || error.response.status >= 500;
+	},
+});
+```
+
+### Manual Retry
+
+```typescript
+function DataComponent() {
+	const { callApi, errors } = useLazyApi(getDataApi);
+	const [retryCount, setRetryCount] = React.useState(0);
+
+	const fetchData = async () => {
+		try {
+			await callApi();
+		} catch (error) {
+			if (retryCount < 3) {
+				setRetryCount((prev) => prev + 1);
+				setTimeout(() => fetchData(), 1000 * retryCount);
+			}
+		}
+	};
+
+	return (
+		<div>
+			{errors && (
+				<div>
+					Error occurred. Retry attempt: {retryCount}/3
+					<button onClick={() => fetchData()}>Retry Now</button>
+				</div>
+			)}
+		</div>
+	);
+}
+```
+
+### Fallback Data
+
+```typescript
+function UserList() {
+	const { result, errors } = useApiOnMount(getUsersApi, []);
+
+	// Use fallback data on error
+	const users = result || [{ id: 1, name: 'Default User', email: 'default@example.com' }];
+
+	return (
+		<div>
+			{errors && <div className="warning">Failed to load users. Showing cached data.</div>}
+			<ul>
+				{users.map((user) => (
+					<li key={user.id}>{user.name}</li>
+				))}
+			</ul>
+		</div>
+	);
+}
+```
+
+## Common Error Scenarios
+
+### Network Error
+
+```typescript
+function OfflineHandler() {
+	const { errors } = useApiOnMount(getDataApi, []);
+	const isNetworkError = errors?.mapped[0]?.code === 'NETWORK_ERROR';
+
+	if (isNetworkError) {
+		return (
+			<div className="offline-banner">
+				<span>You are offline</span>
+				<button onClick={() => window.location.reload()}>Retry</button>
+			</div>
+		);
+	}
+
+	return null;
+}
+```
+
+### Authentication Error (401)
+
+```typescript
+function AuthErrorHandler() {
+	const { errors } = useApiOnMount(getProtectedDataApi, []);
+
+	React.useEffect(() => {
+		if (errors?.mapped[0]?.code === 'UNAUTHORIZED') {
+			// Redirect to login
+			window.location.href = '/login';
+		}
+	}, [errors]);
+
+	return null;
+}
+```
+
+### Validation Error (400)
+
+```typescript
+function FormWithValidation() {
+	const { callApi, errors } = useLazyApi(createUserApi);
+	const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
+
+	React.useEffect(() => {
+		if (errors) {
+			const fieldErrors: Record<string, string> = {};
+			errors.mapped.forEach((error) => {
+				if (error.field) {
+					fieldErrors[error.field] = error.message;
+				}
+			});
+			setFormErrors(fieldErrors);
+		}
+	}, [errors]);
+
+	return (
+		<form>
+			<input name="email" />
+			{formErrors.email && <span>{formErrors.email}</span>}
+
+			<input name="password" type="password" />
+			{formErrors.password && <span>{formErrors.password}</span>}
+		</form>
+	);
+}
+```
+
+### Rate Limit Error (429)
+
+```typescript
+function RateLimitHandler() {
+	const { errors } = useLazyApi(searchApi);
+
+	React.useEffect(() => {
+		if (errors?.mapped[0]?.code === 'TOO_MANY_REQUESTS') {
+			toast.error('Too many requests. Please wait a moment.');
+		}
+	}, [errors]);
+
+	return null;
+}
+```
+
+## Best Practices
+
+### 1. Always Handle Errors
+
+```typescript
+// ✅ Good: Handle errors
+const { result, errors } = useApiOnMount(api, []);
+if (errors) {
+  return <ErrorDisplay errors={errors} />;
+}
+
+// ❌ Bad: Ignore errors
+const { result } = useApiOnMount(api, []);
+```
+
+### 2. Provide User-Friendly Messages
+
+```typescript
+// ✅ Good: User-friendly messages
+const errorMessage = errors?.mapped[0]?.message || 'Something went wrong';
+<div>{errorMessage}</div>
+
+// ❌ Bad: Technical error codes
+<div>{errors?.mapped[0]?.code}</div>
+```
+
+### 3. Log Errors for Debugging
+
+```typescript
+// ✅ Good: Log for debugging
+React.useEffect(() => {
+	if (errors) {
+		console.error('API Error:', errors.original);
+		// Send to error tracking service
+		Sentry.captureException(errors.original);
+	}
+}, [errors]);
+```
+
+### 4. Provide Recovery Actions
+
+```typescript
+// ✅ Good: Offer retry
+{
+	errors && (
+		<div>
+			<p>Failed to load data</p>
+			<button onClick={() => refetch()}>Try Again</button>
+		</div>
+	);
+}
+
+// ❌ Bad: No way to recover
+{
+	errors && <div>Error occurred</div>;
+}
+```
+
+### 5. Handle Different Error Types
+
+```typescript
+// ✅ Good: Different handling for different errors
+if (errors?.mapped[0]?.code === 'UNAUTHORIZED') {
+	redirectToLogin();
+} else if (errors?.mapped[0]?.code === 'NOT_FOUND') {
+	show404Page();
+} else {
+	showGenericError();
+}
+```
+
+### 6. Reset Errors When Appropriate
+
+```typescript
+// ✅ Good: Reset errors on retry
+const retry = () => {
+  setErrors(null); // Reset errors
+  fetchData();
+};
+
+// ❌ Bad: Old errors remain visible
+const retry = () => {
+  fetchData();
+};
+```
+
+## Global Error Handling
+
+### Error Boundary
+
+```typescript
+class APIErrorBoundary extends React.Component {
+	state = { hasError: false };
+
+	static getDerivedStateFromError(error: any) {
+		return { hasError: true };
+	}
+
+	componentDidCatch(error: any, errorInfo: any) {
+		console.error('API Error:', error, errorInfo);
+	}
+
+	render() {
+		if (this.state.hasError) {
+			return <div>Something went wrong</div>;
+		}
+
+		return this.props.children;
+	}
+}
+
+// Usage
+<APIErrorBoundary>
+	<App />
+</APIErrorBoundary>;
+```
+
+### Global Error Toast
+
+```typescript
+// hooks/useGlobalErrorHandler.ts
+export function useGlobalErrorHandler() {
+	React.useEffect(() => {
+		const handleError = (event: CustomEvent) => {
+			toast.error(event.detail.message);
+		};
+
+		window.addEventListener('api-error', handleError as any);
+		return () => {
+			window.removeEventListener('api-error', handleError as any);
+		};
+	}, []);
+}
+
+// App.tsx
+function App() {
+	useGlobalErrorHandler();
+	return <YourApp />;
+}
+```
+
+## Next Steps
+
+- Learn about [Retry Logic](./10-retry-logic.md)
+- Explore [Token Refresh](./09-token-refresh.md)
+- Understand [Validation](./04-validation.md)

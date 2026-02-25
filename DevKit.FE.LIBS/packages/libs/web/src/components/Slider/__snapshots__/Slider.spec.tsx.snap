@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Slider component Should render correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="carousel-root h-full w-full"
+  >
+    <div
+      class="carousel carousel-slider"
+      style="width: 100%;"
+    >
+      <ul
+        class="control-dots"
+      >
+        <div
+          aria-label="slide item 1"
+          class="ml-2 inline-flex h-2 w-2 cursor-pointer rounded-lg selected nj-bg-brand !outline !outline-white"
+          role="button"
+          tabindex="0"
+        />
+        <div
+          aria-label="slide item 2"
+          class="ml-2 inline-flex h-2 w-2 cursor-pointer rounded-lg bg-gray-200"
+          role="button"
+          tabindex="1"
+        />
+        <div
+          aria-label="slide item 3"
+          class="ml-2 inline-flex h-2 w-2 cursor-pointer rounded-lg bg-gray-200"
+          role="button"
+          tabindex="2"
+        />
+      </ul>
+      <button
+        aria-label="previous slide / item"
+        class="control-arrow control-prev control-disabled"
+        type="button"
+      />
+      <div
+        class="slider-wrapper axis-horizontal"
+      >
+        <ul
+          class="slider animated"
+        >
+          <li
+            class="slide"
+            style="position: absolute; display: block; z-index: -2; min-height: 100%; opacity: 0; top: 0px; right: 0px; left: 0px; bottom: 0px; transition-timing-function: ease-in-out; transition-duration: 350ms;"
+          >
+            <div
+              class="h-full w-full"
+            >
+              <div>
+                Slide 3
+              </div>
+            </div>
+          </li>
+          <li
+            class="slide selected previous"
+            style="position: relative; display: block; z-index: -2; min-height: 100%; opacity: 1; top: 0px; right: 0px; left: 0px; bottom: 0px; transition-timing-function: ease-in-out; transition-duration: 350ms;"
+          >
+            <div
+              class="h-full w-full"
+            >
+              <div>
+                Slide 1
+              </div>
+            </div>
+          </li>
+          <li
+            class="slide"
+            style="position: absolute; display: block; z-index: -2; min-height: 100%; opacity: 0; top: 0px; right: 0px; left: 0px; bottom: 0px; transition-timing-function: ease-in-out; transition-duration: 350ms;"
+          >
+            <div
+              class="h-full w-full"
+            >
+              <div>
+                Slide 2
+              </div>
+            </div>
+          </li>
+          <li
+            class="slide"
+            style="position: absolute; display: block; z-index: -2; min-height: 100%; opacity: 0; top: 0px; right: 0px; left: 0px; bottom: 0px; transition-timing-function: ease-in-out; transition-duration: 350ms;"
+          >
+            <div
+              class="h-full w-full"
+            >
+              <div>
+                Slide 3
+              </div>
+            </div>
+          </li>
+          <li
+            class="slide selected previous"
+            style="position: relative; display: block; z-index: -2; min-height: 100%; opacity: 1; top: 0px; right: 0px; left: 0px; bottom: 0px; transition-timing-function: ease-in-out; transition-duration: 350ms;"
+          >
+            <div
+              class="h-full w-full"
+            >
+              <div>
+                Slide 1
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <button
+        aria-label="next slide / item"
+        class="control-arrow control-next control-disabled"
+        type="button"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

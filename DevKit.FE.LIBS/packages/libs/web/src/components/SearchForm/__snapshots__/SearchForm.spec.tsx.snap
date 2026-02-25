@@ -1,0 +1,131 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchForm Component Should match the snapshot 1`] = `
+<DocumentFragment>
+  <form>
+    <div>
+      <div
+        class="flex flex-col h-full justify-between p-1 gap-6"
+      >
+        <div
+          class="grid w-full gap-5"
+          style="grid-template-columns: repeat(3, minmax(0, 1fr));"
+        >
+          <div
+            class="flex-1 w-full"
+          >
+            <div
+              class="mb-1.5"
+            >
+              <label
+                class="flex items-start gap-2 text-start text-black font-medium nj-label-text"
+              >
+                <span>
+                  Field 1
+                </span>
+              </label>
+            </div>
+            <div
+              class="relative text-black text-body"
+            >
+              <div
+                class="flex items-center font-normal leading-none"
+                dir="ltr"
+              >
+                <input
+                  autocomplete="none"
+                  class="placeholder:rtl:text-right w-full nj-button-border-radius border border-gray-500 placeholder:text-gray-500 nj-bg-input px-4 py-2.5 h-10"
+                  dir="ltr"
+                  id=":r0:undefined"
+                  type="text"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              class="flex gap-5 w-full justify-end"
+            />
+          </div>
+          <div
+            class="flex-1 w-full"
+          >
+            <div
+              class="mb-1.5"
+            >
+              <label
+                class="flex items-start gap-2 text-start text-black font-medium nj-label-text"
+              >
+                <span>
+                  Field 4
+                </span>
+              </label>
+            </div>
+            <div
+              class="relative text-black text-body"
+            >
+              <div
+                class="flex items-center font-normal leading-none"
+                dir="ltr"
+              >
+                <input
+                  autocomplete="none"
+                  class="placeholder:rtl:text-right w-full nj-button-border-radius border border-gray-500 placeholder:text-gray-500 nj-bg-input px-4 py-2.5 h-10"
+                  dir="ltr"
+                  id=":r1:undefined"
+                  type="tel"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              class="flex gap-5 w-full justify-end"
+            />
+          </div>
+        </div>
+        <div
+          class="flex justify-center gap-8 h-8 items-center"
+        >
+          <button
+            class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer bg-white nj-secondary-button hover:nj-secondary-button-border-hover hover:nj-text-button-hover hover:nj-secondary-button-opacity-hover nj-button-border-radius nj-button-font-size px-4 py-2.5 h-10"
+            role="button"
+            type="reset"
+          >
+            <label
+              class="flex w-full items-center justify-center cursor-pointer relative"
+            >
+              <div
+                class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+              >
+                <div
+                  class="undefined text-start"
+                >
+                  Reset
+                </div>
+              </div>
+            </label>
+          </button>
+          <button
+            class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer text-white nj-border-brand nj-bg-brand hover:nj-bg-brand-hover hover:nj-button-border-hover nj-button-shadow nj-button-border-radius nj-button-font-size px-4 py-2.5 h-10"
+            role="button"
+            type="button"
+          >
+            <label
+              class="flex w-full items-center justify-center cursor-pointer relative"
+            >
+              <div
+                class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+              >
+                <div
+                  class="undefined text-start"
+                >
+                  Search
+                </div>
+              </div>
+            </label>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</DocumentFragment>
+`;

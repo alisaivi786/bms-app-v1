@@ -1,0 +1,30 @@
+:root {
+	/* Start Fonts Variables */
+	--nj-font-brand-en: 'AktivGrotesk';
+	--nj-font-brand-ar: 'AktivGrotesk';
+	/* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+	font-family: 'AktivGrotesk';
+	src: local('AktivGroteskBold'), url('/fonts/Wio-Bold.ttf') format('opentype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'AktivGrotesk';
+	src: local('AktivGroteskMedium'), url('/fonts/Wio-Medium.ttf') format('opentype');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'AktivGrotesk';
+	src: local('AktivGroteskRegular'), url('/fonts/Wio-Regular.ttf') format('opentype');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+
+/* End Fonts files importation */

@@ -1,0 +1,677 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/03 - API Definitions" />
+
+# Creating API Definitions
+
+Learn how to create type-safe API definitions with full validation support.
+
+## Table of Contents
+
+- [Basic API Definition](#basic-api-definition)
+- [Configuration Options](#configuration-options)
+- [Request Schemas](#request-schemas)
+- [Response Schemas](#response-schemas)
+- [HTTP Methods](#http-methods)
+- [URL Parameters](#url-parameters)
+- [Headers](#headers)
+- [Advanced Options](#advanced-options)
+
+## Basic API Definition
+
+The `createAPIDefinition` function creates a type-safe API definition:
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+const getUserApi = createAPIDefinition({
+	url: 'https://api.example.com/users/:id',
+	method: 'GET',
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string().email(),
+	}),
+});
+```
+
+## Configuration Options
+
+### Required Options
+
+<table>
+	<thead>
+		<tr>
+			<th>Option</th>
+			<th>Type</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>url</code>
+			</td>
+			<td>
+				<code>string</code>
+			</td>
+			<td>The API endpoint URL</td>
+		</tr>
+		<tr>
+			<td>
+				<code>responseSchema</code>
+			</td>
+			<td>
+				<code>ZodSchema</code>
+			</td>
+			<td>Zod schema for response validation</td>
+		</tr>
+	</tbody>
+</table>
+
+### Optional Options
+
+<table>
+	<thead>
+		<tr>
+			<th>Option</th>
+			<th>Type</th>
+			<th>Default</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>method</code>
+			</td>
+			<td>
+				<code>'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'</code>
+			</td>
+			<td>
+				<code>'GET'</code>
+			</td>
+			<td>HTTP method</td>
+		</tr>
+		<tr>
+			<td>
+				<code>requestSchema</code>
+			</td>
+			<td>
+				<code>ZodSchema</code>
+			</td>
+			<td>-</td>
+			<td>Schema for request body validation</td>
+		</tr>
+		<tr>
+			<td>
+				<code>requestHeaders</code>
+			</td>
+			<td>
+				<code>object</code>
+			</td>
+			<td>-</td>
+			<td>Dynamic header parameters</td>
+		</tr>
+		<tr>
+			<td>
+				<code>requestParameters</code>
+			</td>
+			<td>
+				<code>object</code>
+			</td>
+			<td>-</td>
+			<td>Query/path parameter definitions</td>
+		</tr>
+		<tr>
+			<td>
+				<code>httpClient</code>
+			</td>
+			<td>
+				<code>'axios' | 'fetch'</code>
+			</td>
+			<td>
+				<code>'axios'</code>
+			</td>
+			<td>HTTP client to use (Axios or Fetch API)</td>
+		</tr>
+		<tr>
+			<td>
+				<code>baseUrl</code>
+			</td>
+			<td>
+				<code>string</code>
+			</td>
+			<td>-</td>
+			<td>Override base URL</td>
+		</tr>
+		<tr>
+			<td>
+				<code>headers</code>
+			</td>
+			<td>
+				<code>object</code>
+			</td>
+			<td>
+				<code>{}</code>
+			</td>
+			<td>Static headers</td>
+		</tr>
+		<tr>
+			<td>
+				<code>timeout</code>
+			</td>
+			<td>
+				<code>number</code>
+			</td>
+			<td>-</td>
+			<td>Request timeout in ms</td>
+		</tr>
+		<tr>
+			<td>
+				<code>retryConfig</code>
+			</td>
+			<td>
+				<code>object</code>
+			</td>
+			<td>-</td>
+			<td>Retry configuration</td>
+		</tr>
+		<tr>
+			<td>
+				<code>validationMode</code>
+			</td>
+			<td>
+				<code>'Warning' | 'Error'</code>
+			</td>
+			<td>
+				<code>'Warning'</code>
+			</td>
+			<td>Validation behavior</td>
+		</tr>
+	</tbody>
+</table>
+
+## Request Schemas
+
+### POST/PUT/PATCH Requests
+
+For requests with a body, define a `requestSchema`:
+
+```typescript
+const createUserApi = createAPIDefinition({
+	url: '/users',
+	method: 'POST',
+	requestSchema: z.object({
+		name: z.string().min(3),
+		email: z.string().email(),
+		age: z.number().int().positive().optional(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+
+// Usage
+await createUserApi({
+	name: 'John Doe',
+	email: 'john@example.com',
+	age: 30,
+});
+```
+
+### Complex Request Bodies
+
+```typescript
+const updateProfileApi = createAPIDefinition({
+	url: '/profile',
+	method: 'PUT',
+	requestSchema: z.object({
+		user: z.object({
+			name: z.string(),
+			bio: z.string(),
+		}),
+		preferences: z.object({
+			theme: z.enum(['light', 'dark']),
+			notifications: z.boolean(),
+		}),
+		tags: z.array(z.string()),
+	}),
+	responseSchema: z.object({
+		success: z.boolean(),
+	}),
+});
+```
+
+## Response Schemas
+
+### Basic Response
+
+```typescript
+const responseSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	createdAt: z.string(),
+});
+```
+
+### Optional Fields
+
+```typescript
+const responseSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	email: z.string().optional(), // May not be present
+	phone: z.string().nullable(), // May be null
+});
+```
+
+### Nested Objects
+
+```typescript
+const responseSchema = z.object({
+	user: z.object({
+		id: z.number(),
+		profile: z.object({
+			name: z.string(),
+			avatar: z.string().url(),
+		}),
+	}),
+	metadata: z.record(z.string()), // Dynamic keys
+});
+```
+
+### Arrays
+
+```typescript
+const responseSchema = z.object({
+	users: z.array(
+		z.object({
+			id: z.number(),
+			name: z.string(),
+		})
+	),
+	total: z.number(),
+});
+```
+
+### Union Types
+
+```typescript
+const responseSchema = z.object({
+	status: z.enum(['success', 'error']),
+	data: z.union([z.object({ result: z.string() }), z.object({ error: z.string() })]),
+});
+```
+
+## HTTP Methods
+
+### GET Request
+
+```typescript
+const getUsersApi = createAPIDefinition({
+	url: '/users',
+	method: 'GET',
+	responseSchema: z.array(
+		z.object({
+			id: z.number(),
+			name: z.string(),
+		})
+	),
+});
+```
+
+### POST Request
+
+```typescript
+const createPostApi = createAPIDefinition({
+	url: '/posts',
+	method: 'POST',
+	requestSchema: z.object({
+		title: z.string(),
+		content: z.string(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		title: z.string(),
+	}),
+});
+```
+
+### PUT Request (Full Update)
+
+```typescript
+const updateUserApi = createAPIDefinition({
+	url: '/users/:id',
+	method: 'PUT',
+	requestSchema: z.object({
+		name: z.string(),
+		email: z.string().email(),
+		bio: z.string(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+});
+```
+
+### PATCH Request (Partial Update)
+
+```typescript
+const patchUserApi = createAPIDefinition({
+	url: '/users/:id',
+	method: 'PATCH',
+	requestSchema: z
+		.object({
+			name: z.string().optional(),
+			email: z.string().email().optional(),
+		})
+		.refine((data) => Object.keys(data).length > 0, {
+			message: 'At least one field must be provided',
+		}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+});
+```
+
+### DELETE Request
+
+```typescript
+const deleteUserApi = createAPIDefinition({
+	url: '/users/:id',
+	method: 'DELETE',
+	responseSchema: z.object({
+		success: z.boolean(),
+	}),
+});
+```
+
+## URL Parameters
+
+### Path Parameters
+
+Define path parameters in the URL using `:paramName`:
+
+```typescript
+const getUserApi = createAPIDefinition({
+	url: '/users/:userId/posts/:postId',
+	method: 'GET',
+	requestParameters: {
+		userId: ['required', 'string'],
+		postId: ['required', 'number'],
+	},
+	responseSchema: z.object({
+		id: z.number(),
+		title: z.string(),
+	}),
+});
+
+// Usage
+await getUserApi({
+	parameters: {
+		userId: '123',
+		postId: 456,
+	},
+});
+```
+
+### Query Parameters
+
+```typescript
+const searchUsersApi = createAPIDefinition({
+	url: '/users/search',
+	method: 'GET',
+	requestParameters: {
+		q: ['required', 'string'],
+		limit: ['optional', 'number'],
+		offset: ['optional', 'number'],
+	},
+	responseSchema: z.object({
+		users: z.array(
+			z.object({
+				id: z.number(),
+				name: z.string(),
+			})
+		),
+		total: z.number(),
+	}),
+});
+
+// Usage
+await searchUsersApi({
+	parameters: {
+		q: 'john',
+		limit: 10,
+		offset: 0,
+	},
+});
+```
+
+### Array Parameters
+
+```typescript
+const getMultipleUsersApi = createAPIDefinition({
+	url: '/users',
+	method: 'GET',
+	requestParameters: {
+		ids: ['required', 'numberArray'],
+		tags: ['optional', 'stringArray'],
+	},
+	responseSchema: z.array(
+		z.object({
+			id: z.number(),
+			name: z.string(),
+		})
+	),
+});
+
+// Usage - generates: /users?ids=1,2,3&tags=admin,user
+await getMultipleUsersApi({
+	parameters: {
+		ids: [1, 2, 3],
+		tags: ['admin', 'user'],
+	},
+});
+```
+
+## Headers
+
+### Static Headers
+
+```typescript
+const apiWithHeaders = createAPIDefinition({
+	url: '/secure-endpoint',
+	method: 'GET',
+	headers: {
+		'Content-Type': 'application/json',
+		'X-API-Key': 'your-api-key',
+	},
+	responseSchema: z.object({
+		data: z.string(),
+	}),
+});
+```
+
+### Dynamic Headers (Functions)
+
+```typescript
+const apiWithDynamicHeaders = createAPIDefinition({
+	url: '/user/profile',
+	method: 'GET',
+	headers: {
+		Authorization: () => {
+			const token = localStorage.getItem('token');
+			return `Bearer ${token}`;
+		},
+		'X-Request-ID': () => crypto.randomUUID(),
+	},
+	responseSchema: z.object({
+		name: z.string(),
+	}),
+});
+```
+
+### Request-Specific Headers
+
+```typescript
+const apiWithRequestHeaders = createAPIDefinition({
+	url: '/data',
+	method: 'GET',
+	requestHeaders: {
+		'X-Custom-Header': ['required', 'string'],
+		'X-Optional-Header': ['optional', 'string'],
+	},
+	responseSchema: z.object({
+		data: z.string(),
+	}),
+});
+
+// Usage
+await apiWithRequestHeaders({
+	headers: {
+		'X-Custom-Header': 'value',
+		'X-Optional-Header': 'optional-value',
+	},
+});
+```
+
+## Advanced Options
+
+### Using Fetch API
+
+```typescript
+const apiWithFetch = createAPIDefinition({
+	url: '/data',
+	method: 'GET',
+	httpClient: 'fetch', // Use native Fetch instead of Axios
+	responseSchema: z.object({
+		data: z.string(),
+	}),
+});
+```
+
+### Custom Base URL
+
+```typescript
+const externalApi = createAPIDefinition({
+	baseUrl: 'https://external-api.com',
+	url: '/endpoint',
+	method: 'GET',
+	responseSchema: z.object({
+		result: z.string(),
+	}),
+});
+```
+
+### Timeout Configuration
+
+```typescript
+const apiWithTimeout = createAPIDefinition({
+	url: '/slow-endpoint',
+	method: 'GET',
+	timeout: 5000, // 5 seconds
+	responseSchema: z.object({
+		data: z.string(),
+	}),
+});
+```
+
+### Validation Mode
+
+```typescript
+const apiWithStrictValidation = createAPIDefinition({
+	url: '/data',
+	method: 'GET',
+	validationMode: 'Error', // Throw on validation errors
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+});
+
+const apiWithWarningValidation = createAPIDefinition({
+	url: '/data',
+	method: 'GET',
+	validationMode: 'Warning', // Log warnings, don't throw
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+});
+```
+
+## Complete Example
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+const updateUserProfileApi = createAPIDefinition({
+	// Required
+	url: '/users/:userId/profile',
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+		updatedAt: z.string(),
+	}),
+
+	// HTTP Method
+	method: 'PUT',
+
+	// Request validation
+	requestSchema: z.object({
+		name: z.string().min(3),
+		email: z.string().email(),
+		bio: z.string().optional(),
+	}),
+
+	// URL parameters
+	requestParameters: {
+		userId: ['required', 'string'],
+	},
+
+	// Custom headers
+	requestHeaders: {
+		'X-Request-Source': ['optional', 'string'],
+	},
+
+	// Static headers
+	headers: {
+		'Content-Type': 'application/json',
+		Authorization: () => `Bearer ${localStorage.getItem('token')}`,
+	},
+
+	// Configuration
+	timeout: 10000,
+	validationMode: 'Warning',
+	httpClient: 'axios', // Use Axios
+});
+
+// Usage
+const result = await updateUserProfileApi({
+	body: {
+		name: 'John Doe',
+		email: 'john@example.com',
+		bio: 'Software developer',
+	},
+	parameters: {
+		userId: '123',
+	},
+	headers: {
+		'X-Request-Source': 'web-app',
+	},
+});
+```
+
+## Next Steps
+
+- Learn about [React Hooks](./03-react-hooks.md) to use your API definitions in components
+- Understand [Validation](./04-validation.md) for runtime type checking
+- Explore [Error Handling](./05-error-handling.md) strategies

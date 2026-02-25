@@ -1,0 +1,274 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/02 - Installation" />
+
+# Installation & Setup
+
+Complete guide to installing and setting up @devkit/api-client in your project.
+
+## Prerequisites
+
+- Node.js 16.x or higher
+- React 18.x or higher
+- TypeScript 4.5 or higher (recommended)
+
+## Installation
+
+### Using npm
+
+```bash
+npm install @devkit/api-client
+```
+
+### Using yarn
+
+```bash
+yarn add @devkit/api-client
+```
+
+### Using pnpm
+
+```bash
+pnpm add @devkit/api-client
+```
+
+## Installing Peer Dependencies
+
+The library requires these peer dependencies:
+
+```bash
+# Install all peer dependencies at once
+npm install axios zod react
+
+# Or individually
+npm install axios@^1.0.0
+npm install zod@^3.0.0
+npm install react@^18.0.0
+```
+
+## TypeScript Configuration
+
+If you're using TypeScript, ensure your `tsconfig.json` includes:
+
+```json
+{
+	"compilerOptions": {
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"jsx": "react-jsx",
+		"lib": ["ES2020", "DOM"]
+	}
+}
+```
+
+## Verifying Installation
+
+Create a simple test file to verify the installation:
+
+```typescript
+// test-installation.ts
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+const testApi = createAPIDefinition({
+	url: 'https://jsonplaceholder.typicode.com/posts/1',
+	method: 'GET',
+	responseSchema: z.object({
+		userId: z.number(),
+		id: z.number(),
+		title: z.string(),
+		body: z.string(),
+	}),
+});
+
+console.log('✅ @devkit/api-client installed successfully!');
+```
+
+Run the test:
+
+```bash
+npx tsx test-installation.ts
+```
+
+## Project Setup
+
+### 1. Create an API Configuration File
+
+Create a file to configure your API client globally:
+
+```typescript
+// src/api/config.ts
+import { createAPIFactory } from '@devkit/api-client';
+
+// Create API factory with global configuration
+export const apiFactory = createAPIFactory({
+	baseURL: process.env.REACT_APP_API_URL || 'https://api.example.com',
+	headers: {
+		'Content-Type': 'application/json',
+	},
+	getToken: () => {
+		return localStorage.getItem('auth-token');
+	},
+	refreshToken: async () => {
+		// Implement token refresh logic
+		const response = await fetch('/auth/refresh', {
+			method: 'POST',
+			credentials: 'include',
+		});
+		const data = await response.json();
+		localStorage.setItem('auth-token', data.token);
+	},
+	timeout: 30000,
+	retries: 3,
+});
+```
+
+### 2. Create API Definitions
+
+Organize your API definitions by feature:
+
+```typescript
+// src/api/users.ts
+import { z } from 'zod';
+import { apiFactory } from './config';
+
+export const getUserApi = apiFactory({
+	url: '/users/:userId',
+	method: 'GET',
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+
+export const createUserApi = apiFactory({
+	url: '/users',
+	method: 'POST',
+	requestSchema: z.object({
+		name: z.string().min(2),
+		email: z.string().email(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+```
+
+### 3. Use in Components
+
+```typescript
+// src/components/UserProfile.tsx
+import React from 'react';
+import { useApiOnMount } from '@devkit/api-client';
+import { getUserApi } from '../api/users';
+
+export function UserProfile({ userId }: { userId: number }) {
+	const { result, isLoading, errors } = useApiOnMount(getUserApi, [userId]);
+
+	if (isLoading) return <div>Loading...</div>;
+	if (errors) return <div>Error: {errors.mapped[0].message}</div>;
+	if (!result) return null;
+
+	return (
+		<div>
+			<h1>{result.name}</h1>
+			<p>{result.email}</p>
+		</div>
+	);
+}
+```
+
+## Environment Variables
+
+Set up environment variables for different environments:
+
+```bash
+# .env.development
+REACT_APP_API_URL=https://api-dev.example.com
+
+# .env.production
+REACT_APP_API_URL=https://api.example.com
+```
+
+## Bundle Configuration
+
+### Webpack
+
+No additional configuration needed. The library works out of the box with standard React + Webpack setups.
+
+### Vite
+
+Add to `vite.config.ts` if needed:
+
+```typescript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+	plugins: [react()],
+	optimizeDeps: {
+		include: ['@devkit/api-client', 'axios', 'zod'],
+	},
+});
+```
+
+### Next.js
+
+Works seamlessly with Next.js 13+. For API routes, consider using the fetch implementation:
+
+```typescript
+// app/api/users/route.ts
+import { createAPIDefinition } from '@devkit/api-client';
+
+const api = createAPIDefinition({
+	url: '/external-api/users',
+	httpClient: 'fetch', // Use native fetch in Next.js
+	// ...
+});
+```
+
+## Troubleshooting
+
+### Module Not Found
+
+If you see `Cannot find module '@devkit/api-client'`:
+
+1. Ensure the package is installed: `npm ls @devkit/api-client`
+2. Clear node_modules and reinstall: `rm -rf node_modules && npm install`
+3. Check your `package.json` for the correct version
+
+### TypeScript Errors
+
+If you see type errors:
+
+1. Ensure TypeScript version is 4.5+: `npm ls typescript`
+2. Update `@types/react`: `npm install @types/react@latest`
+3. Enable `skipLibCheck` in `tsconfig.json`
+
+### Zod Schema Errors
+
+If you see Zod validation errors:
+
+1. Ensure Zod version is 3.0+: `npm ls zod`
+2. Check your schema definitions match the API responses
+3. Use `.passthrough()` for unknown fields: `z.object({...}).passthrough()`
+
+## Next Steps
+
+Now that you have installed the library, learn how to:
+
+- [Create API Definitions →](/?path=/docs/api-client-documentation-02-api-definitions--docs)
+- [Use React Hooks →](/?path=/docs/api-client-documentation-03-react-hooks--docs)
+- [Handle Validation →](/?path=/docs/api-client-documentation-04-validation--docs)
+
+## Getting Help
+
+- Check the FAQ section
+- View examples in the Sample APIs section
+- Report issues on GitHub

@@ -1,0 +1,10 @@
+{
+	"extends": "@devkit/ts-config/base.lib.json",
+	"compilerOptions": {
+		"lib": ["ES2020"],
+		"baseUrl": ".",
+		"declarationDir": "dist/types",
+		"resolveJsonModule": true
+	},
+	"include": ["index.ts", "./src", "./stories"]
+}

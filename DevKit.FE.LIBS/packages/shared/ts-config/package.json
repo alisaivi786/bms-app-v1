@@ -1,0 +1,7 @@
+{
+	"name": "@devkit/ts-config",
+	"version": "12.0.0",
+	"majorVersionRestrict": "12",
+	"description": "shared tsconfig configuration",
+	"main": "./base.json"
+}

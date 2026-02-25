@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToggleSwitch Component should render as checked 1`] = `
+<div>
+  <div
+    class="nj-bg-brand relative inline-flex shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75  flex-row h-6 w-10 rotate-0"
+    role="switch"
+  >
+    <span
+      class="sr-only"
+    >
+      Use setting
+    </span>
+    <span
+      aria-hidden="true"
+      class="translate-x-full pointer-events-none inline-block h-full w-1/2 rounded-full bg-white ring-0 transition-transform duration-200 ease-in-out"
+    />
+  </div>
+</div>
+`;
+
+exports[`ToggleSwitch Component should render correctly 1`] = `
+<div>
+  <div
+    class="nj-bg-brand relative inline-flex shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75  flex-row h-6 w-10 rotate-0"
+    role="switch"
+  >
+    <span
+      class="sr-only"
+    >
+      Use setting
+    </span>
+    <span
+      aria-hidden="true"
+      class="translate-x-full pointer-events-none inline-block h-full w-1/2 rounded-full bg-white ring-0 transition-transform duration-200 ease-in-out"
+    />
+  </div>
+</div>
+`;
+
+exports[`ToggleSwitch Component should render with default props 1`] = `
+<div>
+  <div
+    class="bg-gray-600 relative inline-flex shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75  flex-row h-6 w-10 rotate-0"
+    role="switch"
+  >
+    <span
+      class="sr-only"
+    >
+      Use setting
+    </span>
+    <span
+      aria-hidden="true"
+      class="translate-x-0 pointer-events-none inline-block h-full w-1/2 rounded-full bg-white ring-0 transition-transform duration-200 ease-in-out"
+    />
+  </div>
+</div>
+`;

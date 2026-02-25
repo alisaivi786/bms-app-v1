@@ -1,0 +1,70 @@
+:root {
+	/* Start Fonts Variables */
+	--nj-font-brand-en: 'DUBAI';
+	--nj-font-brand-ar: 'DUBAIAr';
+	/* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+	font-family: 'DUBAI';
+	src: local('Dubai-Bold'), url('/fonts/Dubai-Bold.woff2') format('woff2'), url('/fonts/Dubai-Bold.woff') format('woff');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAI';
+	src: local('Dubai-Medium'), url('/fonts/Dubai-Medium.woff2') format('woff2'),
+		url('/fonts/Dubai-Medium.woff') format('woff');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAI';
+	src: local('Dubai-Regular'), url('/fonts/Dubai-Regular.woff2') format('woff2'),
+		url('/fonts/Dubai-Regular.woff') format('woff');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAI';
+	src: local('Dubai-Light'), url('/fonts/Dubai-Light.woff2') format('woff2'),
+		url('/fonts/Dubai-Light.woff') format('woff');
+	font-weight: 300;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAIAr';
+	src: local('Dubai-Bold'), url('/fonts/Dubai-Bold.woff2') format('woff2'), url('/fonts/Dubai-Bold.woff') format('woff');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAIAr';
+	src: local('Dubai-Medium'), url('/fonts/Dubai-Medium.woff2') format('woff2'),
+		url('/fonts/Dubai-Medium.woff') format('woff');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAIAr';
+	src: local('Dubai-Regular'), url('/fonts/Dubai-Regular.woff2') format('woff2'),
+		url('/fonts/Dubai-Regular.woff') format('woff');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'DUBAIAr';
+	src: local('Dubai-Light'), url('/fonts/Dubai-Light.woff2') format('woff2'),
+		url('/fonts/Dubai-Light.woff') format('woff');
+	font-weight: 300;
+	font-display: swap;
+}
+/* End Fonts files importation */

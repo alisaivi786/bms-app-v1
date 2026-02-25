@@ -1,0 +1,10 @@
+{
+	"extends": "@devkit/ts-config/base.lib.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"declarationDir": "dist/types",
+		"emitDeclarationOnly": false,
+		"noEmit": true
+	},
+	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
+}

@@ -1,0 +1,26 @@
+.ng-groupBtn-light {
+	background-color: var(--nj-groupBtn-bg-light);
+	color: var(--nj-groupBtn-text-light);
+}
+
+.ng-groupBtn-dark {
+	background-color: var(--nj-groupBtn-bg-dark);
+	color: var(--nj-groupBtn-text-dark);
+}
+
+.ng-groupBtn-black {
+	background-color: var(--nj-groupBtn-bg-black);
+	color: var(--nj-groupBtn-text-black);
+}
+
+.ng-groupBtn-selected {
+	background-color: var(--nj-groupBtn-selected-bg);
+	color: var(--nj-groupBtn-selected-text);
+	border: var(--nj-groupBtn-selected-border-width) solid var(--nj-groupBtn-selected-border-color);
+}
+
+.ng-groupBtn-selected-brand {
+	background-color: var(--nj-groupBtn-selected-brand-bg, var(--nj-brand));
+	color: var(--nj-groupBtn-selected-text);
+	border: var(--nj-groupBtn-selected-border-width) solid var(--nj-groupBtn-selected-border-color);
+}

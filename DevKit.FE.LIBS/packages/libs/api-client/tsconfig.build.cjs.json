@@ -1,0 +1,12 @@
+{
+	"extends": "@devkit/ts-config/base.lib.json",
+	"compilerOptions": {
+		"baseUrl": "src",
+		"module": "CommonJS",
+		"outDir": "dist/cjs",
+		"declaration": false,
+		"noEmit": false,
+		"emitDeclarationOnly": false
+	},
+	"include": ["src"]
+}

@@ -1,0 +1,87 @@
+:root {
+	/* Start Colors Variables */
+	--nj-brand: theme('colors.brand.200');
+	--nj-brand-hover: theme('colors.brand.200');
+	/* End Colors Variable */
+
+	/* Start Header Variables */
+	--nj-brand-header: theme('colors.brand.800');
+	--nj-brand-login-header: theme('colors.brand.800');
+	/* End Header Variables */
+
+	/* Start Alert Variables */
+	--nj-Alert-info-icon: theme('colors.brand.800');
+	--nj-Alert-info-bg: #ebf7ff;
+	--nj-Alert-info-border: theme('colors.brand.400');
+	/* End Alert Variables */
+
+	/* Start Input Variables */
+	--nj-bg-input: theme('colors.white');
+	--nj-label-text-size: theme('fontSize.caption1');
+	--nj-input-highlighted-bg: theme('colors.yellow.50');
+	/* End Input Variables */
+
+	/* Start Breadcrumb Variables */
+	--nj-crumb-font-size: theme('fontSize.caption1');
+	/* End Breadcrumb Variables */
+
+	/* Start Stepper Variables */
+	--nj-stepper-font-weight-inactive: theme('fontWeight.medium');
+	--nj-stepper-font-color-inactive: theme('colors.gray.600');
+	--nj-stepper-line-height: 'inherit';
+	--nj-stepper-font-size: theme('fontSize.caption2');
+	--nj-stepper-font-size-md: theme('fontSize.paragraph');
+	--nj-stepper-subtitle-font-size: theme('fontSize.paragraph');
+	--nj-stepper-white-space: 'nowrap';
+
+	--nj-stepper-font-weight-active: theme('fontWeight.medium');
+	--nj-stepper-font-color-active: var(--nj-brand);
+	/* End Stepper Variables */
+
+	/* Start Radio Card Variables */
+	--nj-Radio-card-selected-background: theme('colors.white');
+	--ng-Radio-card-selected-border-color: theme('colors.brand.200');
+	--ng-Radio-card-selected-border-width: 2px;
+	--ng-Radio-card-border-color: theme('colors.gray.500');
+	--ng-Radio-card-border-width: 2px;
+	/* End Radio Card Variables */
+
+	/* Start Toast Variables */
+	--nj-toast-title-color: theme('colors.white');
+	--nj-toast-title-size: theme('fontSize.body');
+	--nj-toast-title-weight: theme('fontWeight.bold');
+	/* End Toast Variables */
+
+	/* Start Disclosure Variables for Primary Variant */
+	--nj-disclosure-header-bg-color: theme('colors.gray.100');
+	--nj-disclosure-header-text-color: theme('colors.black');
+	--nj-disclosure-header-text-size: theme('fontSize.body');
+	--nj-disclosure-header-font-weight: theme('fontWeight.bold');
+	--nj-disclosure-header-padding: 6px;
+	--nj-disclosure-header-border-radius: 6px;
+	--nj-disclosure-body-padding: 16px;
+	--nj-disclosure-body-bg-color: theme('colors.white');
+	--nj-disclosure-separator-border-width: 0px;
+	/* End Disclosure Variables */
+
+	/* Start Disclosure Arrow Variables */
+	--nj-disclosure-arrow-bg-color: transparent;
+	--nj-disclosure-arrow-padding: 0px;
+	/* End Disclosure Arrow Variables */
+
+	/* Start ScrollBar Variables */
+	--nj-scrollbar-color: #949494;
+	/* End ScrollBar Variables */
+
+	/* Tab Navigation Variables */
+	--nj-tab-nav-filled-active-bg-color: theme('colors.white');
+	--nj-tab-nav-filled-active-text-color: theme('colors.black');
+	--nj-tab-nav-filled-inactive-bg-color: theme('colors.gray.100');
+	--nj-tab-nav-gradient-selected-from: theme('colors.brand.500');
+	--nj-tab-nav-gradient-selected-to: theme('colors.brand.600');
+	--nj-tab-nav-gradient-not-selected-text: #475569; /* Slate 600 */
+	--nj-tab-nav-gradient-not-selected-text-hover: #1e293b; /* Slate 900 */
+	--nj-tab-nav-gradient-not-selected-bg-hover: rgba(255, 255, 255, 0.6); /* White 60% */
+	--nj-tab-nav-gradient-border-color: rgba(226, 232, 240, 0.5); /* Slate 200 50% */
+	/* End Tab Navigation Variables */
+}

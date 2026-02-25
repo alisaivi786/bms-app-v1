@@ -1,0 +1,254 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { LinkToId } from '../stories-helpers';
+
+<Meta title="Components/TranslationFactory" />
+
+# TranslationFactory
+
+This component helps manage and access translations in a type-safe way across your app.
+
+### Table Of Content
+
+1. [Define The Factory](#Define-Factory)
+1. [Consume The `TranslationProvider`](#Consume-TranslationProvider)
+1. [Use The Translation Hook `useTranslation`](#Use-Translation-Hook)
+1. [Render Translations with the `Trans` Component](#Render-Translations)
+
+---
+
+<h2 id="Define-Factory">1. Define The Factory</h2>
+
+First, create a new file (e.g., `translation.tsx`) and define your `TranslationFactory`.
+
+```typescript
+// ./configs/translation.tsx
+import { TranslationFactory } from '@devkit/nextjs';
+
+type ModuleNames = 'common' | 'dashboard'; // Example of possible modules
+export const translationFactory = new TranslationFactory<ModuleNames>();
+```
+
+---
+
+### Provide Dictionaries to the Context
+
+Example Usage for `getAllDictionaries`. You need to provide the necessary dictionaries for each module in your context.
+The `TranslationFactory` will automatically manage and provide translations based on the current locale.
+
+```typescript
+// /app/layout.tsx
+// Main layout component for the application
+import { SystemLocale } from '@devkit/utilities';
+import { getAllDictionaries } from '../../get-dictionary';
+import Providers from '../../providers';
+
+export default async function RootLayout({
+	children,
+	params,
+}: {
+	children: React.ReactNode;
+	params: {
+		locale: SystemLocale;
+	};
+}) {
+	const { locale } = params;
+	const dictionary = await getAllDictionaries(locale as SystemLocale);
+
+	return (
+		<html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+			<head>
+				<title>{dictionary?.common?.shared?.['product-name']}</title>
+			</head>
+
+			<body>
+				<Providers locale={locale as SystemLocale} dictionary={dictionary}>
+					{children}
+				</Providers>
+			</body>
+		</html>
+	);
+}
+```
+
+---
+
+<h2 id="Consume-TranslationProvider">2. Consume The `TranslationProvider`</h2>
+
+Wrap your application with the `TranslationProvider` in your `layout.tsx` Client Wrapper.
+
+```typescript
+'use client';
+
+import { translationFactory } from '../configs/translation';
+
+const RootLayout = ({
+	Component,
+	pageProps,
+	dictionaries,
+	locale,
+	children,
+}: {
+	dictionaries: TranslationDictionary;
+	locale: string;
+	children: React.ReactNode;
+}) => {
+	return (
+		<translationFactory.Provider locale={locale} dictionaries={dictionaries}>
+			{children}
+		</translationFactory.Provider>
+	);
+};
+
+export default RootLayout;
+```
+
+This ensures your application has access to the translation dictionaries and locale.
+
+---
+
+<h2 id="Use-Translation-Hook">3. Use The Translation Hook `useTranslation`</h2>
+
+Use the custom `useTranslation` hook to retrieve translations for specific namespaces.
+
+```typescript
+// ./hooks/useAppTranslation.tsx
+import { useTranslation } from '../configs/translation';
+
+export const TestTranslation = () => {
+	const { t } = useTranslation(['common', 'dashboard']);
+	return t('common.translation');
+};
+```
+
+This allows you to translate keys within the specified namespaces.
+
+---
+
+<h2 id="Render-Translations">4. Render Translations with the `Trans` Component</h2>
+
+Finally, use the `Trans` component to render translations, with support for placeholders and nested components.
+
+```typescript
+import { Trans } from '../configs/translation';
+
+const Greeting = () => {
+	const { t } = useAppTranslation();
+	return (
+		<Trans i18nKey="greeting" t={t}>
+			Hello, <strong>{{ name }}</strong>!
+		</Trans>
+	);
+};
+```
+
+### Using Translation Dictionaries
+
+```typescript
+import { NestedDictionary } from '@devkit/nextjs';
+import { SystemLocale } from '@devkit/utilities';
+
+type TranslationDictionariesType = {
+	common: NestedDictionary;
+	test: NestedDictionary;
+};
+
+// Import JSON files for each module and language
+const dictionaries: TranslationDictionariesType = {
+	common: {
+		en: require('../public/health-insurance/locales/en/common.json'),
+		ar: require('../public/health-insurance/locales/ar/common.json'),
+	},
+	test: {
+		en: require('../public/health-insurance/locales/en/common.json'),
+		ar: require('../public/health-insurance/locales/ar/common.json'),
+	},
+} as const;
+
+export type Module = keyof typeof dictionaries;
+
+/**
+ * Retrieve the dictionary data for all modules for the specified locale.
+ *
+ * @param locale The current system locale (e.g., 'en', 'ar')
+ * @returns A dictionary containing only the translations for the given locale.
+ */
+export const getAllDictionaries = async (locale: SystemLocale): Promise<Record<Module, NestedDictionary>> => {
+	const allModules = Object.keys(dictionaries) as Module[];
+	// Combine all module dictionaries for the current locale
+	const dictionary = allModules.reduce((acc, module) => {
+		acc[module] = dictionaries[module][locale] as NestedDictionary;
+		return acc;
+	}, {} as Record<Module, NestedDictionary>);
+
+	return dictionary;
+};
+```
+
+In this example:
+
+- `getAllDictionaries(locale)` fetches the dictionaries for the given locale and provides them to the
+  `TranslationFactory.Provider`.
+- `locale` is dynamically passed, and all relevant translations will be available.
+
+---
+
+### Module-Wise Usage with `useTranslation`
+
+Now, you can use translations in different modules by calling the custom hook `useTranslation`.
+
+```typescript
+// ./components/MyComponent.tsx
+import { useAppTranslation } from '../hooks/useAppTranslation';
+
+const MyComponent = () => {
+	const { t } = useAppTranslation();
+
+	return (
+		<div>
+			<h1>{t('common:welcome')}</h1> {/* Translation from common module */}
+			<p>{t('dashboard:userStats')}</p> {/* Translation from dashboard module */}
+		</div>
+	);
+};
+
+export default MyComponent;
+```
+
+Here:
+
+- `useAppTranslation` retrieves the `t` function, which allows access to translations from the `common` and `dashboard`
+  modules.
+- Keys are prefixed with their module names (e.g., `common:welcome`, `dashboard:userStats`).
+
+---
+
+### Rendering Components with `Trans`
+
+The `Trans` component allows rendering dynamic content with placeholders or nested components.
+
+```typescript
+// ./components/WelcomeMessage.tsx
+import { Trans } from '../configs/translation';
+
+const WelcomeMessage = () => {
+	const { t } = useAppTranslation();
+
+	return (
+		<Trans i18nKey="common:greeting" t={t} defaults="Hello, {{name}}!" components={[<strong />]}>
+			Hello, <strong>{{ name }}</strong>!
+		</Trans>
+	);
+};
+
+export default WelcomeMessage;
+```
+
+In this example:
+
+- The `Trans` component is used to translate a greeting message.
+- The placeholder `{{name}}` can be dynamically replaced, and `components` allows nested React elements like `<strong>`
+  to be inserted within the translation.
+
+```
+
+```

@@ -1,0 +1,30 @@
+:root {
+  /* Start Fonts Variables */
+  --nj-font-brand-en: 'GreycliffCF';
+  --nj-font-brand-ar: 'GreycliffCF';
+  /* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+  font-family: 'GreycliffCF';
+  src: local('GreycliffCFBold'), url('/fonts/GreycliffCF-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GreycliffCF';
+  src: local('GreycliffCFMedium'), url('/fonts/GreycliffCF-Medium.otf') format('opentype');
+  font-weight: 500 699.999;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GreycliffCF';
+  src: local('GreycliffCFRegular'), url('/fonts/GreycliffCF-Regular.otf') format('opentype');
+  font-weight: 0 499.999;
+  font-display: swap;
+}
+
+/* End Fonts files importation */

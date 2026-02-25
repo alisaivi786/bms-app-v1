@@ -1,0 +1,3 @@
+export const GRID_SELECTION_COLUMN_NAME = '##SELECTION##';
+
+export const GRID_EXPAND_COLUMN_NAME = '##EXPAND##';

@@ -1,0 +1,29 @@
+{
+	"name": "@devkit/shared-types",
+	"version": "12.0.6",
+	"majorVersionRestrict": "12",
+	"description": "shared types used by all packages",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "rimraf -rf ./dist && tsc --project tsconfig.build.json",
+		"prepack": "npm run build",
+		"lint": "eslint ./src",
+		"lint-fix": "eslint --fix ./src",
+		"type-check": "npx tsc --emitDeclarationOnly false --noEmit"
+	},
+	"devDependencies": {
+		"@devkit/ts-config": "workspace:*",
+		"@types/react": "^18.2.21",
+		"react": ">= 18.1.0"
+	},
+	"peerDependencies": {
+		"react": ">= 18.1.0"
+	},
+	"nx": {
+		"tags": [
+			"@devkit/shared-types"
+		]
+	}
+}

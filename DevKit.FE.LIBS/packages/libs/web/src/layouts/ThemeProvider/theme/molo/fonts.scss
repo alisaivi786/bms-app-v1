@@ -1,0 +1,29 @@
+:root {
+  /* Start Fonts Variables */
+  --nj-font-brand-en: 'Urbanist';
+  --nj-font-brand-ar: 'Urbanist';
+  /* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+  font-family: 'Urbanist';
+  src: local('UrbanistBold'), url('/fonts/Urbanist-Bold.ttf') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Urbanist';
+  src: local('UrbanistMedium'), url('/fonts/Urbanist-Medium.ttf') format('woff2');
+  font-weight: 500 699.999;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Urbanist';
+  src: local('UrbanistRegular'), url('/fonts/Urbanist-Regular.ttf') format('woff2');
+  font-weight: 0 499.999;
+  font-display: swap;
+}
+/* End Fonts files importation */

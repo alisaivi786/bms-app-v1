@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stepper Component should render correctly 1`] = `
+<div>
+  <ul
+    class="m-2 flex flex-col"
+  >
+    <li
+      class="mb-2 flex flex-row content-center"
+    >
+      <div
+        class="flex flex-col items-center"
+      >
+        <div
+          class="flex h-7 w-7 items-center justify-center rounded-full bg-green-500"
+        >
+          <div
+            class="text-white"
+          >
+            CheckIcon
+          </div>
+        </div>
+        <div
+          class="mt-2 w-0.5 flex-1 bg-gray-200"
+        />
+      </div>
+      <div
+        class="relative mx-3 flex flex-auto flex-col pb-11"
+      >
+        <p
+          class="text-title font-medium"
+        >
+          Step 1
+        </p>
+        <p
+          class="my-4 h-full text-body font-normal"
+        >
+          Description for Step 1
+        </p>
+      </div>
+    </li>
+    <li
+      class="mb-2 flex flex-row content-center"
+    >
+      <div
+        class="flex flex-col items-center"
+      >
+        <div
+          class="h-6 w-6 rounded-full flex items-center justify-center ring-2 nj-bg-brand text-white nj-ring-brand"
+        >
+          <p
+            class="text-title font-medium leading-none"
+          >
+            2
+          </p>
+        </div>
+        <div
+          class="mt-2 w-0.5 flex-1 bg-gray-200"
+        />
+      </div>
+      <div
+        class="relative mx-3 flex flex-auto flex-col pb-11"
+      >
+        <p
+          class="text-title font-bold"
+        >
+          Step 2
+        </p>
+        <p
+          class="my-4 h-full text-body font-normal"
+        >
+          Description for Step 2
+        </p>
+      </div>
+    </li>
+    <li
+      class="mb-2 flex flex-row content-center"
+    >
+      <div
+        class="flex flex-col items-center"
+      >
+        <div
+          class="h-6 w-6 rounded-full flex items-center justify-center ring-2 bg-white text-gray-500  ring-gray-500"
+        >
+          <p
+            class="text-title font-medium leading-none"
+          >
+            3
+          </p>
+        </div>
+      </div>
+      <div
+        class="relative mx-3 flex flex-auto flex-col pb-11"
+      >
+        <p
+          class="text-title font-medium  text-gray-500"
+        >
+          Step 3
+        </p>
+        <p
+          class="my-4 h-full text-body font-normal"
+        >
+          Description for Step 3
+        </p>
+      </div>
+    </li>
+  </ul>
+</div>
+`;

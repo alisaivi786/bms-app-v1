@@ -1,0 +1,39 @@
+diff --git a/lib/commonjs/components/bottomSheet/BottomSheet.js b/lib/commonjs/components/bottomSheet/BottomSheet.js
+index 40725c071f23498d5a3053c0b307ab3f17566e18..76c7db9ca8dc9b2ba817e626f1a3e4413e553bcf 100644
+--- a/lib/commonjs/components/bottomSheet/BottomSheet.js
++++ b/lib/commonjs/components/bottomSheet/BottomSheet.js
+@@ -455,7 +455,7 @@ const BottomSheetComponent = /*#__PURE__*/(0, _react.forwardRef)(function Bottom
+      * we will need to manually set the index to the highest detent index.
+      */
+     if (index === -1 && status === _constants.KEYBOARD_STATUS.SHOWN && position !== closedDetentPosition) {
+-      index = highestDetentPosition ?? _constants2.DEFAULT_KEYBOARD_INDEX;
++      index = detents?.indexOf(highestDetentPosition ?? 0) ?? _constants2.DEFAULT_KEYBOARD_INDEX;
+     }
+ 
+     /**
+diff --git a/lib/module/components/bottomSheet/BottomSheet.js b/lib/module/components/bottomSheet/BottomSheet.js
+index 561ad524ac6ed22e9e2284097b964923751ee9aa..da12c47319c4b6405011b7381248e7b80f8b0e1c 100644
+--- a/lib/module/components/bottomSheet/BottomSheet.js
++++ b/lib/module/components/bottomSheet/BottomSheet.js
+@@ -448,7 +448,7 @@ const BottomSheetComponent = /*#__PURE__*/forwardRef(function BottomSheet(props,
+      * we will need to manually set the index to the highest detent index.
+      */
+     if (index === -1 && status === KEYBOARD_STATUS.SHOWN && position !== closedDetentPosition) {
+-      index = highestDetentPosition ?? DEFAULT_KEYBOARD_INDEX;
++      index = detents?.indexOf(highestDetentPosition ?? 0) ?? DEFAULT_KEYBOARD_INDEX;
+     }
+ 
+     /**
+diff --git a/src/components/bottomSheet/BottomSheet.tsx b/src/components/bottomSheet/BottomSheet.tsx
+index 6748c93cac1a29c745480fe2282b8d8f6b36226f..3dbb2fd7e5268d4e6b57ea44e6c314791ff10642 100644
+--- a/src/components/bottomSheet/BottomSheet.tsx
++++ b/src/components/bottomSheet/BottomSheet.tsx
+@@ -659,7 +659,7 @@ const BottomSheetComponent = forwardRef<BottomSheet, BottomSheetProps>(
+           status === KEYBOARD_STATUS.SHOWN &&
+           position !== closedDetentPosition
+         ) {
+-          index = highestDetentPosition ?? DEFAULT_KEYBOARD_INDEX;
++          index = detents?.indexOf(highestDetentPosition ?? 0) ?? DEFAULT_KEYBOARD_INDEX;
+         }
+ 
+         /**

@@ -1,0 +1,72 @@
+{
+	"root": true,
+	"extends": ["@devkit/eslint-config"],
+	"plugins": ["@nrwl/nx"],
+	"overrides": [
+		{
+			"files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+			"rules": {
+				"@nrwl/nx/enforce-module-boundaries": [
+					"error",
+					{
+						"enforceBuildableLibDependency": true,
+						"allow": [],
+						"depConstraints": [
+							{
+								"sourceTag": "@devkit/web",
+								"onlyDependOnLibsWithTags": [
+									"@devkit/utilities",
+									"@devkit/icons",
+									"@devkit/config",
+									"@devkit/shared-types",
+									"@devkit/rollup-config"
+								]
+							},
+							{
+								"sourceTag": "@devkit/mobile",
+								"onlyDependOnLibsWithTags": [
+									"@devkit/utilities",
+									"@devkit/icons",
+									"@devkit/config",
+									"@devkit/shared-types",
+									"@devkit/rollup-config"
+								]
+							},
+							{
+								"sourceTag": "@devkit/utilities",
+								"onlyDependOnLibsWithTags": ["@devkit/config", "@devkit/rollup-config"]
+							},
+							{
+								"sourceTag": "@devkit/config",
+								"onlyDependOnLibsWithTags": ["@devkit/shared-types", "@devkit/rollup-config"]
+							},
+							{
+								"sourceTag": "@devkit/api-client",
+								"onlyDependOnLibsWithTags": ["@devkit/utilities"]
+							},
+							{
+								"sourceTag": "@devkit/charts",
+								"onlyDependOnLibsWithTags": [
+									"@devkit/utilities",
+									"@devkit/web",
+									"@devkit/icons",
+									"@devkit/shared-types",
+									"@devkit/ts-config",
+									"@devkit/config"
+								]
+							},
+							{
+								"sourceTag": "@devkit/nextjs",
+								"onlyDependOnLibsWithTags": ["@devkit/utilities", "@devkit/web", "@devkit/rollup-config"]
+							},
+							{
+								"sourceTag": "@shory/auth",
+								"onlyDependOnLibsWithTags": ["@devkit/utilities", "@devkit/web", "@devkit/ts-config"]
+							}
+						]
+					}
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,61 @@
+import { Source } from '@storybook/addon-docs/blocks';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+
+const StoryComponent: StoryFn = () => (
+	<div className="flex flex-col gap-5">
+		<h2>devkit Packages installation</h2>
+		<p>Create .npmrc in the project root folder and add the below lines to it</p>
+		<Source
+			code={`@devkit:registry=https://pkgs.dev.azure.com/shory-com/_packaging/devkit-frontend/npm/registry/
+always-auth=true`}
+		/>
+		<p>Install the devkit packages (follow the artifacts to authenticate user .npmrc)</p>
+		<h2>Tailwind Setup</h2>
+		<p>Install tailwind, postcss and autoprefixer</p>
+		<Source code="npm install -D tailwindcss postcss autoprefixer" />
+		<p>Init tailwind</p>
+		<Source code="npx tailwindcss init -p" />
+		<p>Create or Modify tailwind.config.js file in root to look like this</p>
+		<Source
+			code={`const tailwindConfig = require("@devkit/web/dist/tailwind/tailwind.config.cjs");\n/** @type {import("tailwindcss").Config} */
+	module.exports = {
+		...tailwindConfig,
+		content: {
+			files: [
+				"./node_modules/@devkit/web/dist/**/*.{js,jsx, ts, tsx}",
+				"./pages/**/*.{js,ts,jsx,tsx}",
+				"./src/**/*.{js,ts,jsx,tsx}",
+			],
+		},
+	};`}
+		/>
+		<p>Create or Modify postcss.config.js file in root to look like this</p>
+		<Source
+			code={`const { join } = require('path');
+
+			module.exports = {
+				plugins: {
+					'postcss-import': {},
+					'tailwindcss/nesting': {},
+					tailwindcss: {
+						config: join(__dirname, 'tailwind.config.js'),
+					},
+					autoprefixer: {},
+				},
+			};
+			`}
+		/>
+		<h2>Project Setup</h2>
+		<p>In layout.tsx/jsx or _app.tsx/jsx import the following file</p>
+		<Source code={'import "@devkit/web/dist/tailwind/main.css";'} />
+	</div>
+);
+
+const StoryMeta: Meta = {
+	title: 'Getting Started/Installation',
+	component: StoryComponent,
+};
+
+export default StoryMeta;
+
+export const Installation: StoryObj = {};

@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Alert Component should render correctly with warning severity 1`] = `
+<div>
+  <div
+    class="flex gap-2 rounded-md border p-2 leading-5 items-start border-yellow-500 bg-yellow-50"
+  >
+    <div
+      class="flex-none"
+    >
+      <div
+        class="text-yellow-500 w-5 h-5"
+      >
+        WarningIcon
+      </div>
+    </div>
+    Alert test component
+    <div
+      class="ml-auto h-5 w-5 justify-end flex items-center"
+    >
+      <div
+        class="cursor-pointer text-paragraph text-gray-500 hover:text-gray-600 w-3.5 h-3.5  shrink-0"
+        data-testid="close-icon"
+      >
+        SpXmarkIcon
+      </div>
+    </div>
+  </div>
+</div>
+`;

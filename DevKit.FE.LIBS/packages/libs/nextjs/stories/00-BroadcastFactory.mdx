@@ -1,0 +1,133 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { LinkToId } from '../stories-helpers';
+
+<Meta title="Components/BroadcastFactory" />
+
+# BroadcastFactory
+
+You can use this component to share messages between different tabs within the same domain
+
+### Table Of Content
+
+1. <LinkToId elementId="Factory">Define The Factory</LinkToId>
+1. <LinkToId elementId="BroadcastProvider">Consume The `BroadcastProvider`</LinkToId>
+1. <LinkToId elementId="useBroadcastingMessages">Handle The Broadcasted Message `useBroadcastingMessages`</LinkToId>
+1. <LinkToId elementId="postMessageUtil">Send Message `postMessageUtil`</LinkToId>
+
+<h2 id="Factory">1. Define The Factory</h2>
+
+The first step is to define the factory and it's messages types.
+
+Create a new file (e.g. broadcast.tsx) and add the following code
+
+```typescript
+// ./configs/broadcast.tsx
+import { devkitBroadcastingFactory } from '@devkit/nextjs';
+
+type Messages = { type: 'reloadWebsite' } | { type: 'updateUserId'; uid: string };
+
+export const { BroadcastProvider, postMessageUtil, useBroadcastingMessages } = new devkitBroadcastingFactory<Messages>();
+```
+
+Then you have to modify the type `Messages` to reflect your needs, basically you can add any messages you need to
+exchange, also you can add some data with the message if needed like with type `updateUserId` we added a string for
+`uid`
+
+<h2 id="BroadcastProvider">2. Consume The `BroadcastProvider`</h2>
+
+In your \_app.tsx you need to wrap all your app inside the `<BroadcastProvider>`:
+
+```typescript
+// ./pages/_app.tsx
+import { BroadcastProvider } from '../configs/broadcast';
+
+const AppRoot = ({ Component, pageProps }: AppProps) => {
+	return (
+		<BroadcastProvider>
+			<Component {...pageProps} />
+		</BroadcastProvider>
+	);
+};
+
+export default AppRoot;
+```
+
+<h2 id="useBroadcastingMessages">3. Handle The Broadcasted Message `useBroadcastingMessages`</h2>
+
+Now we need to handle each message after receiving it. For that we need to create a new file with simple useEffect that
+acts as `componentDidMount`.
+
+```typescript
+// ./hooks/useOnBroadcastMessages
+import { useEffect } from 'react';
+import { useBroadcastingMessages } from '../configs/broadcast';
+
+const useOnBroadcastMessage = () => {
+	const { messagesSubscribe } = useBroadcastingMessages();
+
+	useEffect(() => {
+		const unsubscribe = messagesSubscribe((message) => {
+			switch (message.type) {
+				case 'reloadWebsite':
+					window.location.reload();
+					break;
+
+				case 'updateUserId':
+					// Do something with message.uid
+					break;
+
+				default:
+					break;
+			}
+		});
+
+		return () => unsubscribe();
+	}, []);
+};
+
+export default useOnBroadcastMessages;
+```
+
+This is very strait forward implementation to use whatever message you will send.
+
+Now we need to consume that hook in the `_app.tsx`. So now the `_app.tsx` should look like the following:
+
+```typescript
+// ./pages/_app.tsx
+import { BroadcastProvider } from '../configs/broadcast';
+import useOnBroadcastMessages from '../hooks/useOnBroadcastMessages';
+
+const App = ({ Component, pageProps }: AppProps) => {
+	useOnBroadcastMessages();
+
+	return <Component {...pageProps} />;
+};
+
+const AppRoot = (props: AppProps) => {
+	return (
+		<BroadcastProvider>
+			<App {...props} />
+		</BroadcastProvider>
+	);
+};
+
+export default AppRoot;
+```
+
+<h2 id="postMessageUtil">4. Send Message `postMessageUtil`</h2>
+
+Now our website should be listening to the 2 messages specified in the factory (step 1) `reloadWebsite` and
+`updateUserId`. The only messing step is to send the message whenever its needed.
+
+Simply import `postMessageUtil` and call it with the required params. e.g. lets create a button to reload all tabs
+opening on the same domain:
+
+```typescript
+import { postMessageUtil } from '../configs/broadcast';
+
+const TestComponent = (props: AppProps) => {
+	return <Button onClick={() => postMessageUtil({ type: 'reloadWebsite' })}>Reload All Tabs</Button>;
+};
+
+export default TestComponent;
+```

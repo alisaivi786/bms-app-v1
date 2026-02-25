@@ -1,0 +1,15 @@
+{
+	"testEnvironment": "@happy-dom/jest-environment",
+	"transform": {
+		"^.+\\.tsx?$": "ts-jest"
+	},
+	"setupFilesAfterEnv": ["@testing-library/jest-dom"],
+	"collectCoverageFrom": ["./src/**/*.{ts,tsx}"],
+	"coverageDirectory": "coverage",
+	"modulePathIgnorePatterns": ["node_modules", "jest-test-results.json"],
+	"coverageThreshold": {
+		"global": {
+			"lines": 90
+		}
+	}
+}

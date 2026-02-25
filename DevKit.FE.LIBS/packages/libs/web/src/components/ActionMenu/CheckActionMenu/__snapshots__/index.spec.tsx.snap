@@ -1,0 +1,200 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CheckActionMenu Should match large textSize variant 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <button
+      class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer bg-white nj-secondary-button hover:nj-secondary-button-border-hover hover:nj-text-button-hover hover:nj-secondary-button-opacity-hover nj-button-border-radius nj-button-font-size px-4 py-3 h-12 w-full"
+      role="button"
+      type="button"
+    >
+      <label
+        class="flex w-full items-center justify-center cursor-pointer relative"
+      >
+        <div
+          class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+        >
+          <div
+            class="undefined text-start"
+          >
+            Menu
+          </div>
+          <div
+            class=""
+          >
+            ArrowDownIcon
+          </div>
+        </div>
+      </label>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`CheckActionMenu Should match medium textSize variant 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <button
+      class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer bg-white nj-secondary-button hover:nj-secondary-button-border-hover hover:nj-text-button-hover hover:nj-secondary-button-opacity-hover nj-button-border-radius nj-button-font-size px-4 py-2.5 h-10 w-full"
+      role="button"
+      type="button"
+    >
+      <label
+        class="flex w-full items-center justify-center cursor-pointer relative"
+      >
+        <div
+          class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+        >
+          <div
+            class="undefined text-start"
+          >
+            Menu
+          </div>
+          <div
+            class=""
+          >
+            ArrowDownIcon
+          </div>
+        </div>
+      </label>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`CheckActionMenu Should match secondary variant 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <button
+      class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer bg-white nj-secondary-button hover:nj-secondary-button-border-hover hover:nj-text-button-hover hover:nj-secondary-button-opacity-hover nj-button-border-radius nj-button-font-size px-4 py-2.5 h-10 w-full"
+      role="button"
+      type="button"
+    >
+      <label
+        class="flex w-full items-center justify-center cursor-pointer relative"
+      >
+        <div
+          class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+        >
+          <div
+            class="undefined text-start"
+          >
+            Menu
+          </div>
+          <div
+            class=""
+          >
+            ArrowDownIcon
+          </div>
+        </div>
+      </label>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`CheckActionMenu Should match text variant 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <button
+      class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer border-transparent nj-text-brand hover:nj-text-brand-hover  nj-button-font-size px-4 py-2.5 h-10 w-full"
+      role="button"
+      type="button"
+    >
+      <label
+        class="flex w-full items-center justify-center cursor-pointer relative"
+      >
+        <div
+          class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+        >
+          <div
+            class="undefined text-start"
+          >
+            Menu
+          </div>
+          <div
+            class=""
+          >
+            ArrowDownIcon
+          </div>
+        </div>
+      </label>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`CheckActionMenu Should match the snapshot when disabled prop equal to false 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <button
+      class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer bg-white nj-secondary-button hover:nj-secondary-button-border-hover hover:nj-text-button-hover hover:nj-secondary-button-opacity-hover nj-button-border-radius nj-button-font-size px-4 py-2.5 h-10 w-full"
+      role="button"
+      type="button"
+    >
+      <label
+        class="flex w-full items-center justify-center cursor-pointer relative"
+      >
+        <div
+          class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+        >
+          <div
+            class="undefined text-start"
+          >
+            Menu
+          </div>
+          <div
+            class=""
+          >
+            ArrowDownIcon
+          </div>
+        </div>
+      </label>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`CheckActionMenu Should match the snapshot when disabled prop equal to true 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <button
+      class="whitespace-nowrap leading-none font-medium flex border items-center cursor-pointer bg-white border-gray-400 text-gray-400 nj-button-border-radius nj-button-font-size px-4 py-2.5 h-10 w-full"
+      disabled=""
+      role="button"
+      type="button"
+    >
+      <label
+        class="flex w-full items-center justify-center cursor-pointer relative"
+      >
+        <div
+          class="flex relative w-full items-center justify-center cursor-pointer gap-2"
+        >
+          <div
+            class="undefined text-start"
+          >
+            Menu
+          </div>
+          <div
+            class=""
+          >
+            ArrowDownIcon
+          </div>
+        </div>
+      </label>
+    </button>
+  </div>
+</div>
+`;

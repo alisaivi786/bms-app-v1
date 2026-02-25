@@ -1,0 +1,1 @@
+export { normalizeArabicDigits } from './normalizeArabicDigits';

@@ -1,0 +1,22 @@
+.bottom-sheet-container [data-rsbs-header],
+.bottom-sheet-container [data-rsbs-footer] {
+	box-shadow: none !important;
+}
+
+.bottom-sheet-container [data-rsbs-header] {
+	text-align: inherit !important;
+}
+
+.bottom-sheet-container.disable-click-outside [data-rsbs-backdrop] {
+	pointer-events: none !important;
+}
+
+.hide-content-scroll [data-rsbs-scroll]::-webkit-scrollbar {
+	display: none;
+}
+
+.hide-content-scroll [data-rsbs-scroll] {
+	/* Hide scrollbar for IE, old Edge and Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}

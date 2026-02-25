@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FullScreenLayout renders correctly with default props (snapshot) 1`] = `
+<View
+  style={
+    [
+      {
+        "style": [
+          "flex-1 bg-gray-100",
+        ],
+      },
+      {
+        "marginTop": 10,
+      },
+    ]
+  }
+  testID="full-screen-layout"
+>
+  <RCTSafeAreaView
+    style={
+      {
+        "style": [
+          "flex-1 bg-gray-100",
+        ],
+      }
+    }
+    testID="safe-area-view"
+  >
+    <RCTScrollView
+      automaticallyAdjustContentInsets={false}
+      contentInset={
+        {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableOnAndroid={true}
+      enableResetScrollToCoords={false}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
+      keyboardShouldPersistTaps="handled"
+      keyboardSpace={0}
+      nestedScrollEnabled={true}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEnabled={true}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={false}
+      stickyHeaderIndices={[]}
+      testID="scroll-view"
+      update={[Function]}
+      viewIsInsideTabBar={false}
+    >
+      <View>
+        <View
+          style={
+            {
+              "style": [
+                "p-4",
+              ],
+            }
+          }
+          testID="content-container"
+        >
+          <View
+            testID="content"
+          >
+            Sample Content
+          </View>
+        </View>
+      </View>
+    </RCTScrollView>
+  </RCTSafeAreaView>
+</View>
+`;

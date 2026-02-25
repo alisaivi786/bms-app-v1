@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Form Component should render correctly with children 1`] = `
+<div>
+  <form>
+    hello world
+  </form>
+</div>
+`;

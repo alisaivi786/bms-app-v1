@@ -1,0 +1,41 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Ping-Bold.otf",
+      "sha1": "2ba0b1430caef1655dbfe5c1cc34836c13d19c31"
+    },
+    {
+      "path": "src/assets/fonts/Ping-Regular.otf",
+      "sha1": "2108e1d19aac35a001d3029b36f5be8c8f9af9b5"
+    },
+    {
+      "path": "src/assets/fonts/PingAR+LT-Medium.otf",
+      "sha1": "1c94c5a29be091a198ddbf94730ab6fad59dfcd6"
+    },
+    {
+      "path": "src/assets/fonts/Urbanist-Bold.ttf",
+      "sha1": "5393e451665e344701f6f250898895ca98dabdbc"
+    },
+    {
+      "path": "src/assets/fonts/Urbanist-Medium.ttf",
+      "sha1": "8fdacadcc8bf9a54e98e7894f54c0d8edab92b03"
+    },
+    {
+      "path": "src/assets/fonts/Urbanist-Regular.ttf",
+      "sha1": "ca6e793bc43b42306c06fedc353c68af20ee2c7b"
+    },
+    {
+      "path": "src/assets/fonts/Urbanist-SemiBold.ttf",
+      "sha1": "a0dd44015ece2092d0b480cd60c87ccbe932e3f4"
+    },
+    {
+      "path": "src/assets/fonts/saudi_riyal.ttf",
+      "sha1": "2ce282a012c0df991353e98208b8122172a250af"
+    },
+    {
+      "path": "src/assets/fonts/uae-symbol.ttf",
+      "sha1": "3207022237d36317666f19108dfc4142979e5d22"
+    }
+  ]
+}

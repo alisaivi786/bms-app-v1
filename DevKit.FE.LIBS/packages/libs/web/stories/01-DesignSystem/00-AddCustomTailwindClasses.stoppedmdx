@@ -1,0 +1,130 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Source } from '@storybook/addon-docs/blocks';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+
+const codeStyle = {
+	color: 'crimson',
+	backgroundColor: '#f1f1f1',
+	padding: '2px',
+};
+
+const linkStyle = {
+	textDecoration: 'underline',
+	cursor: 'pointer',
+	color: 'crimson',
+};
+
+const StoryComponent: StoryFn = () => (
+	<div className="flex flex-col gap-5">
+		<h2>Rational behind adding custom Tailwind classes:</h2>
+		<p>
+			In some cases, we would need to add a style to an element that is not in our DLS (Design Language System) ex:
+			specific font size that is not usually used.
+		</p>
+		<p>
+			Because of this, and rather than using the <code style={codeStyle}>style</code> tag to set the style for each
+			element, we can override the tailwind config to add our custom style.
+		</p>
+		<br />
+		<h2>How to add a custom Tailwind class:</h2>
+		<p>
+			If you check the devkit.Frontend.Libs project, you can see in{' '}
+			<code style={codeStyle}>packages/libs/web/tailwind.config.js</code> which contains the base classes configs like
+			screen sizes, colors, spacings, fonts, etc..
+		</p>
+		<p>
+			In whatever project you are working where it supports tailwind, you should be able to find a file called{' '}
+			<code style={codeStyle}>tailwind.config.js</code> which will host any additional classes required by the project.
+			In that file, you will see that first, it is spreading (using) the base tailwind config from the
+			devkit.Frontend.Libs project (or any other devkit or Shory libraries), after that you can extend it with custom
+			classes using the syntax
+		</p>
+		<Source
+			code={`spacing: {
+	...tailwindConfig.theme.spacing,
+	300: '38.75rem',
+},`}
+		/>
+		<p>
+			Whatever class you want to create, you can do so within the <code style={codeStyle}>tailwind.config.js</code>{' '}
+			file.
+		</p>
+		<br />
+		<h2>What possible properties can you extend/override?:</h2>
+		<p>There are 3 main configurations within Theme</p>
+
+		<li>Screens</li>
+		<li>Colors</li>
+		<li>Spacing</li>
+
+		<p>
+			Within the <code style={codeStyle}>Theme</code> object, you can edit all of the{' '}
+			<a
+				style={linkStyle}
+				target="_blank"
+				rel="noreferrer"
+				href="https://tailwindcss.com/docs/theme#configuration-reference"
+			>
+				following properties
+			</a>
+		</p>
+		<p>
+			Within the <code style={codeStyle}>Screens</code> Object, you can override the different screen sizes queries
+			(media queries) (sm, md, lg, xl, etc...). You can find the documentation for the Screen{' '}
+			<a style={linkStyle} target="_blank" rel="noreferrer" href="https://tailwindcss.com/docs/theme">
+				through this link
+			</a>
+		</p>
+		<p>
+			Similarly{' '}
+			<a style={linkStyle} target="_blank" rel="noreferrer" href="https://tailwindcss.com/docs/customizing-colors">
+				Colors
+			</a>{' '}
+			and{' '}
+			<a style={linkStyle} target="_blank" rel="noreferrer" href="https://tailwindcss.com/docs/customizing-spacing">
+				Spacing
+			</a>
+		</p>
+		<p>A final Tailwind configuration would look something like</p>
+		<Source
+			code={`const { createGlobPatternsForDependencies } = require('@nrwl/react/tailwind');
+const { join } = require('path');
+const tailwindConfig = require('@devkit/web/dist/tailwind/tailwind.config.cjs');
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+	...tailwindConfig,
+	content: [
+		'./node_modules/@devkit/web/dist/**/*.{js,jsx}',
+		join(__dirname, 'src/**/*.{ts,tsx}'),
+		...createGlobPatternsForDependencies(__dirname),
+	],
+	theme: {
+		...tailwindConfig.theme,
+		spacing: {
+			...tailwindConfig.theme.spacing,
+			200: '50rem',
+		},
+		colors: {
+			...tailwindConfig.theme.colors,
+			transparent: 'transparent',
+		},
+		spacing: {
+			...tailwindConfig.theme.spacing,
+            '1': '8px',
+		}
+	},
+};
+`}
+		/>
+	</div>
+);
+
+const StoryMeta: Meta = {
+	title: 'DLS/Adding Custom Tailwind Classes',
+	component: StoryComponent,
+};
+
+export default StoryMeta;
+
+export const AddingCustomTailwindClasses: StoryObj = {};

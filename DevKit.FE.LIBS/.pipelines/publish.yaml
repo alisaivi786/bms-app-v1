@@ -1,0 +1,67 @@
+trigger: none
+
+variables:
+  pnpm_config_cache: $(Pipeline.Workspace)/.pnpm-store
+
+jobs:
+  - job: Publish
+    displayName: Publish - devkit FrontEnd Libs
+    pool:
+      vmImage: macOS-15
+    steps:
+      - checkout: self
+        clean: true
+        persistCredentials: true
+
+      - task: npmAuthenticate@0
+        inputs:
+          workingFile: '.npmrc'
+
+      - script: |
+          git config --global user.email "devkit-build-service@shory.local"
+          git config --global user.name "devkit Build Service"
+          git switch $(basename $(Build.SourceBranch))
+        displayName: Switch To '$(Build.SourceBranch)'
+
+      - template: build.yaml
+
+      - script: |
+          pnpm changeset status --verbose 
+          pnpm changeset status --verbose --output=./release-notes.json
+          pnpm changeset version
+        displayName: Bump Version
+
+      - script: |
+          pnpm check-major-version-policy
+        displayName: Avoid Major Version Publish Check
+
+      - script: |
+          git add --all -- ':!.npmrc'
+          git commit -m "pipeline: package publish"
+          git push
+        displayName: Push changes
+
+      - script: 'pnpm changeset publish'
+        displayName: 'Publish Packages'
+
+      - script: |
+          git push --follow-tags
+        displayName: Push tags
+
+      - bash: |
+          payload=$(node ./.changeset/create-release-notes.js)
+          echo $payload
+          echo "##vso[task.setvariable variable=RELEASE_NOTES;isoutput=true]$payload"
+        name: notification_payload
+        displayName: Prepare Notification
+
+      - task: CmdLine@2
+        displayName: Slack Notification
+        inputs:
+          script: |
+            echo '$(notification_payload.RELEASE_NOTES)'
+            curl --location $SLACK_HOOK \
+            --header 'Content-type: application/json' \
+            --data-raw '$(notification_payload.RELEASE_NOTES)'
+        env:
+          SLACK_HOOK: $(SLACK_HOOK)

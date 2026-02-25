@@ -1,0 +1,38 @@
+:root {
+	/* Start Data Table Variables */
+	--nj-dataTable-paging-container-spacing: 24px;
+	--nj-dataTable-content-spacing: 12px;
+	// rows
+	--nj-dataTable-row-even-bg: theme('colors.white');
+	--nj-dataTable-row-odd-bg: theme('colors.white');
+
+	// header
+	--nj-dataTable-header-bg: theme('colors.gray.50'); //value applied only in case headerColor=default
+	--nj-dataTable-header-text-color: theme('colors.gray.700');
+	--nj-dataTable-header-text-weight: 600;
+	--nj-dataTable-header-text-size: theme('fontSize.caption1');
+	//header borders
+	--nj-dataTable-flat-header-border-top-width: 0px;
+	--nj-dataTable-flat-header-border-bottom-width: 0px;
+
+	// cells
+	--nj-dataTable-cell-text-color: theme('colors.gray.900');
+	--nj-dataTable-cell-text-size: theme('fontSize.paragraph');
+
+	// pagination
+	--nj-dataTable-pagination-border: theme('colors.gray.300');
+	--nj-dataTable-pagination-cell-text: theme('colors.gray.700');
+	--nj-dataTable-pagination-cell-text-hover: theme('colors.brand.800');
+	--nj-dataTable-pagination-cell-bg-hover: theme('colors.gray.200');
+	--nj-dataTable-pagination-cell-bg-selected: theme('colors.brand.600');
+	--nj-dataTable-pagination-cell-text-selected: theme('colors.white');
+	--nj-dataTable-pagination-cell-border-disabled: theme('colors.gray.400');
+	--nj-dataTable-pagination-cell-text-disabled: theme('colors.gray.400');
+	--nj-dataTable-pagination-cell-bg-selected-disabled: theme('colors.gray.400');
+	--nj-dataTable-pagination-nexPrev-border: theme('colors.white');
+	// paging content
+	--nj-dataTable-paging-content-text-color: theme('colors.gray.700');
+	--nj-dataTable-paging-content-text-size: theme('fontSize.paragraph');
+	--nj-dataTable-paging-content-icon-weight: theme('fontWeight.medium');
+	/* End Data Table Variables */
+}

@@ -1,0 +1,7 @@
+packages:
+  - 'packages/apps/*'
+  - 'packages/shared/*'
+  - 'packages/libs/*'
+  - 'packages/storybook'
+  - 'packages/upgrade'
+  - 'packages/shory/*'

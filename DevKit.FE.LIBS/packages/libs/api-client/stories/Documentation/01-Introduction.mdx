@@ -1,0 +1,214 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/01 - Introduction" />
+
+# @devkit/api-client
+
+A powerful, type-safe API client library for React applications with support for both Axios and native Fetch API.
+
+## Overview
+
+The `@devkit/api-client` library provides a modern, type-safe way to make API requests in React applications. It combines
+the power of TypeScript, Zod validation, and React hooks to create a seamless developer experience.
+
+## Key Features
+
+✅ **Dual HTTP Client Support**: Choose between Axios or Fetch API  
+✅ **Type-Safe**: Full TypeScript support with automatic type inference  
+✅ **Runtime Validation**: Request/response validation using Zod schemas  
+✅ **React Hooks**: Easy integration with `useApiOnMount` and `useLazyApi`  
+✅ **Streaming Support**: Built-in support for streaming APIs (SSE, AI responses)  
+✅ **Progress Tracking**: Track upload/download progress with `onProgress`  
+✅ **Smart Detection**: Automatically uses Fetch for streaming requests  
+✅ **Token Management**: Automatic token refresh on 401 errors  
+✅ **Retry Logic**: Configurable retry with exponential backoff  
+✅ **Error Handling**: Structured error format with field-level validation  
+✅ **Factory Pattern**: Share configuration across multiple APIs
+
+## Installation
+
+```bash
+# Using npm
+npm install @devkit/api-client
+
+# Using yarn
+yarn add @devkit/api-client
+
+# Using pnpm
+pnpm add @devkit/api-client
+```
+
+### Peer Dependencies
+
+```bash
+npm install axios zod react
+```
+
+Required versions:
+
+- `axios`: ^1.0.0
+- `zod`: ^3.0.0
+- `react`: ^18.0.0
+
+## Quick Start
+
+### 1. Define an API
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+const getUserApi = createAPIDefinition({
+	method: 'GET',
+	url: '/users/:userId',
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string().email(),
+	}),
+});
+```
+
+### 2. Use in React Component
+
+```typescript
+import { useApiOnMount } from '@devkit/api-client';
+
+function UserProfile({ userId }: { userId: number }) {
+	const { result, isLoading, errors } = useApiOnMount(getUserApi, [userId]);
+
+	if (isLoading) return <div>Loading...</div>;
+	if (errors) return <div>Error: {errors.mapped[0].message}</div>;
+
+	return <div>Hello, {result?.name}!</div>;
+}
+```
+
+## Core Concepts
+
+### API Definitions
+
+Create reusable API definitions with full type safety:
+
+```typescript
+const createUserApi = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+	requestSchema: z.object({
+		name: z.string().min(2),
+		email: z.string().email(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+```
+
+### React Hooks
+
+**`useApiOnMount`** - Automatically fetch data when component mounts:
+
+```typescript
+const { result, isLoading, errors } = useApiOnMount(api, [dependencies]);
+```
+
+**`useLazyApi`** - Manually trigger API calls:
+
+```typescript
+const { callApi, result, isLoading, errors } = useLazyApi(api);
+await callApi(requestData);
+```
+
+### Axios vs Fetch
+
+Choose the HTTP client that fits your needs:
+
+- **Axios** (default): Mature, widely-used, automatic JSON parsing
+- **Fetch**: Native, streaming support, modern API
+
+```typescript
+// Use Fetch explicitly
+const api = createAPIDefinition({
+	method: 'GET',
+	url: '/data',
+	httpClient: 'fetch',
+});
+
+// Automatic Fetch for streaming
+await callApi(request, {
+	onStreamData: (chunk) => console.log(chunk), // Auto-detects and uses Fetch
+});
+```
+
+### Streaming APIs
+
+Built-in support for real-time data streaming:
+
+```typescript
+const chatApi = createAPIDefinition({
+	method: 'POST',
+	url: '/chat/stream',
+	requestSchema: z.object({ message: z.string() }),
+});
+
+// Use with streaming callback
+await callApi(
+	{ message: 'Hello!' },
+	{
+		onStreamData: (chunk) => {
+			console.log('Received:', chunk); // Real-time updates
+		},
+	}
+);
+```
+
+### Progress Tracking
+
+Track upload/download progress:
+
+```typescript
+await callApi(
+	{ file: myFile },
+	{
+		onProgress: (event) => {
+			console.log(`${event.percentage}% complete`);
+			console.log(`${event.loaded} of ${event.total} bytes`);
+		},
+	}
+);
+```
+
+## Documentation Structure
+
+This documentation is organized into the following sections:
+
+1. **Installation** - Setup and configuration
+2. **API Definitions** - Creating and configuring APIs
+3. **React Hooks** - Using hooks in your components
+4. **Validation** - Request/response validation with Zod
+5. **Error Handling** - Handling and displaying errors
+6. **Axios vs Fetch** - Choosing the right HTTP client
+7. **Streaming** - Real-time data streaming
+8. **Progress Tracking** - Upload/download progress
+9. **Token Refresh** - Automatic token management
+10. **Retry Logic** - Configuring retries
+11. **API Factory** - Sharing configuration
+12. **Advanced Configuration** - Advanced features
+13. **TypeScript** - Type safety best practices
+14. **FAQ** - Common questions and troubleshooting
+
+## Examples
+
+Check out the interactive examples in the **Sample APIs** section to see real-world usage patterns.
+
+## Next Steps
+
+- [Installation Guide →](/?path=/docs/api-client-documentation-01-installation--docs)
+- [API Definitions →](/?path=/docs/api-client-documentation-02-api-definitions--docs)
+- [React Hooks →](/?path=/docs/api-client-documentation-03-react-hooks--docs)
+
+## Support
+
+For issues, questions, or contributions, please refer to the project repository.

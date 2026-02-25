@@ -1,0 +1,582 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/07 - Axios vs Fetch" />
+
+# Axios vs Fetch API
+
+Understanding when and how to use Axios or the native Fetch API in @devkit/api-client.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Differences](#key-differences)
+- [When to Use Axios](#when-to-use-axios)
+- [When to Use Fetch](#when-to-use-fetch)
+- [Configuration](#configuration)
+- [Feature Parity](#feature-parity)
+- [Migration Guide](#migration-guide)
+
+## Overview
+
+@devkit/api-client supports **both** Axios and the native Fetch API as HTTP clients. Both implementations provide
+identical functionality and API surface, allowing you to choose based on your project needs.
+
+### Default Behavior
+
+By default, the library uses **Axios**. You can opt into Fetch by setting `httpClient: 'fetch'`.
+
+```typescript
+// Uses Axios (default)
+const axiosApi = createAPIDefinition({
+	url: '/data',
+	responseSchema: z.object({ data: z.string() }),
+});
+
+// Uses Fetch
+const fetchApi = createAPIDefinition({
+	url: '/data',
+	httpClient: 'fetch', // ✅ Opt into Fetch
+	responseSchema: z.object({ data: z.string() }),
+});
+```
+
+## Key Differences
+
+<table>
+	<thead>
+		<tr>
+			<th>Feature</th>
+			<th>Axios</th>
+			<th>Fetch</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<strong>Bundle Size</strong>
+			</td>
+			<td>~13KB gzipped</td>
+			<td>0KB (native)</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Browser Support</strong>
+			</td>
+			<td>All browsers</td>
+			<td>Modern browsers</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>JSON Parsing</strong>
+			</td>
+			<td>Automatic</td>
+			<td>Automatic (in our impl)</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Progress Tracking</strong>
+			</td>
+			<td>✅ Native</td>
+			<td>✅ Via ReadableStream</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Request Cancellation</strong>
+			</td>
+			<td>✅ AbortController</td>
+			<td>✅ AbortController</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Timeout</strong>
+			</td>
+			<td>✅ Built-in</td>
+			<td>✅ AbortSignal.timeout</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Interceptors</strong>
+			</td>
+			<td>✅ Native</td>
+			<td>❌ Not available</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Streaming</strong>
+			</td>
+			<td>❌ Not supported</td>
+			<td>✅ ReadableStream</td>
+		</tr>
+		<tr>
+			<td>
+				<strong>Node.js Support</strong>
+			</td>
+			<td>✅ Full support</td>
+			<td>⚠️ Requires polyfill</td>
+		</tr>
+	</tbody>
+</table>
+
+## When to Use Axios
+
+### ✅ Recommended For:
+
+1. **Legacy Projects**: If your project already uses Axios
+
+   ```typescript
+   // Consistent with existing Axios usage
+   const api = createAPIDefinition({
+   	url: '/data',
+   	// httpClient: 'axios' (default)
+   });
+   ```
+
+2. **Node.js Applications**: Axios has better Node.js support
+
+   ```typescript
+   // Server-side API calls
+   const serverApi = createAPIDefinition({
+   	url: '/internal/data',
+   	// Axios works seamlessly in Node.js
+   });
+   ```
+
+3. **Request/Response Interceptors**: When you need advanced interceptor patterns
+
+   ```typescript
+   import axios from 'axios';
+
+   // Global Axios interceptors
+   axios.interceptors.request.use((config) => {
+   	// Custom logic
+   	return config;
+   });
+   ```
+
+4. **Teams Familiar with Axios**: Lower learning curve
+   ```typescript
+   // Same patterns developers know
+   const api = createAPIDefinition({
+   	url: '/data',
+   	// Developer-friendly Axios behavior
+   });
+   ```
+
+## When to Use Fetch
+
+### ✅ Recommended For:
+
+1. **Modern Web Applications**: Reduce bundle size
+
+   ```typescript
+   const api = createAPIDefinition({
+   	url: '/data',
+   	httpClient: 'fetch', // ✅ Zero dependency
+   });
+   ```
+
+2. **Streaming APIs**: Real-time data with Server-Sent Events
+
+   ```typescript
+   const streamingApi = createAPIDefinition({
+   	url: '/stream',
+   	httpClient: 'fetch', // Required for streaming
+   	responseSchema: z.string(),
+   });
+
+   await streamingApi(
+   	{},
+   	{
+   		onStreamData: (chunk) => {
+   			console.log('Received:', chunk);
+   		},
+   	}
+   );
+   ```
+
+3. **Bundle Size Optimization**: Every KB counts
+
+   ```typescript
+   // Saves ~13KB from bundle
+   const api = createAPIDefinition({
+   	url: '/data',
+   	httpClient: 'fetch',
+   });
+   ```
+
+4. **Next.js Applications**: Use native fetch for better caching
+
+   ```typescript
+   // Next.js 13+ App Router
+   const api = createAPIDefinition({
+   	url: '/data',
+   	httpClient: 'fetch', // Leverages Next.js fetch cache
+   });
+   ```
+
+5. **Progressive Web Apps**: Native browser APIs
+   ```typescript
+   const pwaApi = createAPIDefinition({
+   	url: '/data',
+   	httpClient: 'fetch', // Works offline with service workers
+   });
+   ```
+
+## Configuration
+
+### API Definition Level
+
+Set `httpClient` on individual API definitions:
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+// Axios API
+const axiosApi = createAPIDefinition({
+	url: '/axios-endpoint',
+	responseSchema: z.object({ data: z.string() }),
+	// httpClient: 'axios' (default)
+});
+
+// Fetch API
+const fetchApi = createAPIDefinition({
+	url: '/fetch-endpoint',
+	responseSchema: z.object({ data: z.string() }),
+	httpClient: 'fetch', // ✅ Use Fetch
+});
+```
+
+### Factory Level
+
+Set `httpClient` globally for all APIs in a factory:
+
+```typescript
+import { z } from 'zod';
+import { APIFactory } from '@devkit/api-client';
+
+// All APIs will use Fetch
+const apiFactory = new APIFactory({
+	baseUrl: 'https://api.example.com',
+	httpClient: 'fetch', // ✅ Global setting
+	originalResponseSchema: z.any(),
+});
+
+// This API uses Fetch (inherited from factory)
+const api1 = apiFactory.createAPIDefinition({
+	url: '/endpoint1',
+	responseSchema: z.object({ data: z.string() }),
+});
+
+// Override to use Axios for specific API
+const api2 = apiFactory.createAPIDefinition({
+	url: '/endpoint2',
+	httpClient: 'axios', // Override factory setting
+	responseSchema: z.object({ data: z.string() }),
+});
+```
+
+### Automatic Detection
+
+Streaming APIs automatically use Fetch:
+
+```typescript
+const api = createAPIDefinition({
+	url: '/stream',
+	responseSchema: z.string(),
+	// httpClient is automatically 'fetch' when onStreamData is used
+});
+
+// Automatically uses Fetch because of onStreamData
+await api(
+	{},
+	{
+		onStreamData: (chunk) => console.log(chunk),
+	}
+);
+```
+
+### Priority Order
+
+Configuration is resolved in this order (highest to lowest priority):
+
+1. **Automatic Detection**: `onStreamData` callback forces Fetch
+2. **API Definition Level**: Individual `httpClient` setting
+3. **Factory Level**: Factory's `httpClient` setting
+4. **Default**: Axios
+
+```typescript
+const factory = new APIFactory({
+	httpClient: 'fetch', // Priority 3
+});
+
+const api = factory.createAPIDefinition({
+	url: '/data',
+	httpClient: 'axios', // Priority 2 - overrides factory
+	responseSchema: z.string(),
+});
+
+// Priority 1 - automatic detection overrides everything
+await api(
+	{},
+	{
+		onStreamData: (chunk) => {}, // Forces Fetch regardless of config
+	}
+);
+```
+
+## Feature Parity
+
+Both implementations provide identical features:
+
+### ✅ Request/Response Validation
+
+```typescript
+const api = createAPIDefinition({
+	url: '/users',
+	method: 'POST',
+	requestSchema: z.object({
+		name: z.string(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+	}),
+	httpClient: 'fetch', // Works with both
+});
+```
+
+### ✅ Error Handling
+
+```typescript
+try {
+	await api({ name: 'John' });
+} catch (error) {
+	// Same error format for both Axios and Fetch
+	console.error(error.mapped[0].code);
+}
+```
+
+### ✅ Retry Logic
+
+```typescript
+const api = createAPIDefinition({
+	url: '/data',
+	retryConfig: {
+		retries: 3,
+		retryDelay: (count) => count * 1000,
+	},
+	httpClient: 'fetch', // Retry works with both
+});
+```
+
+### ✅ Token Refresh
+
+```typescript
+const api = createAPIDefinition({
+	url: '/protected',
+	refreshToken: async (headers, responseHeaders) => {
+		// Get new token
+		return newToken;
+	},
+	httpClient: 'fetch', // Token refresh works with both
+});
+```
+
+### ✅ Progress Tracking
+
+```typescript
+const uploadApi = createAPIDefinition({
+	url: '/upload',
+	method: 'POST',
+	requestSchema: z.object({ file: z.any() }),
+	responseSchema: z.object({ url: z.string() }),
+	httpClient: 'fetch', // Progress tracking works with both
+});
+
+await uploadApi(
+	{ file },
+	{
+		onProgress: (event) => {
+			console.log(`Progress: ${event.percentage}%`);
+		},
+	}
+);
+```
+
+### ✅ Timeout
+
+```typescript
+const api = createAPIDefinition({
+	url: '/slow',
+	timeout: 5000, // 5 seconds
+	httpClient: 'fetch', // Timeout works with both
+});
+```
+
+### ⚠️ Streaming (Fetch Only)
+
+```typescript
+const streamApi = createAPIDefinition({
+	url: '/stream',
+	httpClient: 'fetch', // Required for streaming
+	responseSchema: z.string(),
+});
+
+await streamApi(
+	{},
+	{
+		onStreamData: (chunk) => console.log(chunk),
+	}
+);
+```
+
+## Migration Guide
+
+### From Axios to Fetch
+
+1. **Add httpClient flag**:
+
+   ```typescript
+   const api = createAPIDefinition({
+   	url: '/data',
+   	httpClient: 'fetch', // ✅ Add this
+   	responseSchema: z.object({ data: z.string() }),
+   });
+   ```
+
+2. **Test your API calls**: Both should work identically
+
+3. **Remove Axios dependency** (if not used elsewhere):
+   ```bash
+   npm uninstall axios
+   ```
+
+### From Fetch to Axios
+
+1. **Remove httpClient flag**:
+
+   ```typescript
+   const api = createAPIDefinition({
+   	url: '/data',
+   	// httpClient: 'fetch', // ❌ Remove this
+   	responseSchema: z.object({ data: z.string() }),
+   });
+   ```
+
+2. **Ensure Axios is installed**:
+   ```bash
+   npm install axios
+   ```
+
+### Gradual Migration
+
+Migrate one API at a time:
+
+```typescript
+// Start with mixed approach
+const legacyApi = createAPIDefinition({
+	url: '/legacy',
+	// httpClient: 'axios' (Axios)
+});
+
+const modernApi = createAPIDefinition({
+	url: '/modern',
+	httpClient: 'fetch', // Migrate gradually
+});
+```
+
+## Performance Comparison
+
+### Bundle Size Impact
+
+```
+Application without API client: 200 KB
++ Axios implementation:         213 KB (+13 KB)
++ Fetch implementation:         200 KB (+0 KB)
+```
+
+### Runtime Performance
+
+Both implementations have similar performance:
+
+- **Small payloads** (&lt;10 KB): ~identical
+- **Large payloads** (&gt;1 MB): Fetch slightly faster due to streaming
+- **Many requests**: ~identical
+
+### Recommendation
+
+Choose based on your priorities:
+
+- **Bundle size matters**: Use Fetch
+- **Team familiarity matters**: Use Axios
+- **Streaming needed**: Use Fetch
+- **Node.js environment**: Use Axios
+
+## Complete Examples
+
+### Example 1: Mixed Usage
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+// Use Axios for traditional APIs
+const getUserApi = createAPIDefinition({
+	url: '/users/:id',
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+});
+
+// Use Fetch for streaming
+const streamChatApi = createAPIDefinition({
+	url: '/chat/stream',
+	httpClient: 'fetch',
+	responseSchema: z.string(),
+});
+
+// Use Fetch for bundle optimization
+const publicDataApi = createAPIDefinition({
+	url: '/public/data',
+	httpClient: 'fetch',
+	responseSchema: z.object({
+		data: z.array(z.string()),
+	}),
+});
+```
+
+### Example 2: Factory with Override
+
+```typescript
+import { z } from 'zod';
+import { APIFactory } from '@devkit/api-client';
+
+// Default to Fetch for all APIs
+const apiFactory = new APIFactory({
+	baseUrl: 'https://api.example.com',
+	httpClient: 'fetch',
+	originalResponseSchema: z.any(),
+});
+
+// Most APIs use Fetch
+const api1 = apiFactory.createAPIDefinition({
+	url: '/endpoint1',
+	responseSchema: z.object({ data: z.string() }),
+});
+
+// Special case: use Axios for file upload
+const uploadApi = apiFactory.createAPIDefinition({
+	url: '/upload',
+	method: 'POST',
+	httpClient: 'axios', // Override for specific needs
+	requestSchema: z.object({ file: z.any() }),
+	responseSchema: z.object({ url: z.string() }),
+});
+```
+
+## Next Steps
+
+- Learn about [Streaming APIs](./07-streaming.md)
+- Explore [Progress Tracking](./08-progress-tracking.md)
+- Understand [Advanced Configuration](./12-advanced-configuration.md)

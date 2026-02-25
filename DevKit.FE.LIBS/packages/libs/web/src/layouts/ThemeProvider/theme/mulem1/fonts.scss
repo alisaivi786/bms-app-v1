@@ -1,0 +1,36 @@
+:root {
+	/* Start Fonts Variables */
+	--nj-font-brand-en: 'Outfit';
+	--nj-font-brand-ar: 'Outfit';
+	/* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+	font-family: 'Outfit';
+	src: local('OutfitBold'), url('/fonts/Outfit-Bold.otf') format('opentype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Outfit';
+	src: local('OutfitMedium'), url('/fonts/Outfit-Medium.otf') format('opentype');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Outfit';
+	src: local('OutfitRegular'), url('/fonts/Outfit-Regular.otf') format('opentype');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Outfit';
+	src: local('OutfitSemiBold'), url('/fonts/Outfit-SemiBold.otf') format('opentype');
+	font-weight: 600;
+	font-display: swap;
+}
+/* End Fonts files importation */

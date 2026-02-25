@@ -1,0 +1,78 @@
+{
+	"name": "@devkit/api-client",
+	"version": "12.3.2",
+	"majorVersionRestrict": "12",
+	"main": "dist/cjs/index.js",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"require": "./dist/cjs/index.js",
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./dist/*": {
+			"require": "./dist/cjs/*.js",
+			"import": "./dist/*.js",
+			"types": "./dist/*.d.ts",
+			"default": "./dist/*.js"
+		}
+	},
+	"scripts": {
+		"build": "rimraf -rf ./dist && tsc --project tsconfig.build.json && tsc --project tsconfig.build.cjs.json",
+		"prepack": "npm run build",
+		"lint": "eslint ./src",
+		"lint-fix": "eslint --fix ./src",
+		"type-check": "npx tsc --emitDeclarationOnly false --noEmit",
+		"test": "jest",
+		"test:watch": "jest --watch",
+		"test:coverage": "jest --coverage",
+		"dev": "storybook dev -p 6011",
+		"start": "storybook dev -p 6011",
+		"storybook:build": "storybook build --disable-telemetry --output-dir=../../../.build/api-client"
+	},
+	"nx": {
+		"tags": [
+			"@devkit/api-client"
+		]
+	},
+	"devDependencies": {
+		"@happy-dom/jest-environment": "^14.12.0",
+		"@devkit/ts-config": "workspace:*",
+		"@devkit/utilities": "workspace:*",
+		"@storybook/addon-docs": "9.1.1",
+		"@storybook/addon-links": "9.1.1",
+		"@storybook/addons": "^7.0.26",
+		"@storybook/preset-scss": "^1.0.3",
+		"@storybook/react": "9.1.1",
+		"@storybook/react-vite": "9.1.1",
+		"@testing-library/jest-dom": "^6.1.5",
+		"@testing-library/react": "^14.1.2",
+		"@testing-library/react-hooks": "^8.0.1",
+		"@types/jest": "^29.5.11",
+		"@types/lodash": "^4.14.194",
+		"@types/node": "^20.12.12",
+		"@types/react": "^18.2.21",
+		"axios": "^1.5.0",
+		"axios-mock-adapter": "^1.22.0",
+		"axios-retry": "^3.8.0",
+		"eslint-plugin-storybook": "9.1.1",
+		"jest": "^29.7.0",
+		"react": "18.2.0",
+		"react-dom": "18.2.0",
+		"storybook": "9.1.1",
+		"ts-jest": "^29.1.1",
+		"typescript": "^5.2.2",
+		"zod": "~3.22.2"
+	},
+	"peerDependencies": {
+		"@devkit/utilities": "12.x",
+		"@types/uuid": ">= 8.x",
+		"axios": "^1.x",
+		"axios-retry": "^3.8.0",
+		"lodash": ">= 4.17.21",
+		"uuid": ">= 8.x",
+		"zod": "~3.22.2"
+	}
+}

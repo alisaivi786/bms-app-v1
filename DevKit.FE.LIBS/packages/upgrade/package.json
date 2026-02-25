@@ -1,0 +1,22 @@
+{
+	"name": "@devkit/upgrade",
+	"version": "12.0.0",
+	"majorVersionRestrict": "12",
+	"description": "",
+	"main": "index.mjs",
+	"type": "module",
+	"bin": {
+		"devkit-upgrade": "./index.mjs"
+	},
+	"scripts": {
+		"fix": "node ./index.js",
+		"fix-colors": "node ./patches/fix-colors.js",
+		"fix-fonts": "node ./patches/fix-fonts.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"replace-in-file": "^7.0.1"
+	}
+}

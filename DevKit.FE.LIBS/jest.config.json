@@ -1,0 +1,10 @@
+{
+	"moduleNameMapper": {
+		"@devkit/config/dist/date": "<rootDir>/packages/libs/config/dist/index.js"
+	},
+	"projects": [
+		"<rootDir>/packages/libs/utilities/src",
+		"<rootDir>/packages/libs/nextjs/src",
+		"<rootDir>/packages/libs/web/src"
+	]
+}

@@ -1,0 +1,41 @@
+{
+	"extends": "nx/presets/npm.json",
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"tasksRunnerOptions": {
+		"default": {
+			"runner": "nx/tasks-runners/default",
+			"options": {
+				"cacheableOperations": ["build"]
+			}
+		}
+	},
+	"targetDefaults": {
+		"type-check": {
+			"dependsOn": ["^build", "^type-check"]
+		},
+		"build": {
+			"dependsOn": ["^build", "^type-check"]
+		},
+		"dev": {
+			"dependsOn": ["^build"]
+		},
+		"storybook:build": {
+			"dependsOn": ["^build"]
+		},
+		"start": {
+			"dependsOn": ["^dev"]
+		},
+		"lint": {
+			"dependsOn": ["lint"]
+		},
+		"lint-fix": {
+			"dependsOn": ["lint-fix"]
+		},
+		"test": {
+			"dependsOn": ["test"]
+		},
+		"test:cover": {
+			"dependsOn": ["test:cover"]
+		}
+	}
+}

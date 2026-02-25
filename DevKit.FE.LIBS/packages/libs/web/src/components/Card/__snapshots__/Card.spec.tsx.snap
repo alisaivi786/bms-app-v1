@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Card Component should render correctly with default variant 1`] = `
+<div>
+  <section
+    class="shadow-card rounded-xl p-6 xl:p-8
+      
+      test-class-name"
+    data-testid="card"
+  >
+    <div
+      data-testid="children"
+    >
+      Card test component
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Card Component should render correctly with responsive variant 1`] = `
+<div>
+  <section
+    class="shadow-card rounded-xl p-6 xl:p-8
+      max-sm:p-0 max-sm:rounded-none max-sm:shadow-none
+      test-class-name"
+    data-testid="card"
+  >
+    <div
+      data-testid="children"
+    >
+      Card test component
+    </div>
+  </section>
+</div>
+`;

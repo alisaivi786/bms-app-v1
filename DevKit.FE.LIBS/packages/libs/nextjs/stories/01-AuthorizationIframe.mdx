@@ -1,0 +1,160 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { LinkToId } from '../stories-helpers';
+
+<Meta title="Components/AuthorizationIframe" />
+
+# AuthorizationIframe
+
+You can use this component to leverage the <a href="/?path=/docs/components-broadcastfactory">BroadcastFactory</a> and
+share messages between different tabs with different domains (Sub and Parent). As an example here we will conceder the
+use case of identity (as sub website), and the all admin websites (as Parent)
+
+### Table Of Content
+
+1. <LinkToId elementId="BroadcastFactory">Define The BroadcastFactory Factory On The Sub Website</LinkToId>
+1. <LinkToId elementId="SubWebsite">Create The IFrame Page On The Sub Website</LinkToId>
+1. <LinkToId elementId="ParentWebsite">Handling The Parent Website</LinkToId>
+1. <LinkToId elementId="SecuringData">VERY IMPORTANT: Securing Your Data And Defining Wight List</LinkToId>
+
+<h2 id="BroadcastFactory">1. Define The BroadcastFactory Factory On The Sub Website</h2>
+
+Please follow the steps in <a href="/?path=/docs/components-broadcastfactory">BroadcastFactory</a> on the sub website
+"in our example its the identity" to define the logic for sharing the messages between the different tabs.
+
+<h2 id="SubWebsite">2. Create The IFrame Page On The Sub Website</h2>
+
+In this page we need to handle the logic for sending the messages that we will receive through the `BroadcastFactory`
+and send it to the parent website "In our example its the admin website"
+
+```typescript
+// ./pages/sso/iframe-authorize.tsx
+import { useCallback } from 'react';
+import { AuthorizationSource, AuthorizeSourcePage } from '@devkit/nextjs';
+
+function IFrameAuthorize() {
+	const isUserLoggerIn = false; // boolean to identify if the user is already logged in
+	const user = { uid: '' }; // The current logged in user object and his uid
+	// Logged in user uid to pass to the client website and detect if the user logged in or not
+	const loggedUserUid = isUserLoggerIn ? user?.uid : undefined;
+
+	/**
+	 * To generate the authorization code that will be passed to to the client website and used to authorize it
+	 *
+	 * @param paramClientId - The client id fetched from the query param to generate the authorization code against
+	 * @returns The authorization code
+	 */
+	const authorizeUser = useCallback(async (paramClientId: string | null) => {
+		if (!paramClientId) return '';
+
+		// Generate authorization code and return it
+		return 'authorization code';
+	}, []);
+
+	return (
+		<AuthorizeSourcePage
+			authorizeUser={authorizeUser}
+			// Logged in user uid to pass to the client website and detect if the user logged in or not
+			loggedUserUid={isUserLoggerIn ? user?.uid : undefined}
+			// The source of authorization (which identity are you using)
+			authorizationSource={AuthorizationSource['shory-admin-identity']}
+		/>
+	);
+}
+
+export default IFrameAuthorize;
+```
+
+<h2 id="ParentWebsite">3. Handling The Parent Website</h2>
+
+Now in each parent website we need to handle the login and logout parts logic based on the shared message
+
+1. Create a new component as follows
+
+```typescript
+// ./pages/AuthorizeClient
+import { useCallback } from 'react';
+import { AuthorizationSource, AuthorizeClient as AuthorizeClientComp } from '@devkit/nextjs';
+import { AppConfig } from '../config/app-config';
+import { useWebNavigation } from '../contexts/navigation';
+
+function AuthorizeClient() {
+	const { navigationPush } = useWebNavigation();
+
+	const isUserLoggerIn = false; // boolean to identify if the user is already logged in
+	const user = { uid: '' }; // The current logged in user object and his uid
+
+	const onLogin = useCallback((code: string) => {
+		// Login the user using the authorization code shared by the identity
+	}, []);
+
+	const onLogout = useCallback(() => {
+		// Logout the user
+		navigationPush('SSO_Logout');
+	}, [navigationPush]);
+
+	return (
+		<AuthorizeClientComp
+			// The source of authorization (which identity are you using) ... should be the same as the source
+			authorizationSource={AuthorizationSource['shory-admin-identity']}
+			authorizeUrl={AppConfig.sso_ServerURLs.iframeAuthorize}
+			// Logged in user uid to pass to the client website and detect if the user logged in or not
+			loggedUserUid={isUserLoggerIn ? user?.uid : undefined}
+			onLogin={onLogin}
+			onLogout={onLogout}
+			productId={String(AppConfig.productId)}
+		/>
+	);
+}
+
+export default AuthorizeClient;
+```
+
+2. Now we need to import same component and use it on the `_app.tsx`
+
+```typescript
+// ./pages/_app.tsx
+import AuthorizeClient from '../components/AuthorizeClient';
+
+const AppRoot = (props: AppProps) => {
+	return (
+		<>
+			{/** ...... */}
+			<AuthorizeClient />
+		</>
+	);
+};
+
+export default AppRoot;
+```
+
+<h2 id="SecuringData">4. VERY IMPORTANT: Securing Your Data And Defining Wight List</h2>
+
+Now we are sharing sensitive data so we have to make sure that we are protecting it. to do that we need to make sure
+that our identity website can not be opened in any IFrames except for the domains that we allow.
+
+To do that we need to add one header to all pages in the website by changing the `next.config.js` file and add the
+following section:
+
+```typescript
+// next.config.js
+
+const nextConfig = {
+	headers: async () => {
+		return [
+			{
+				source: '/:path*',
+				headers: [
+					{
+						key: 'Content-Security-Policy',
+						value: `frame-ancestors ${process.env.PUBLIC_IFRAME_ANCESTORS_WHITELIST}`,
+					},
+				],
+			},
+		];
+	},
+	// .... The rest of the configs
+};
+```
+
+If we set the env variable `PUBLIC_IFRAME_ANCESTORS_WHITELIST` to be `*` it will allow any origin to use our website,
+but for example here at should we should set it as `https://*.shory.com` to allow only any shory subdomains

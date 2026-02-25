@@ -1,0 +1,8 @@
+{
+	"name": "@devkit/fastlane-plugin",
+	"version": "1.0.7",
+	"majorVersionRestrict": "1",
+	"description": "",
+	"author": "",
+	"license": "ISC"
+}

@@ -1,0 +1,636 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/10 - API Factory" />
+
+# API Factory
+
+Learn how to use the API Factory pattern for shared configuration across multiple APIs.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Basic Usage](#basic-usage)
+- [Configuration Options](#configuration-options)
+- [Use Cases](#use-cases)
+- [Advanced Patterns](#advanced-patterns)
+- [Best Practices](#best-practices)
+
+## Overview
+
+The API Factory allows you to:
+
+- Share common configuration across multiple API definitions
+- Define base URLs, headers, and settings once
+- Override factory settings at the API level
+- Organize related APIs together
+- Switch between Axios and Fetch at the factory level
+
+### Benefits
+
+✅ **DRY**: Define common config once  
+✅ **Consistency**: All APIs use same base settings  
+✅ **Flexibility**: Override factory settings per API  
+✅ **Organization**: Group related APIs together  
+✅ **Type Safety**: Full TypeScript support
+
+## Basic Usage
+
+### Creating a Factory
+
+```typescript
+import { createAPIFactory } from '@devkit/api-client';
+
+const userApiFactory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+	headers: {
+		'Content-Type': 'application/json',
+	},
+});
+```
+
+### Defining APIs with Factory
+
+```typescript
+import { z } from 'zod';
+
+// Define multiple APIs using the same factory
+const getUserApi = userApiFactory({
+	method: 'GET',
+	url: '/users/:userId',
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+
+const createUserApi = userApiFactory({
+	method: 'POST',
+	url: '/users',
+	requestSchema: z.object({
+		name: z.string(),
+		email: z.string(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+
+const updateUserApi = userApiFactory({
+	method: 'PUT',
+	url: '/users/:userId',
+	requestSchema: z.object({
+		name: z.string().optional(),
+		email: z.string().optional(),
+	}),
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+```
+
+### Using Factory APIs
+
+```typescript
+import { useApiOnMount, useLazyApi } from '@devkit/api-client';
+
+function UserProfile({ userId }: { userId: number }) {
+	// Use factory-created API
+	const { result } = useApiOnMount(getUserApi, [userId]);
+
+	return <div>{result?.name}</div>;
+}
+
+function CreateUserForm() {
+	const { callApi } = useLazyApi(createUserApi);
+
+	const handleSubmit = async (data) => {
+		await callApi(data);
+	};
+
+	return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+## Configuration Options
+
+### Full Configuration
+
+```typescript
+const apiFactory = createAPIFactory({
+	// Base URL for all APIs
+	baseURL: 'https://api.example.com/v1',
+
+	// Common headers
+	headers: {
+		'Content-Type': 'application/json',
+		'X-API-Version': '1.0',
+	},
+
+	// Token management
+	getToken: () => localStorage.getItem('auth-token'),
+	refreshToken: async () => {
+		const response = await fetch('/auth/refresh', {
+			method: 'POST',
+			credentials: 'include',
+		});
+		const data = await response.json();
+		localStorage.setItem('auth-token', data.token);
+	},
+
+	// Timeout (milliseconds)
+	timeout: 30000,
+
+	// Retry configuration
+	retries: 3,
+	retryDelay: 1000,
+	retryCondition: (error) => {
+		return error.response?.status >= 500;
+	},
+
+	// Use Fetch instead of Axios
+	httpClient: 'axios', // default
+
+	// Transform responses
+	transformResponse: (data) => {
+		// Transform all responses from factory APIs
+		return data;
+	},
+
+	// Detect error responses
+	isErrorResponse: (data) => {
+		return data.error === true;
+	},
+});
+```
+
+### Configuration Priority
+
+When using a factory, configuration is merged in this order:
+
+1. **Factory-level config** (lowest priority)
+2. **API-level config** (highest priority)
+
+```typescript
+const factory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+	timeout: 5000,
+	httpClient: 'axios', // Use Axios by default
+});
+
+const api = factory({
+	method: 'GET',
+	url: '/data',
+	timeout: 10000, // ✅ Overrides factory timeout
+	httpClient: 'fetch', // ✅ Overrides factory httpClient
+});
+```
+
+## Use Cases
+
+### Microservices Architecture
+
+```typescript
+// User service
+const userServiceFactory = createAPIFactory({
+	baseURL: 'https://api.example.com/users',
+	headers: { 'X-Service': 'users' },
+});
+
+export const getUserApi = userServiceFactory({
+	method: 'GET',
+	url: '/:userId',
+	responseSchema: UserSchema,
+});
+
+export const createUserApi = userServiceFactory({
+	method: 'POST',
+	url: '/',
+	requestSchema: CreateUserSchema,
+	responseSchema: UserSchema,
+});
+
+// Product service
+const productServiceFactory = createAPIFactory({
+	baseURL: 'https://api.example.com/products',
+	headers: { 'X-Service': 'products' },
+});
+
+export const getProductApi = productServiceFactory({
+	method: 'GET',
+	url: '/:productId',
+	responseSchema: ProductSchema,
+});
+
+export const createProductApi = productServiceFactory({
+	method: 'POST',
+	url: '/',
+	requestSchema: CreateProductSchema,
+	responseSchema: ProductSchema,
+});
+```
+
+### Authentication Management
+
+```typescript
+const authenticatedFactory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+
+	getToken: () => {
+		return localStorage.getItem('access-token');
+	},
+
+	refreshToken: async () => {
+		try {
+			const refreshToken = localStorage.getItem('refresh-token');
+			const response = await fetch('/auth/refresh', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ refreshToken }),
+			});
+
+			const data = await response.json();
+			localStorage.setItem('access-token', data.accessToken);
+			localStorage.setItem('refresh-token', data.refreshToken);
+		} catch (error) {
+			// Redirect to login
+			window.location.href = '/login';
+			throw error;
+		}
+	},
+
+	// Retry on 401 after token refresh
+	retries: 1,
+	retryCondition: (error) => {
+		return error.response?.status === 401;
+	},
+});
+
+// All APIs will have authentication
+const getUserApi = authenticatedFactory({
+	method: 'GET',
+	url: '/users/:userId',
+	responseSchema: UserSchema,
+});
+```
+
+### Multi-Tenant Applications
+
+```typescript
+const createTenantFactory = (tenantId: string) => {
+	return createAPIFactory({
+		baseURL: 'https://api.example.com',
+		headers: {
+			'X-Tenant-ID': tenantId,
+		},
+	});
+};
+
+// Usage
+const tenant1Factory = createTenantFactory('tenant-1');
+const tenant2Factory = createTenantFactory('tenant-2');
+
+const getTenant1Users = tenant1Factory({
+	method: 'GET',
+	url: '/users',
+	responseSchema: z.array(UserSchema),
+});
+
+const getTenant2Users = tenant2Factory({
+	method: 'GET',
+	url: '/users',
+	responseSchema: z.array(UserSchema),
+});
+```
+
+### Versioned APIs
+
+```typescript
+const v1Factory = createAPIFactory({
+	baseURL: 'https://api.example.com/v1',
+	headers: { 'X-API-Version': '1' },
+});
+
+const v2Factory = createAPIFactory({
+	baseURL: 'https://api.example.com/v2',
+	headers: { 'X-API-Version': '2' },
+});
+
+// Support both versions
+export const getUserV1 = v1Factory({
+	method: 'GET',
+	url: '/users/:userId',
+	responseSchema: UserV1Schema,
+});
+
+export const getUserV2 = v2Factory({
+	method: 'GET',
+	url: '/users/:userId',
+	responseSchema: UserV2Schema,
+});
+```
+
+## Advanced Patterns
+
+### Factory with Custom Error Handling
+
+```typescript
+const apiFactory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+
+	isErrorResponse: (data) => {
+		// Custom error detection
+		return data.success === false || data.error !== undefined;
+	},
+
+	transformResponse: (data) => {
+		// Unwrap custom API format
+		if (data.success && data.data) {
+			return data.data;
+		}
+		return data;
+	},
+});
+```
+
+### Factory with Request Interceptors
+
+```typescript
+const apiFactory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+
+	transformRequest: (config) => {
+		// Add timestamp to all requests
+		return {
+			...config,
+			headers: {
+				...config.headers,
+				'X-Request-Time': Date.now().toString(),
+			},
+		};
+	},
+});
+```
+
+### Conditional Factory Selection
+
+```typescript
+const createApiFactory = (useStreamingEndpoint: boolean) => {
+	return createAPIFactory({
+		baseURL: useStreamingEndpoint ? 'https://stream.api.example.com' : 'https://api.example.com',
+		httpClient: useStreamingEndpoint ? 'fetch' : 'axios', // Use Fetch for streaming
+	});
+};
+
+// Usage
+const factory = createApiFactory(enableStreaming);
+```
+
+### Factory Composition
+
+```typescript
+// Base factory
+const baseFactory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+	timeout: 5000,
+});
+
+// Extended factory (simulated)
+const createAuthFactory = (baseConfig: any) => {
+	return createAPIFactory({
+		...baseConfig,
+		getToken: () => localStorage.getItem('token'),
+		refreshToken: async () => {
+			// Refresh logic
+		},
+	});
+};
+
+const authFactory = createAuthFactory({
+	baseURL: 'https://api.example.com',
+	timeout: 5000,
+});
+```
+
+### Per-Request Configuration Override
+
+```typescript
+const factory = createAPIFactory({
+	baseURL: 'https://api.example.com',
+	timeout: 5000,
+});
+
+const api = factory({
+	method: 'GET',
+	url: '/data',
+});
+
+// Override at call time
+const { callApi } = useLazyApi(api);
+
+await callApi(
+	{
+		/* request data */
+	},
+	{
+		// Override factory/API settings
+		timeout: 10000,
+		headers: {
+			'X-Custom-Header': 'value',
+		},
+	}
+);
+```
+
+## Best Practices
+
+### 1. Organize by Domain
+
+```typescript
+// ✅ Good: Separate factories by domain
+// api/users/factory.ts
+export const userApiFactory = createAPIFactory({
+	baseURL: 'https://api.example.com/users',
+});
+
+// api/products/factory.ts
+export const productApiFactory = createAPIFactory({
+	baseURL: 'https://api.example.com/products',
+});
+
+// ❌ Bad: Single factory for everything
+const apiFactory = createAPIFactory({ baseURL: 'https://api.example.com' });
+```
+
+### 2. Use Environment Variables
+
+```typescript
+// ✅ Good: Configuration from environment
+const apiFactory = createAPIFactory({
+  baseURL: process.env.REACT_APP_API_URL,
+  timeout: parseInt(process.env.REACT_APP_API_TIMEOUT || '5000'),
+});
+
+// ❌ Bad: Hardcoded values
+const apiFactory = createAPIFactory({
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+});
+```
+
+### 3. Centralize Token Management
+
+```typescript
+// ✅ Good: Shared token logic
+const authFactory = createAPIFactory({
+	getToken: () => TokenService.getToken(),
+	refreshToken: () => TokenService.refresh(),
+});
+
+// ❌ Bad: Duplicate token logic
+const factory1 = createAPIFactory({
+	getToken: () => localStorage.getItem('token'),
+});
+const factory2 = createAPIFactory({
+	getToken: () => localStorage.getItem('token'), // Duplicated
+});
+```
+
+### 4. Type-Safe Factories
+
+```typescript
+// ✅ Good: Export factory type
+export type UserApiFactory = ReturnType<typeof createAPIFactory>;
+
+export const userApiFactory: UserApiFactory = createAPIFactory({
+  baseURL: 'https://api.example.com/users',
+});
+
+// ❌ Bad: No type exports
+export const userApiFactory = createAPIFactory({
+  baseURL: 'https://api.example.com/users',
+});
+```
+
+### 5. Document Factory Purpose
+
+```typescript
+// ✅ Good: Clear documentation
+/**
+ * Factory for user-related API endpoints.
+ *
+ * Base URL: https://api.example.com/users
+ * Authentication: Required (Bearer token)
+ * Retry: 3 attempts on 5xx errors
+ */
+export const userApiFactory = createAPIFactory({
+	baseURL: 'https://api.example.com/users',
+	getToken: () => localStorage.getItem('token'),
+	retries: 3,
+});
+```
+
+### 6. Avoid Over-Configuration
+
+```typescript
+// ✅ Good: Minimal factory config
+const apiFactory = createAPIFactory({
+  baseURL: 'https://api.example.com',
+  getToken: () => localStorage.getItem('token'),
+});
+
+// ❌ Bad: Too many options
+const apiFactory = createAPIFactory({
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+  retries: 3,
+  retryDelay: 1000,
+  // ... 20 more options
+});
+```
+
+## Complete Example
+
+```typescript
+// api/factory.ts
+import { createAPIFactory } from '@devkit/api-client';
+
+export const apiFactory = createAPIFactory({
+  baseURL: process.env.REACT_APP_API_URL,
+
+  getToken: () => {
+    return localStorage.getItem('access-token');
+  },
+
+  refreshToken: async () => {
+    const refreshToken = localStorage.getItem('refresh-token');
+    const response = await fetch('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+    const data = await response.json();
+    localStorage.setItem('access-token', data.accessToken);
+  },
+
+  timeout: 30000,
+  retries: 3,
+
+  httpClient: 'axios', // Use Axios by default
+});
+
+// api/users.ts
+import { z } from 'zod';
+import { apiFactory } from './factory';
+
+const UserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
+});
+
+export const getUserApi = apiFactory({
+  method: 'GET',
+  url: '/users/:userId',
+  responseSchema: UserSchema,
+});
+
+export const createUserApi = apiFactory({
+  method: 'POST',
+  url: '/users',
+  requestSchema: z.object({
+    name: z.string(),
+    email: z.string(),
+  }),
+  responseSchema: UserSchema,
+});
+
+// components/UserProfile.tsx
+import { useApiOnMount } from '@devkit/api-client';
+import { getUserApi } from '../api/users';
+
+export function UserProfile({ userId }: { userId: number }) {
+  const { result, isLoading } = useApiOnMount(getUserApi, [userId]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (!result) return null;
+
+  return (
+    <div>
+      <h1>{result.name}</h1>
+      <p>{result.email}</p>
+    </div>
+  );
+}
+```
+
+## Next Steps
+
+- Learn about [Advanced Configuration](./12-advanced-configuration.md)
+- Explore [Token Refresh](./09-token-refresh.md)
+- Understand [TypeScript Best Practices](./13-typescript.md)

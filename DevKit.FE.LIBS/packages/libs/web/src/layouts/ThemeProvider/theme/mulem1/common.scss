@@ -1,0 +1,92 @@
+:root {
+	/* Start Header Variables */
+	--nj-brand-header: theme('colors.brand.800'); /* mulem1 primary */
+	--nj-brand-login-header: theme('colors.white'); /* mulem1 secondary */
+	/* End Header Variables */
+
+	/* Start Colors Variables */
+	--nj-brand: theme('colors.brand.600'); /* mulem1 primary */
+	--nj-brand-hover: theme('colors.brand.700'); /* mulem1 secondary-content, lighter tint */
+	--nj-dark: theme('colors.dark.1'); /* mulem1 dark */
+	/* End Colors Variables */
+
+	/* Start Alert Variables */
+	--nj-Alert-info-icon: theme('colors.brand.800'); /* mulem1 primary */
+	--nj-Alert-info-bg: #f2f5f7; /* mulem1 card background */
+	--nj-Alert-info-border: theme('colors.brand.600');
+	/* End Alert Variables */
+
+	/* Start Input Variables */
+	--nj-bg-input: theme('colors.white');
+	--nj-label-text-size: theme('fontSize.paragraph');
+	--nj-label-text-color: theme('colors.brand.900');
+	--nj-input-highlighted-bg: theme('colors.yellow.50');
+	/* End Input Variables */
+
+	/* Start Breadcrumb Variables */
+	--nj-crumb-font-size: theme('fontSize.paragraph');
+	/* End Breadcrumb Variables */
+
+	/* Start Stepper Variables */
+	--nj-stepper-font-weight-inactive: theme('fontWeight.bold');
+	--nj-stepper-font-color-inactive: theme('colors.gray.500');
+	--nj-stepper-line-height: theme('spacing[4.5]');
+	--nj-stepper-font-size: theme('fontSize.caption1');
+	--nj-stepper-font-size-md: 'text-xs';
+	--nj-stepper-subtitle-font-size: 'inherit';
+	--nj-stepper-white-space: 'nowrap';
+
+	--nj-stepper-font-weight-active: theme('fontWeight.bold');
+	--nj-stepper-font-color-active: var(--nj-brand);
+	/* End Stepper Variables */
+
+	/* Start Radio Card Variables */
+	--nj-Radio-card-selected-background: #eef7fb;
+	--ng-Radio-card-selected-border-color: theme('colors.brand.800');
+	--ng-Radio-card-selected-border-width: theme('spacing[0]');
+	--ng-Radio-card-border-color: #95a5a6;
+	--ng-Radio-card-border-width: theme('spacing[px]');
+	/* End Radio Card Variables */
+
+	/* Start Toast Variables */
+	--nj-toast-title-color: theme('colors.white');
+	--nj-toast-title-size: theme('fontSize.paragraph');
+	--nj-toast-title-weight: theme('fontWeight.medium');
+	/* End Toast Variables */
+
+	/* Start Disclosure Variables for Primary Variant */
+	--nj-disclosure-header-bg-color: theme('colors.white');
+	--nj-disclosure-header-text-color: theme('colors.gray.700');
+	--nj-disclosure-header-text-size: theme('fontSize.paragraph');
+	--nj-disclosure-header-font-weight: theme('fontWeight.medium');
+	--nj-disclosure-header-padding: 16px;
+	--nj-disclosure-header-border-radius: 6px;
+	--nj-disclosure-body-padding: 16px;
+	--nj-disclosure-body-bg-color: theme('colors.white');
+	--nj-disclosure-separator-border-width: 0px;
+	/* End Disclosure Variables */
+
+	/* Start Disclosure Arrow Variables */
+	--nj-disclosure-arrow-bg-color: theme('colors.gray.50');
+	--nj-disclosure-arrow-padding: 12px;
+	/* End Disclosure Arrow Variables */
+
+	/* Start ScrollBar Variables */
+	--nj-scrollbar-color: theme('colors.brand.600');
+	/* End ScrollBar Variables */
+
+	/* Tab Navigation Variables */
+	--nj-tab-nav-filled-active-bg-color: theme('colors.brand.600');
+	--nj-tab-nav-filled-active-text-color: theme('colors.white');
+	--nj-tab-nav-filled-inactive-bg-color: theme('colors.gray.100');
+
+	/* End Tab Navigation Variables */
+
+	/* Gradient Colors */
+	--nj-tab-nav-gradient-selected-from: #10b981; /* Emerald 500 */
+	--nj-tab-nav-gradient-selected-to: #059669; /* Emerald 600 */
+	--nj-tab-nav-gradient-not-selected-text: #475569; /* Slate 600 */
+	--nj-tab-nav-gradient-not-selected-text-hover: #1e293b; /* Slate 900 */
+	--nj-tab-nav-gradient-not-selected-bg-hover: rgba(255, 255, 255, 0.6); /* White 60% */
+	--nj-tab-nav-gradient-border-color: rgba(226, 232, 240, 0.5); /* Slate 200 50% */
+}

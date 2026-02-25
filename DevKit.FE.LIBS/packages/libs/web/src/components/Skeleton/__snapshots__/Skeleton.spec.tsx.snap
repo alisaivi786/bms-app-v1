@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Skeleton Component should render correctly with className 1`] = `
+<div>
+  <div
+    class="h-2 w-full animate-pulse p-10"
+    data-testid="skeleton-test-id"
+  >
+    <div
+      class="h-full w-full rounded-full bg-gray-200"
+    />
+  </div>
+</div>
+`;
+
+exports[`Skeleton Component should render correctly without className 1`] = `
+<div>
+  <div
+    class="h-2 w-full animate-pulse "
+    data-testid="skeleton-test-id"
+  >
+    <div
+      class="h-full w-full rounded-full bg-gray-200"
+    />
+  </div>
+</div>
+`;

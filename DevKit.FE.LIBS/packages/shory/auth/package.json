@@ -1,0 +1,42 @@
+{
+	"name": "@shory/auth",
+	"version": "1.0.5",
+	"type": "module",
+	"majorVersionRestrict": "1",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"src/**/*.d.ts"
+	],
+	"scripts": {
+		"build": "rimraf -rf ./dist && mkdir ./dist && cp src/global.d.ts dist/global.d.ts && tsc --project tsconfig.json",
+		"prepack": "npm run build",
+		"lint": "eslint ./src",
+		"lint-fix": "eslint --fix ./src",
+		"type-check": "npx tsc --emitDeclarationOnly false --noEmit"
+	},
+	"nx": {
+		"tags": [
+			"@shory/auth"
+		]
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@devkit/ts-config": "workspace:*",
+		"@devkit/utilities": "workspace:*",
+		"@devkit/web": "workspace:*",
+		"@types/react": "^18.2.21",
+		"@types/react-dom": "^18.2.7"
+	},
+	"peerDependencies": {
+		"@devkit/utilities": "12.x",
+		"@devkit/web": "12.x",
+		"next": "14.x",
+		"next-auth": "^4.24.5",
+		"react": ">= 18.1.0",
+		"react-dom": ">= 18.1.0"
+	}
+}

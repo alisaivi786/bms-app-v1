@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Checkbox Component Should render Checked Checkbox Component 1`] = `
+<div>
+  <div
+    class="flex w-fit text-caption1 gap-2 items-start relative"
+  >
+    <input
+      class="w-0 h-0 overflow-hidden opacity-0 absolute"
+      data-testid="checkbox"
+      id="checkbox:r1:"
+      type="checkbox"
+    />
+    <div
+      class="relative"
+    >
+      <label
+        class="flex items-center justify-center rounded border-2 border-solid relative  cursor-pointer nj-bg-brand nj-border-brand h-4 w-4"
+        data-testid="label-1"
+        for="checkbox:r1:"
+      >
+        <div
+          class="text-white h-4/6 w-4/6 z-10"
+          data-testid="checked-icon"
+        >
+          CheckedIcon
+        </div>
+      </label>
+    </div>
+    <label
+      class="cursor-pointer text-caption1"
+      data-testid="label-2"
+      for="checkbox:r1:"
+    >
+      Checkbox test component
+    </label>
+  </div>
+</div>
+`;
+
+exports[`Checkbox Component Should render UnChecked Checkbox Component 1`] = `
+<div>
+  <div
+    class="flex w-fit text-caption1 gap-2 items-start relative"
+  >
+    <input
+      class="w-0 h-0 overflow-hidden opacity-0 absolute"
+      data-testid="checkbox"
+      id="checkbox:r0:"
+      type="checkbox"
+    />
+    <div
+      class="relative"
+    >
+      <label
+        class="flex items-center justify-center rounded border-2 border-solid relative  cursor-pointer border-gray-500 bg-white h-4 w-4"
+        data-testid="label-1"
+        for="checkbox:r0:"
+      />
+    </div>
+    <label
+      class="cursor-pointer text-caption1"
+      data-testid="label-2"
+      for="checkbox:r0:"
+    >
+      Checkbox test component
+    </label>
+  </div>
+</div>
+`;
+
+exports[`Checkbox Component Should render unchecked disabled Checkbox Component 1`] = `
+<div>
+  <div
+    class="flex w-fit text-caption1 gap-2 items-start relative"
+  >
+    <input
+      class="w-0 h-0 overflow-hidden opacity-0 absolute"
+      data-testid="checkbox"
+      id="checkbox:r2:"
+      type="checkbox"
+    />
+    <div
+      class="relative"
+    >
+      <label
+        class="flex items-center justify-center rounded border-2 border-solid relative  opacity-30 pointer-events-none border-gray-500 bg-white h-4 w-4"
+        data-testid="label-1"
+        for="checkbox:r2:"
+      />
+    </div>
+    <label
+      class="opacity-30 pointer-events-none text-caption1"
+      data-testid="label-2"
+      for="checkbox:r2:"
+    >
+      Checkbox test component
+    </label>
+  </div>
+</div>
+`;

@@ -1,0 +1,676 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/08 - Streaming" />
+
+# Streaming APIs
+
+Learn how to work with streaming APIs for real-time data updates.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Basic Streaming](#basic-streaming)
+- [Configuration](#configuration)
+- [Use Cases](#use-cases)
+- [Advanced Patterns](#advanced-patterns)
+- [Best Practices](#best-practices)
+
+## Overview
+
+Streaming APIs allow you to receive data in real-time as it becomes available, rather than waiting for the entire
+response. This is perfect for:
+
+- AI/LLM chat responses (like ChatGPT)
+- Server-Sent Events (SSE)
+- Large file downloads
+- Real-time data feeds
+- Progress updates
+
+**Note:** Streaming APIs automatically use the Fetch API (not Axios) under the hood.
+
+## Basic Streaming
+
+### Defining a Streaming API
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+const chatStreamApi = createAPIDefinition({
+	method: 'POST',
+	url: '/api/chat/stream',
+	requestSchema: z.object({
+		message: z.string(),
+	}),
+	// No responseSchema needed for streaming
+});
+```
+
+### Using the Streaming API
+
+```typescript
+import { useLazyApi } from '@devkit/api-client';
+
+function ChatInterface() {
+	const { callApi, isLoading } = useLazyApi(chatStreamApi);
+	const [response, setResponse] = React.useState('');
+
+	const sendMessage = async () => {
+		setResponse(''); // Reset previous response
+
+		await callApi(
+			{ message: 'Tell me a story' },
+			{
+				onStreamData: (chunk) => {
+					// Receives partial data as it arrives
+					setResponse(chunk);
+				},
+			}
+		);
+	};
+
+	return (
+		<div>
+			<button onClick={sendMessage} disabled={isLoading}>
+				Send Message
+			</button>
+			{isLoading && <div>Streaming...</div>}
+			<div className="response">{response}</div>
+		</div>
+	);
+}
+```
+
+## Configuration
+
+### API Definition Options
+
+```typescript
+const streamingApi = createAPIDefinition({
+	method: 'POST',
+	url: '/api/stream',
+	requestSchema: z.object({
+		query: z.string(),
+	}),
+	// Streaming APIs don't need responseSchema
+	// Data is passed directly to onStreamData callback
+});
+```
+
+### Automatic Fetch Detection
+
+When you provide `onStreamData` callback, the library automatically:
+
+1. Uses Fetch API instead of Axios
+2. Enables streaming mode
+3. Processes response as ReadableStream
+
+```typescript
+// ✅ Automatically uses Fetch because onStreamData is provided
+callApi(
+	{ query: 'test' },
+	{
+		onStreamData: (chunk) => {
+			console.log('Received:', chunk);
+		},
+	}
+);
+```
+
+### Explicit Fetch Mode (Optional)
+
+You can also explicitly enable Fetch mode:
+
+```typescript
+const streamingApi = createAPIDefinition({
+	method: 'POST',
+	url: '/api/stream',
+	httpClient: 'fetch', // Explicit Fetch mode
+	requestSchema: z.object({
+		query: z.string(),
+	}),
+});
+```
+
+## Use Cases
+
+### AI Chat Assistant
+
+```typescript
+function AIChatBot() {
+	const { callApi, isLoading } = useLazyApi(aiChatApi);
+	const [messages, setMessages] = React.useState<
+		Array<{
+			role: 'user' | 'assistant';
+			content: string;
+		}>
+	>([]);
+	const [currentResponse, setCurrentResponse] = React.useState('');
+
+	const sendMessage = async (userMessage: string) => {
+		// Add user message
+		setMessages((prev) => [
+			...prev,
+			{
+				role: 'user',
+				content: userMessage,
+			},
+		]);
+
+		setCurrentResponse('');
+
+		const fullResponse = await callApi(
+			{
+				message: userMessage,
+				history: messages,
+			},
+			{
+				onStreamData: (chunk) => {
+					// Update UI in real-time
+					setCurrentResponse(chunk);
+				},
+			}
+		);
+
+		// Add complete response to messages
+		setMessages((prev) => [
+			...prev,
+			{
+				role: 'assistant',
+				content: fullResponse,
+			},
+		]);
+
+		setCurrentResponse('');
+	};
+
+	return (
+		<div className="chat-container">
+			{messages.map((msg, idx) => (
+				<div key={idx} className={msg.role}>
+					{msg.content}
+				</div>
+			))}
+			{currentResponse && (
+				<div className="assistant streaming">
+					{currentResponse}
+					{isLoading && <span className="cursor">▋</span>}
+				</div>
+			)}
+			<ChatInput onSend={sendMessage} disabled={isLoading} />
+		</div>
+	);
+}
+```
+
+### Code Generation
+
+```typescript
+function CodeGenerator() {
+	const { callApi, isLoading } = useLazyApi(generateCodeApi);
+	const [generatedCode, setGeneratedCode] = React.useState('');
+
+	const generate = async (prompt: string) => {
+		await callApi(
+			{ prompt },
+			{
+				onStreamData: (chunk) => {
+					setGeneratedCode(chunk);
+				},
+			}
+		);
+	};
+
+	return (
+		<div>
+			<textarea placeholder="Describe the code you want..." onChange={(e) => generate(e.target.value)} />
+			<pre>
+				<code>{generatedCode}</code>
+			</pre>
+			{isLoading && <div>Generating...</div>}
+		</div>
+	);
+}
+```
+
+### Real-Time Translation
+
+```typescript
+function LiveTranslator() {
+	const { callApi } = useLazyApi(translateStreamApi);
+	const [original, setOriginal] = React.useState('');
+	const [translated, setTranslated] = React.useState('');
+
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			if (original) {
+				callApi(
+					{
+						text: original,
+						targetLang: 'es',
+					},
+					{
+						onStreamData: (chunk) => {
+							setTranslated(chunk);
+						},
+					}
+				);
+			}
+		}, 500); // Debounce
+
+		return () => clearTimeout(timer);
+	}, [original]);
+
+	return (
+		<div className="translator">
+			<div>
+				<h3>English</h3>
+				<textarea value={original} onChange={(e) => setOriginal(e.target.value)} />
+			</div>
+			<div>
+				<h3>Spanish</h3>
+				<div className="translation">{translated}</div>
+			</div>
+		</div>
+	);
+}
+```
+
+### Server-Sent Events (SSE)
+
+```typescript
+function LiveFeed() {
+	const { callApi } = useLazyApi(eventsStreamApi);
+	const [events, setEvents] = React.useState<string[]>([]);
+
+	React.useEffect(() => {
+		callApi(
+			{ channel: 'notifications' },
+			{
+				onStreamData: (chunk) => {
+					// Parse SSE format
+					const lines = chunk.split('\n\n');
+					const newEvents = lines.filter((line) => line.startsWith('data: ')).map((line) => line.slice(6));
+
+					setEvents((prev) => [...prev, ...newEvents]);
+				},
+			}
+		);
+	}, []);
+
+	return (
+		<div>
+			<h2>Live Events</h2>
+			{events.map((event, idx) => (
+				<div key={idx}>{event}</div>
+			))}
+		</div>
+	);
+}
+```
+
+### Log Streaming
+
+```typescript
+function LogViewer({ jobId }: { jobId: string }) {
+	const { callApi, isLoading } = useLazyApi(streamLogsApi);
+	const [logs, setLogs] = React.useState<string[]>([]);
+	const logsEndRef = React.useRef<HTMLDivElement>(null);
+
+	const startStreaming = async () => {
+		await callApi(
+			{ parameters: { jobId } },
+			{
+				onStreamData: (chunk) => {
+					// Split by newlines and add to logs
+					const newLines = chunk.split('\n').filter(Boolean);
+					setLogs((prev) => [...prev, ...newLines]);
+				},
+			}
+		);
+	};
+
+	// Auto-scroll to bottom
+	React.useEffect(() => {
+		logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+	}, [logs]);
+
+	return (
+		<div>
+			<button onClick={startStreaming} disabled={isLoading}>
+				{isLoading ? 'Streaming...' : 'Start Streaming Logs'}
+			</button>
+			<div className="log-container">
+				{logs.map((log, idx) => (
+					<div key={idx} className="log-line">
+						{log}
+					</div>
+				))}
+				<div ref={logsEndRef} />
+			</div>
+		</div>
+	);
+}
+```
+
+## Advanced Patterns
+
+### Combining Streaming with Progress
+
+```typescript
+function StreamingWithProgress() {
+	const { callApi, isLoading } = useLazyApi(largeDataStreamApi);
+	const [data, setData] = React.useState('');
+	const [progress, setProgress] = React.useState(0);
+
+	const fetchData = async () => {
+		await callApi(
+			{ query: 'large-dataset' },
+			{
+				onProgress: (event) => {
+					setProgress(event.percentage);
+				},
+				onStreamData: (chunk) => {
+					setData(chunk);
+				},
+			}
+		);
+	};
+
+	return (
+		<div>
+			<button onClick={fetchData}>Fetch Data</button>
+			{isLoading && (
+				<>
+					<progress value={progress} max={100} />
+					<span>{progress}%</span>
+				</>
+			)}
+			<pre>{data}</pre>
+		</div>
+	);
+}
+```
+
+### Cancellable Streaming
+
+```typescript
+function CancellableStream() {
+	const { callApi, isLoading } = useLazyApi(streamApi);
+	const [data, setData] = React.useState('');
+	const abortControllerRef = React.useRef<AbortController | null>(null);
+
+	const startStreaming = async () => {
+		abortControllerRef.current = new AbortController();
+
+		try {
+			await callApi(
+				{ query: 'data' },
+				{
+					signal: abortControllerRef.current.signal, // Not directly supported yet
+					onStreamData: (chunk) => {
+						setData(chunk);
+					},
+				}
+			);
+		} catch (error) {
+			if (error.name === 'AbortError') {
+				console.log('Stream cancelled');
+			}
+		}
+	};
+
+	const cancel = () => {
+		abortControllerRef.current?.abort();
+	};
+
+	return (
+		<div>
+			<button onClick={startStreaming} disabled={isLoading}>
+				Start
+			</button>
+			<button onClick={cancel} disabled={!isLoading}>
+				Cancel
+			</button>
+			<div>{data}</div>
+		</div>
+	);
+}
+```
+
+### Typed Streaming Data
+
+```typescript
+interface StreamChunk {
+	type: 'text' | 'code' | 'image';
+	content: string;
+	metadata?: Record<string, any>;
+}
+
+function TypedStreamingChat() {
+	const { callApi } = useLazyApi(chatApi);
+	const [chunks, setChunks] = React.useState<StreamChunk[]>([]);
+
+	const sendMessage = async (message: string) => {
+		await callApi(
+			{ message },
+			{
+				onStreamData: (rawChunk) => {
+					try {
+						const chunk = JSON.parse(rawChunk) as StreamChunk;
+						setChunks((prev) => [...prev, chunk]);
+					} catch {
+						console.error('Failed to parse chunk');
+					}
+				},
+			}
+		);
+	};
+
+	return (
+		<div>
+			{chunks.map((chunk, idx) => (
+				<div key={idx} className={chunk.type}>
+					{chunk.type === 'code' ? (
+						<pre>
+							<code>{chunk.content}</code>
+						</pre>
+					) : chunk.type === 'image' ? (
+						<img src={chunk.content} alt="" />
+					) : (
+						<p>{chunk.content}</p>
+					)}
+				</div>
+			))}
+		</div>
+	);
+}
+```
+
+### Accumulating Streaming Data
+
+```typescript
+function AccumulatingStream() {
+	const { callApi } = useLazyApi(streamApi);
+	const [fullData, setFullData] = React.useState('');
+
+	const fetchStream = async () => {
+		let accumulated = '';
+
+		const result = await callApi(
+			{ query: 'test' },
+			{
+				onStreamData: (chunk) => {
+					// Accumulate chunks
+					accumulated += chunk;
+					setFullData(accumulated);
+				},
+			}
+		);
+
+		// 'result' contains the full accumulated data
+		console.log('Complete data:', result);
+	};
+
+	return (
+		<div>
+			<button onClick={fetchStream}>Fetch</button>
+			<pre>{fullData}</pre>
+		</div>
+	);
+}
+```
+
+## Best Practices
+
+### 1. Handle Loading States
+
+```typescript
+// ✅ Good: Show loading indicator
+{
+	isLoading && <div>Streaming...</div>;
+}
+{
+	!isLoading && response && <div>{response}</div>;
+}
+
+// ❌ Bad: No loading feedback
+<div>{response}</div>;
+```
+
+### 2. Reset State Between Calls
+
+```typescript
+// ✅ Good: Clear previous data
+const sendMessage = async () => {
+  setResponse(''); // Reset before new stream
+  await callApi(...);
+};
+
+// ❌ Bad: Old data remains visible
+const sendMessage = async () => {
+  await callApi(...);
+};
+```
+
+### 3. Use Appropriate UI Patterns
+
+```typescript
+// ✅ Good: Show streaming indicator
+<div className="streaming-response">
+	{currentResponse}
+	{isLoading && <span className="cursor-blink">▋</span>}
+</div>;
+
+// ✅ Good: Auto-scroll for logs
+React.useEffect(() => {
+	containerRef.current?.scrollTo({
+		top: containerRef.current.scrollHeight,
+		behavior: 'smooth',
+	});
+}, [streamData]);
+```
+
+### 4. Handle Errors Gracefully
+
+```typescript
+const { callApi, errors } = useLazyApi(streamApi);
+
+React.useEffect(() => {
+	if (errors) {
+		toast.error('Stream failed: ' + errors.mapped[0].code);
+	}
+}, [errors]);
+```
+
+### 5. Optimize Re-renders
+
+```typescript
+// ✅ Good: Use callback ref to avoid re-renders
+const onStreamDataRef = React.useRef((chunk: string) => {
+	setData((prev) => prev + chunk);
+});
+
+await callApi(
+	{ query: 'data' },
+	{
+		onStreamData: onStreamDataRef.current,
+	}
+);
+
+// ❌ Bad: Creates new function on every render
+await callApi(
+	{ query: 'data' },
+	{
+		onStreamData: (chunk) => setData((prev) => prev + chunk),
+	}
+);
+```
+
+### 6. Consider Memory Usage
+
+```typescript
+// ✅ Good: Limit stored data
+const MAX_CHUNKS = 1000;
+
+setChunks((prev) => {
+	const newChunks = [...prev, chunk];
+	return newChunks.slice(-MAX_CHUNKS); // Keep last 1000
+});
+
+// ❌ Bad: Unlimited growth
+setChunks((prev) => [...prev, chunk]);
+```
+
+### 7. Provide Cancel Functionality
+
+```typescript
+// ✅ Good: Allow users to stop streaming
+<button onClick={stopStreaming} disabled={!isLoading}>
+	Stop
+</button>
+
+// ❌ Bad: No way to cancel long-running streams
+```
+
+## Performance Considerations
+
+### Throttle Updates
+
+For very high-frequency streams, throttle UI updates:
+
+```typescript
+const [data, setData] = React.useState('');
+const lastUpdateRef = React.useRef(Date.now());
+
+const onStreamData = (chunk: string) => {
+	const now = Date.now();
+	if (now - lastUpdateRef.current > 100) {
+		// Max 10 updates/second
+		setData(chunk);
+		lastUpdateRef.current = now;
+	}
+};
+```
+
+### Use Web Workers
+
+For heavy processing:
+
+```typescript
+const worker = new Worker('/stream-processor.js');
+
+worker.onmessage = (e) => {
+	setProcessedData(e.data);
+};
+
+const onStreamData = (chunk: string) => {
+	worker.postMessage({ chunk });
+};
+```
+
+## Next Steps
+
+- Learn about [Progress Tracking](./08-progress-tracking.md)
+- Explore [Error Handling](./05-error-handling.md)
+- Understand [Advanced Configuration](./12-advanced-configuration.md)

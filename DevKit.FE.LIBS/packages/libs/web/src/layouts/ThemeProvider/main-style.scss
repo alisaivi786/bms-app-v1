@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	h1 {
+		@apply text-h1;
+	}
+
+	h2 {
+		@apply text-h2;
+	}
+
+	h3 {
+		@apply text-h3;
+	}
+
+	h4 {
+		@apply text-title;
+	}
+
+	html,
+	[dir='ltr'] {
+		@apply text-body;
+		font-family: var(--nj-font-brand-en);
+		height: 100%;
+	}
+
+	html[lang='ar'],
+	[dir='rtl'] {
+		direction: rtl;
+		font-family: var(--nj-font-brand-ar);
+	}
+
+	body {
+		/* stop pull to refresh the page on mobile devices */
+		overscroll-behavior-y: none;
+		overscroll-behavior-x: none;
+		padding: 0px !important;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		@apply text-body md:overflow-hidden;
+	}
+
+	#__next {
+		height: 100%;
+	}
+
+	* {
+		outline: none !important;
+	}
+
+	.un-selectable {
+		-webkit-user-select: none;
+		-webkit-touch-callout: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		color: #cc0000;
+	}
+
+	.devkit-anchor {
+		color: #1d68ff;
+	}
+
+	.no-text-select {
+		-webkit-touch-callout: none;
+		/* iOS Safari */
+		-webkit-user-select: none;
+		/* Safari */
+		-khtml-user-select: none;
+		/* Konqueror HTML */
+		-moz-user-select: none;
+		/* Old versions of Firefox */
+		-ms-user-select: none;
+		/* Internet Explorer/Edge */
+		user-select: none;
+		/* Non-prefixed version, currently
+                                      supported by Chrome, Edge, Opera and Firefox */
+	}
+
+	* {
+		border-color: #dfe1eb;
+	}
+
+	* {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	.pan-container {
+		height: 100%;
+	}
+
+	.pan-container div {
+		height: 100%;
+	}
+
+	*:focus {
+		box-shadow: none !important;
+	}
+
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* For IE, Edge and Firefox */
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		/* IE and Edge */
+		scrollbar-width: none;
+		/* Firefox */
+	}
+
+	::-webkit-scrollbar {
+		@apply w-3.5;
+		@apply h-3.5;
+		@apply bg-gray-50;
+		@apply rounded-r-md;
+	}
+
+	::-webkit-scrollbar-track {
+		border: solid 4px transparent;
+		@apply rounded-md;
+	}
+
+	::-webkit-scrollbar-thumb {
+		box-shadow: inset 0 0 14px 14px var(--nj-scrollbar-color);
+		border: solid 4px transparent;
+		border-radius: 14px;
+	}
+
+	/* set button(top and bottom of the scrollbar) */
+	::-webkit-scrollbar-button {
+		display: none;
+	}
+
+	.white-scrollbar ::-webkit-scrollbar {
+		border-left: solid 1px #caccd9;
+		@apply bg-white;
+	}
+
+	.white-scrollbar::-webkit-scrollbar-thumb,
+	.white-x-scrollbar::-webkit-scrollbar-thumb {
+		border-radius: 10px;
+	}
+
+	.white-x-scrollbar ::-webkit-scrollbar:horizontal {
+		border-top: solid 1px #caccd9;
+		border-bottom: solid 1px #caccd9;
+		border-right: none;
+		@apply bg-white;
+	}
+
+	.grey-scrollbar ::-webkit-scrollbar {
+		@apply bg-gray-50;
+	}
+
+	.grey-x-scrollbar ::-webkit-scrollbar:horizontal {
+		border-top: solid 1px #caccd9;
+		border-bottom: solid 1px #caccd9;
+		border-right: none;
+		@apply bg-gray-50;
+	}
+
+	.no-radius-scrollbar ::-webkit-scrollbar {
+		@apply rounded-none;
+	}
+
+	.scrollbar-round-bottom ::-webkit-scrollbar {
+		@apply rounded-none;
+		@apply rounded-b;
+		border-bottom-width: 0px !important;
+	}
+
+	.scrollbar-full-round::-webkit-scrollbar {
+		@apply rounded-md;
+	}
+
+	::-ms-reveal {
+		display: none;
+	}
+	.no-scroll {
+		overflow: hidden !important;
+	}
+}

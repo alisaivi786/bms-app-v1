@@ -1,0 +1,39 @@
+:root {
+	/* Start Group Button Variables */
+	--nj-groupBtn-font-weight: theme('fontWeight.medium');
+	/* Selected Group Buttons */
+	--nj-groupBtn-selected-bg: theme('colors.gray.600');
+	--nj-groupBtn-selected-text: theme('colors.white');
+	--nj-groupBtn-selected-brand-bg: var('--nj-brand');
+	--nj-groupBtn-selected-border-color: transparent;
+	--nj-groupBtn-selected-border-width: 0px;
+
+	/* Light Group Buttons */
+	--nj-groupBtn-bg-light: theme('colors.gray.50');
+	--nj-groupBtn-text-light: theme('colors.gray.700');
+	/*Dark Group Buttons */
+	--nj-groupBtn-bg-dark: #8db7d0;
+	--nj-groupBtn-text-dark: theme('colors.white');
+	/*Black Group Buttons */
+	--nj-groupBtn-bg-black: #1a3e56;
+	--nj-groupBtn-text-black: theme('colors.white');
+	/* End Group Button Variables */
+
+	/* Button Variables */
+	--nj-button-border-radius: theme('borderRadius.lg');
+	--nj-button-font-size: theme('fontSize.paragraph');
+	--nj-button-hover: theme('colors.brand.700');
+	--nj-button-shadow: theme('boxShadow.button');
+	--nj-text-button-hover: theme('colors.brand.700');
+	--nj-secondary-button-border-hover: theme('colors.brand.700');
+	--nj-secondary-button-opacity-hover: 1;
+	--nj-disabled-button-bg-color: theme('colors.gray.200');
+	--nj-disabled-button-text-color: theme('colors.gray.400');
+	/* End Button Variables */
+
+	/* Secondary Button Variables */
+	--nj-brand-secondary-button-border-color: theme('colors.brand.600');
+	--nj-brand-secondary-button-color: theme('colors.brand.600');
+	--nj-brand-secondary-button-bg-color: theme('colors.white');
+	/* End Secondary Button Variables */
+}

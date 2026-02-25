@@ -1,0 +1,61 @@
+{
+	"editor.rulers": [80],
+	"files.exclude": {
+		"**/.git": true
+	},
+	"files.eol": "\n",
+	"javascript.validate.enable": false,
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/dist": true,
+		"**/coverge": true
+	},
+	"typescript.referencesCodeLens.enabled": true,
+	"typescript.preferences.importModuleSpecifier": "relative",
+	"editor.tabSize": 2,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"yaml.format.singleQuote": true,
+	"explorer.compactFolders": false,
+	"cSpell.words": [
+		"aber",
+		"appstore",
+		"autodocs",
+		"Buildable",
+		"callees",
+		"changesets",
+		"classname",
+		"clsx",
+		"datetime",
+		"Flexbox",
+		"gradlew",
+		"headlessui",
+		"Hijri",
+		"hookform",
+		"IRTK",
+		"linebreak",
+		"NEXTAUTH",
+		"nextjs",
+		"nrwl",
+		"Omni",
+		"Omnichannel",
+		"pnpm",
+		"podfile",
+		"Pressable",
+		"shory",
+		"simplebar",
+		"secureData",
+		"tailwindcss",
+		"Telr",
+		"testflight",
+		"twrnc",
+		"vite",
+		"xcodeproj"
+	],
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.patterns": {
+		"*.tsx": "${capture}.spec.tsx",
+		"*.ts": ""
+	}
+}

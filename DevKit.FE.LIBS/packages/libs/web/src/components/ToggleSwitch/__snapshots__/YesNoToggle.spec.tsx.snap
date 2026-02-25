@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`YesNoToggle Component should render correctly 1`] = `
+<div>
+  <div
+    class="flex overflow-hidden rounded border border-gray-500"
+  >
+    <div
+      class="w-[50%] md:w-full cursor-pointer text-center md:self-start border-r border-r-gray-500 px-4 py-3.5 md:py-2 text-paragraph capitalize hover:nj-bg-brand   text-white nj-bg-brand"
+    >
+      Yes
+    </div>
+    <div
+      class="w-[50%] md:w-full cursor-pointer text-center md:self-start px-4 py-3.5 md:py-2 text-paragraph capitalize hover:nj-bg-brand text-gray-500 "
+    >
+      No
+    </div>
+  </div>
+</div>
+`;

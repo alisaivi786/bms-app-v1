@@ -1,0 +1,9 @@
+{
+	"extends": "@devkit/ts-config/base.lib.json",
+	"compilerOptions": {
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"types": ["jest", "node"]
+	},
+	"exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,70 @@
+.thumb_container {
+	.slider__track {
+		z-index: 1;
+	}
+	.slider__range {
+		z-index: 2;
+	}
+	.slider__left-value {
+		z-index: 5;
+	}
+	.slider__right-value {
+		z-index: 5;
+	}
+	/* Removing the default appearance */
+	.thumb {
+		margin-top: 7px;
+		-webkit-appearance: none;
+		-webkit-tap-highlight-color: transparent;
+		/* For Chrome browsers */
+		&::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			-webkit-tap-highlight-color: transparent;
+			background-color: transparent;
+			border: none;
+			cursor: pointer;
+			height: 20px;
+			width: 30px;
+			margin-top: 4px;
+			pointer-events: all;
+			position: relative;
+		}
+		/* For Firefox browsers */
+		&::-moz-range-thumb {
+			background-color: transparent;
+			border: none;
+			cursor: pointer;
+			height: 20px;
+			width: 30px;
+			margin-top: 4px;
+			pointer-events: all;
+			position: relative;
+		}
+		&:disabled {
+			/* For Chrome browsers */
+			&::-webkit-slider-thumb {
+				cursor: default;
+			}
+			/* For Firefox browsers */
+			&::-moz-range-thumb {
+				cursor: default;
+			}
+		}
+	}
+	.thumb--zindex-3 {
+		z-index: 83;
+	}
+	.thumb--zindex-4 {
+		z-index: 84;
+	}
+	.thumb--zindex-5 {
+		z-index: 85;
+	}
+}
+input[type='range'] {
+	&::-webkit-slider-thumb {
+		height: 20px;
+		width: 30px;
+		border-radius: 6px;
+	}
+}

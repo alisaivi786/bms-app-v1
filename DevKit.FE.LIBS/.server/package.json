@@ -1,0 +1,14 @@
+{
+	"name": "build",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.cjs",
+	"scripts": {
+		"start": "node server.cjs"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.18.2"
+	}
+}

@@ -1,0 +1,13 @@
+trigger: none
+
+variables:
+  pnpm_config_cache: $(Pipeline.Workspace)/.pnpm-store
+
+jobs:
+  - job: Build
+    displayName: Build - devkit FrontEnd Libs
+    pool:
+      vmImage: macOS-15
+    steps:
+      - checkout: self
+      - template: build.yaml

@@ -1,0 +1,20 @@
+{
+	"testEnvironment": "@happy-dom/jest-environment",
+	"transform": {
+		"^.+\\.tsx?$": "ts-jest"
+	},
+	"setupFilesAfterEnv": ["<rootDir>/src/test-utils/setupTests.js"],
+	"collectCoverageFrom": ["./src/**/*.{ts,tsx}"],
+	"coverageDirectory": "coverage",
+	"modulePathIgnorePatterns": ["node_modules", "jest-test-results.json"],
+	"coverageThreshold": {
+		"global": {
+			"lines": 90
+		}
+	},
+	"moduleNameMapper": {
+		"@devkit/icons/web": "<rootDir>/src/test-utils/mockdevkitIcons.tsx",
+		"\\.(css|less|scss|sass)$": "identity-obj-proxy",
+		"canvas": "<rootDir>/src/test-utils/mockCanvas.js"
+	}
+}

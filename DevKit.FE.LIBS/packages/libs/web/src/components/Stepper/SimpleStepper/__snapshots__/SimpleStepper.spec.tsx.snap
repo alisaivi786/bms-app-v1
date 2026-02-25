@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SimpleStepper Component Should match the snapshot 1`] = `
+<ul
+  class="flex justify-between w-full"
+>
+  <li
+    class="relative flex flex-col items-center justify-center gap-2"
+  >
+    <p
+      class="nj-stepper-active md:nj-stepper-font-size-md"
+    >
+      Step 1
+    </p>
+    <div
+      class="flex w-full items-center"
+    >
+      <div
+        class="h-0.5 flex-1"
+      />
+      <div
+        class="relative flex h-5 w-5 items-center justify-center rounded-full nj-bg-brand"
+      >
+        <div
+          class="text-caption1 text-white"
+        >
+          CheckIcon
+        </div>
+      </div>
+      <div
+        class="h-0.5 flex-1 nj-bg-brand"
+      />
+    </div>
+  </li>
+  <div
+    class="mb-[0.562rem] h-0.5 flex-1 self-end nj-bg-brand"
+  />
+  <li
+    class="relative flex flex-col items-center justify-center gap-2"
+  >
+    <p
+      class="nj-stepper-active md:nj-stepper-font-size-md"
+    >
+      Step 2
+    </p>
+    <div
+      class="flex w-full items-center"
+    >
+      <div
+        class="h-0.5 flex-1 nj-bg-brand"
+      />
+      <div
+        class="relative flex h-5 w-5 items-center justify-center rounded-full border-4 bg-white nj-border-brand"
+      />
+      <div
+        class="h-0.5 flex-1 bg-gray-200"
+      />
+    </div>
+  </li>
+  <div
+    class="mb-[0.562rem] h-0.5 flex-1 self-end bg-gray-200"
+  />
+  <li
+    class="relative flex flex-col items-center justify-center gap-2"
+  >
+    <p
+      class="nj-stepper-inactive md:nj-stepper-font-size-md"
+    >
+      Step 3
+    </p>
+    <div
+      class="flex w-full items-center"
+    >
+      <div
+        class="h-0.5 flex-1 bg-gray-200"
+      />
+      <div
+        class="relative flex h-5 w-5 items-center justify-center rounded-full border-4 bg-white border-gray-200"
+      />
+      <div
+        class="h-0.5 flex-1"
+      />
+    </div>
+  </li>
+</ul>
+`;

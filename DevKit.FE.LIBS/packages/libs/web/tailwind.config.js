@@ -1,0 +1,200 @@
+import defaultTheme from 'tailwindcss/defaultTheme';
+
+const spaceValues = {
+	...defaultTheme.spacing,
+	4.5: '1.125rem',
+	18: '4.5rem',
+	108: '27rem',
+	112: '28rem',
+	130: '32.5rem',
+	250: '62.5rem',
+};
+
+/** @type {import('tailwindcss').Config} */
+export default {
+	content: {
+		files: ['./src/**/*.{ts,tsx}', './stories/**/*.{ts,tsx}'],
+	},
+	safelist: [
+		{
+			pattern: /grid-cols-\d+/,
+			variants: ['md'],
+		},
+	],
+	theme: {
+		extend: {
+			maxWidth: {
+				screen: '100vw',
+				...spaceValues,
+			},
+			minHeight: {
+				...spaceValues,
+			},
+		},
+		screens: {
+			sm: '576px',
+			md: '768px',
+			lg: '1024px',
+			xl: '1200px',
+			'2xl': '1320px',
+			'3xl': '1480px',
+		},
+		container: {
+			padding: {
+				DEFAULT: '1rem',
+			},
+		},
+		colors: {
+			white: '#fff',
+			black: '#000',
+			transparent: 'transparent',
+			brand: {
+				900: 'var(--nj-color-brand-900)',
+				800: 'var(--nj-color-brand-800)',
+				700: 'var(--nj-color-brand-700)',
+				600: 'var(--nj-color-brand-600)',
+				500: 'var(--nj-color-brand-500)',
+				400: 'var(--nj-color-brand-400)',
+				300: 'var(--nj-color-brand-300)',
+				200: 'var(--nj-color-brand-200)',
+				100: 'var(--nj-color-brand-100)',
+				50: 'var(--nj-color-brand-50)',
+			},
+			dark: {
+				1: '#181A20',
+				2: '#1E2025',
+				3: '#1F222A',
+				4: '#262A35',
+				5: '#35383F',
+			},
+			gray: {
+				900: 'var(--nj-color-gray-900)',
+				800: 'var(--nj-color-gray-800)',
+				700: 'var(--nj-color-gray-700)',
+				600: 'var(--nj-color-gray-600)',
+				500: 'var(--nj-color-gray-500)',
+				400: 'var(--nj-color-gray-400)',
+				300: 'var(--nj-color-gray-300)',
+				200: 'var(--nj-color-gray-200)',
+				100: 'var(--nj-color-gray-100)',
+				50: 'var(--nj-color-gray-50)',
+				10: 'var(--nj-color-gray-10)',
+			},
+			green: {
+				700: '#248F59',
+				500: '#30C078',
+				300: '#70DBA6',
+				100: '#C2F0D9',
+				50: '#EBFAF2',
+			},
+			red: {
+				700: '#9D2515',
+				500: '#E23D28',
+				300: '#ED8578',
+				100: '#F9D6D2',
+				50: '#FCEBE9',
+			},
+			yellow: {
+				700: '#C08B0C',
+				500: '#F3BF41',
+				300: '#F6CF6F',
+				100: '#FCEFCF',
+				50: '#FDF7E7',
+			},
+			purple: {
+				900: '#430099',
+				800: '#6500E5',
+				700: '#8D33FF',
+				600: '#AA67FF',
+				500: '#B880FF',
+				400: '#C699FF',
+				300: '#D4B2FF',
+				200: '#E2CCFF',
+				100: '#F1E5FF',
+				50: '#F9F5FF',
+			},
+		},
+		boxShadow: {
+			none: '0 0 #0000',
+			default: '0px 0px 6px rgba(0, 0, 0 , 25%)',
+			datePicker: '0px 0px 12px 0px rgba(0, 0, 0 , 30%)',
+			card: '0px 0px 40px rgba(0, 0, 0, 0.07)',
+			popover: '0px 2px 8px rgba(0, 0, 0, 0.3);',
+			menu: '0px 2px 8px 0px rgba(0, 0, 0, 0.15);',
+			button: '0px 2px 20px 0px rgba(57, 170, 165, 0.3);',
+			elevation1: '0px 8px 40px 0px rgba(0, 0, 0, 0.10)',
+			elevation2: '0px 2px 8px 0px rgba(0, 0, 0, 0.30)',
+			elevation3: '0px 0px 40px 0px rgba(0, 0, 0, 0.07)',
+		},
+		dropShadow: {
+			none: '0 0 #0000',
+			tooltip: '0 2px 12px rgba(0, 0, 0, 0.3)',
+			groupMenu: '0 2px 8px rgba(0,0,0,.3)',
+		},
+		fontFamily: {
+			'main-en': ['var(--nj-font-brand-en)'],
+			'main-ar': ['var(--nj-font-brand-ar)'],
+		},
+		fontWeight: {
+			normal: 400,
+			medium: 500,
+			semibold: 600,
+			bold: 700,
+		},
+		space: defaultTheme.space,
+		spacing: {
+			...spaceValues,
+		},
+		minWidth: {
+			...defaultTheme.minWidth,
+			...spaceValues,
+		},
+		fontSize: {
+			display1: ['3.75rem', 1.4],
+			display2: ['3.125rem', 1.4],
+			display3: ['2.625rem', 1.4],
+			h1: ['2rem', 1.4],
+			h2: ['1.75rem', 1.4],
+			h3: ['1.5rem', 1.4],
+			title: ['1.125rem', 1.4],
+			body: ['1rem', 1.4],
+			paragraph: ['0.875rem', 1.4],
+			caption1: ['0.75rem', 1.4],
+			caption2: ['0.625rem', 1.4],
+			legal: ['0.5rem', 1.4],
+		},
+		zIndex: {
+			...defaultTheme.zIndex,
+			layoutSticky: 200,
+			layoutScrollTracks: 210,
+			modal: 220,
+			floating: 230,
+			drawer: 240,
+			toast: 250,
+			datagridFrozenColumn: 10,
+		},
+		outlineWidth: {
+			...defaultTheme.outlineWidth,
+			3: '3px',
+		},
+		transitionProperty: {
+			...defaultTheme.transitionProperty,
+			'max-height': 'max-height',
+		},
+		animation: {
+			...defaultTheme.animation,
+			'ping-once': 'ping 1s cubic-bezier(0,0,.2,1) 1',
+		},
+		borderRadius: {
+			...defaultTheme.borderRadius,
+			'4xl': '2rem',
+			'5xl': '2.5rem',
+		},
+		backgroundImage: {
+			...defaultTheme.backgroundImage,
+			'half-left': 'linear-gradient(to right, rgba(0, 0, 0, 0) 50%, var(--nj-color-brand-100) 50%)',
+			'half-right': 'linear-gradient(to right, var(--nj-color-brand-100) 50%, rgba(0, 0, 0, 0) 50%)',
+		},
+	},
+	plugins: [],
+};

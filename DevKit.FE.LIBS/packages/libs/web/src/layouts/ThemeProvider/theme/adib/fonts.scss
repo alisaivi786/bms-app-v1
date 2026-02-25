@@ -1,0 +1,50 @@
+:root {
+	/* Start Fonts Variables */
+	--nj-font-brand-en: 'ADIB';
+	--nj-font-brand-ar: 'ADIBAr';
+	/* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+	font-family: 'ADIB';
+	src: local('BlissProExtraBold'), url('/fonts/BlissProExtraBold.otf') format('opentype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'ADIB';
+	src: local('BlissProMedium'), url('/fonts/BlissProMedium.otf') format('opentype');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'ADIB';
+	src: local('BlissProRegular'), url('/fonts/BlissProRegular.otf') format('opentype');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'ADIBAr';
+	src: local('RobotoBold'), url('/fonts/RobotoBold.ttf') format('opentype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'ADIBAr';
+	src: local('RobotoMedium'), url('/fonts/RobotoMedium.ttf') format('opentype');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'ADIBAr';
+	src: local('RobotoRegular'), url('/fonts/RobotoRegular.ttf') format('opentype');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+/* End Fonts files importation */

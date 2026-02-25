@@ -1,0 +1,61 @@
+{
+	"name": "@devkit/config",
+	"version": "12.0.9",
+	"majorVersionRestrict": "12",
+	"main": "dist/cjs/index.js",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"require": "./dist/cjs/index.js",
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./dist/*": {
+			"require": "./dist/cjs/*.js",
+			"import": "./dist/*.js",
+			"types": "./dist/*.d.ts",
+			"default": "./dist/*.js"
+		}
+	},
+	"license": "MIT",
+	"engines": {
+		"node": ">=10",
+		"pnpm": ">=7"
+	},
+	"scripts": {
+		"build": "rollup -c",
+		"prepack": "npm run build",
+		"lint": "eslint ./src",
+		"lint-fix": "eslint --fix ./src",
+		"type-check": "npx tsc --emitDeclarationOnly false --noEmit"
+	},
+	"files": [
+		"./dist",
+		"./src",
+		"./index.ts"
+	],
+	"nx": {
+		"tags": [
+			"@devkit/config"
+		]
+	},
+	"devDependencies": {
+		"@devkit/eslint-config": "workspace:*",
+		"@devkit/rollup-config": "workspace:*",
+		"@devkit/shared-types": "workspace:*",
+		"@devkit/ts-config": "workspace:*",
+		"@types/node": "^20.12.12",
+		"@types/react": "^18.2.21",
+		"react": "18.2.0"
+	},
+	"dependencies": {
+		"pino": "^9.2.0"
+	},
+	"peerDependencies": {
+		"@devkit/shared-types": "12.x",
+		"pino": "9.x",
+		"react": ">= 18.1.0"
+	}
+}

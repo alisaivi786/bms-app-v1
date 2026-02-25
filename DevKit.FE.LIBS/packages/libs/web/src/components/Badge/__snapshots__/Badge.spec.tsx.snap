@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Badge Component should render correctly 1`] = `
+<div>
+  <div
+    class="inline-flex items-center gap-1.5 whitespace-nowrap text-center border rounded-md text-black px-2.5 py-1 bg-white border-gray-200"
+    data-testid="badge"
+  >
+    <h6
+      class="font-bold text-caption1 leading-4"
+    >
+      Badge test title
+    </h6>
+  </div>
+</div>
+`;

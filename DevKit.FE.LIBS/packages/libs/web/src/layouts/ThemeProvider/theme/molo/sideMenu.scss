@@ -1,0 +1,32 @@
+:root {
+	/* Start Admin Side Menu Variables */
+	--nj-sideMenu-bg: theme('colors.brand.50');
+	--nj-sideMenu-item-border-width: theme('spacing[0]');
+	--nj-sideMenu-expanded-width: theme('spacing[72]');
+	--nj-sideMenu-collapsed-width: theme('spacing[12]');
+
+	--nj-sideMenu-item-border-color: theme('colors.gray.200');
+	--nj-sideMenu-item-border-b: theme('spacing[px]');
+	--nj-sideMenu-item-padding-x: theme('spacing[4]');
+	--nj-sideMenu-item-padding-y: theme('spacing[2]');
+
+	--nj-sideMenu-item-text-weight: theme('fontWeight.normal');
+	--nj-sideMenu-item-group-text-size: theme('fontSize.paragraph');
+	--nj-sideMenu-item-child-text-size: theme('fontSize.caption1');
+
+	--nj-sideMenu-item-unselected-bg: theme('colors.brand.50');
+	--nj-sideMenu-item-unselected-text-color: theme('colors.black');
+	--nj-sideMenu-item-selected-bg: theme('colors.brand.50');
+	--nj-sideMenu-item-selected-child-bg: theme('colors.brand.50');
+	--nj-sideMenu-item-selected-child-text-color: theme('colors.brand.600');
+	--nj-sideMenu-item-selected-group-text-color: theme('colors.brand.600');
+	--nj-sideMenu-item-selected-group-hover-bg: theme('colors.gray.200');
+	--nj-sideMenu-item-unselected-hover-bg: theme('colors.gray.200');
+	--nj-adminHeader-padding-x: theme('spacing[4]');
+	--nj-sideMenu-shadow: 0px 0px 40px rgba(0, 0, 0, 0.07);
+
+	--nj-sideMenu-selected-highlight-padding-x: 0px;
+	--nj-sideMenu-selected-highlight-border-radius: 0px;
+
+	/* End Admin Side Menu Variables */
+}

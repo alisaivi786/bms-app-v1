@@ -1,0 +1,272 @@
+.nj-text-brand {
+	color: var(--nj-brand);
+}
+
+.nj-bg-login-header {
+	background-color: var(--nj-brand-login-header);
+}
+
+.nj-bg-header {
+	background-color: var(--nj-brand-header);
+}
+
+.nj-bg-brand {
+	background-color: var(--nj-brand);
+}
+
+.nj-dark {
+	color: var(--nj-dark);
+}
+
+.nj-color-gray-700 {
+	color: var(--nj-color-gray-700);
+}
+
+.nj-color-brand-900 {
+	color: var(--nj-color-brand-900);
+}
+
+.before\:nj-bg-brand::before {
+	background-color: var(--nj-brand);
+}
+
+.before\:nj-border-brand::before {
+	border-color: var(--nj-brand);
+}
+
+.nj-border-brand {
+	border-color: var(--nj-brand);
+}
+
+.nj-outline-brand {
+	outline-color: var(--nj-brand);
+}
+
+.nj-alert-info-border {
+	border-color: var(--nj-Alert-info-border);
+}
+
+.nj-border-t-brand {
+	border-top-color: var(--nj-brand);
+}
+
+.nj-border-b-brand {
+	border-bottom-color: var(--nj-brand);
+}
+
+.nj-ring-brand {
+	--tw-ring-color: var(--nj-brand);
+}
+
+.nj-border-s-brand {
+	border-inline-start-color: var(--nj-brand);
+}
+
+.nj-border-e-brand {
+	border-inline-end-color: var(--nj-brand);
+}
+
+.\!nj-outline-brand {
+	outline-color: var(--nj-brand) !important;
+}
+
+.\!nj-border-brand {
+	border-color: var(--nj-brand) !important;
+}
+
+.\!nj-bg-brand {
+	background-color: var(--nj-brand) !important;
+}
+
+.\!nj-text-brand {
+	color: var(--nj-brand) !important;
+}
+
+.hover\:nj-bg-brand:hover {
+	background-color: var(--nj-brand);
+}
+
+.hover\:nj-text-brand:hover {
+	color: var(--nj-brand);
+}
+
+.hover\:nj-border-brand:hover {
+	border-color: var(--nj-brand);
+}
+
+.hover\:\!nj-text-brand:hover {
+	color: var(--nj-brand) !important;
+}
+
+.nj-text-brand-hover {
+	color: var(--nj-brand-hover);
+}
+
+.hover\:nj-text-brand-hover:hover {
+	color: var(--nj-brand-hover);
+}
+
+.nj-bg-brand-hover {
+	background-color: var(--nj-brand-hover);
+}
+
+.hover\:nj-bg-brand-hover:hover {
+	background-color: var(--nj-brand-hover);
+}
+
+.nj-border-brand-hover {
+	border-color: var(--nj-brand-hover);
+}
+
+.hover\:nj-border-brand-hover:hover {
+	border-color: var(--nj-brand-hover);
+}
+.nj-crumb-font-size {
+	font-size: var(--nj-crumb-font-size);
+}
+
+.nj-groupBtn-font-weight {
+	font-weight: var(--nj-groupBtn-font-weight, theme('fontWeight.normal'));
+}
+
+.nj-button-shadow {
+	box-shadow: var(--nj-button-shadow);
+}
+
+.nj-button-border-hover {
+	border-color: var(--nj-button-hover);
+}
+
+.hover\:nj-button-border-hover:hover {
+	border-color: var(--nj-button-hover);
+}
+
+.nj-secondary-button-border-hover {
+	border-color: var(--nj-secondary-button-border-hover);
+}
+
+.hover\:nj-secondary-button-border-hover:hover {
+	border-color: var(--nj-secondary-button-border-hover);
+}
+
+.nj-secondary-button-opacity-hover {
+	opacity: var(--nj-secondary-button-opacity-hover);
+}
+
+.hover\:nj-secondary-button-opacity-hover:hover {
+	opacity: var(--nj-secondary-button-opacity-hover);
+}
+
+.nj-text-button-hover {
+	color: var(--nj-text-button-hover);
+}
+
+.hover\:nj-text-button-hover:hover {
+	color: var(--nj-text-button-hover);
+}
+
+.nj-button-border-radius {
+	border-radius: var(--nj-button-border-radius);
+}
+
+.nj-button-font-size {
+	font-size: var(--nj-button-font-size, theme('fontSize.body'));
+}
+
+.nj-stepper-inactive {
+	font-weight: var(--nj-stepper-font-weight-inactive);
+	color: var(--nj-stepper-font-color-inactive);
+	font-size: var(--nj-stepper-font-size);
+	white-space: var(--nj-stepper-white-space);
+	line-height: var(--nj-stepper-line-height);
+	text-align: center;
+}
+
+.nj-stepper-active {
+	font-weight: var(--nj-stepper-font-weight-active);
+	color: var(--nj-stepper-font-color-active);
+	font-size: var(--nj-stepper-font-size);
+	white-space: var(--nj-stepper-white-space);
+	line-height: var(--nj-stepper-line-height);
+	text-align: center;
+}
+
+.nj-stepper-subtitle-font-size {
+	font-size: var(--nj-stepper-subtitle-font-size);
+}
+
+.nj-bg-input {
+	background-color: var(--nj-bg-input);
+}
+
+.nj-disabled-button-color {
+	background-color: var(--nj-disabled-button-bg-color);
+	color: var(--nj-disabled-button-text-color);
+}
+
+.nj-secondary-button {
+	border-color: var(--nj-brand-secondary-button-border-color);
+	color: var(--nj-brand-secondary-button-color);
+	background: var(--nj-brand-secondary-button-bg-color);
+}
+
+.nj-radio-button-selected {
+	background-color: var(--nj-Radio-card-selected-background);
+	border-color: var(--ng-Radio-card-selected-border-color);
+	border-width: var(--ng-Radio-card-selected-border-width);
+	border-radius: var(--nj-Radio-card-border-radius, theme('borderRadius.md'));
+}
+
+.nj-radio-button {
+	border-color: var(--ng-Radio-card-border-color);
+	border-width: var(--ng-Radio-card-border-width);
+	border-radius: var(--nj-Radio-card-border-radius, theme('borderRadius.md'));
+}
+
+.nj-toast-title {
+	color: var(--nj-toast-title-color);
+	font-size: var(--nj-toast-title-size);
+	font-weight: var(--nj-toast-title-weight);
+}
+
+.nj-label-text {
+	font-size: var(--nj-label-text-size);
+	color: var(--nj-label-text-color);
+}
+
+.nj-input-highlighted-bg {
+	background-color: var(--nj-input-highlighted-bg) !important;
+}
+
+// #region Disclosure Component Styles
+.nj-disclosure-header {
+	color: var(--nj-disclosure-header-text-color);
+	font-size: var(--nj-disclosure-header-text-size);
+	font-weight: var(--nj-disclosure-header-font-weight);
+	background-color: var(--nj-disclosure-header-bg-color);
+	padding: var(--nj-disclosure-header-padding);
+	border-radius: var(--nj-disclosure-header-border-radius);
+}
+.nj-disclosure-separator {
+	border-width: var(--nj-disclosure-separator-border-width);
+}
+.nj-disclosure-body {
+	padding: var(--nj-disclosure-body-padding);
+	background-color: var(--nj-disclosure-body-bg-color);
+}
+.nj-disclosure-arrow {
+	background-color: var(--nj-disclosure-arrow-bg-color);
+	padding: var(--nj-disclosure-arrow-padding);
+}
+
+// #endregion
+
+// #region Tab Navigation Styles
+.nj-tab-nav-filled-active {
+	background-color: var(--nj-tab-nav-filled-active-bg-color);
+	color: var(--nj-tab-nav-filled-active-text-color);
+}
+.nj-tab-nav-filled-inactive {
+	background-color: var(--nj-tab-nav-filled-inactive-bg-color);
+}
+// #endregion

@@ -1,0 +1,11 @@
+{
+	"extends": "@devkit/ts-config/base.lib.json",
+	"compilerOptions": {
+		"baseUrl": "src",
+		"outDir": "dist",
+		"declaration": true,
+		"noEmit": false,
+		"emitDeclarationOnly": false
+	},
+	"include": ["src", "./src/next-auth.d.ts"]
+}

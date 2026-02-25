@@ -1,0 +1,132 @@
+/* #region Table Row */
+.dg_TableRowOdd {
+	@apply bg-[var(--nj-dataTable-row-odd-bg)];
+}
+.dg_TableRowOdd .dg_TableCell {
+	@apply bg-[var(--nj-dataTable-row-odd-bg)];
+}
+.dg_TableRowEven {
+	@apply bg-[var(--nj-dataTable-row-even-bg)];
+}
+.dg_TableRowEven .dg_TableCell {
+	@apply bg-[var(--nj-dataTable-row-even-bg)];
+}
+.dg_TableRow:nth-child(even) {
+	@apply bg-[var(--nj-dataTable-row-even-bg)];
+}
+.dg_TableRow:nth-child(even) .dg_TableCell {
+	@apply bg-[var(--nj-dataTable-row-even-bg)];
+}
+.dg_TableCell {
+	font-size: var(--nj-dataTable-cell-text-size) !important;
+	@apply px-[calc(var(--nj-dataTable-content-spacing))] align-middle text-[var(--nj-dataTable-cell-text-color)];
+}
+.dg_TableRow:nth-child(odd) {
+	@apply bg-[var(--nj-dataTable-row-odd-bg)];
+}
+.dg_TableRow:nth-child(odd) .dg_TableCell {
+	@apply bg-[var(--nj-dataTable-row-odd-bg)];
+}
+/* #endregion Table Row */
+
+/* #region Pagination */
+.dg-pagination {
+	@apply flex list-none rounded-md border border-[var(--nj-dataTable-pagination-border)] p-0;
+}
+.dg-pagination li {
+	@apply text-caption2 relative m-1 flex items-center justify-center rounded-md font-medium leading-5 text-[var(--nj-dataTable-pagination-cell-text)] decoration-0;
+}
+.dg-pagination li a:hover {
+	@apply bg-[var(--nj-dataTable-pagination-cell-bg-hover)];
+}
+.dg-pagination li a {
+	@apply block rounded-e rounded-s px-2.5 py-0.5;
+}
+.dg-pagination li.selected {
+	@apply bg-[var(--nj-dataTable-pagination-cell-bg-selected)] text-[var(--nj-dataTable-pagination-cell-text-selected)];
+}
+.dg-pagination li.selected a:hover {
+	@apply bg-transparent;
+}
+.dg-pagination li.previous {
+	@apply m-0 flex items-center justify-center rounded-e-none rounded-s-md border-e border-e-[var(--nj-dataTable-pagination-nexPrev-border)] p-1;
+}
+.dg-pagination li.previous a {
+	@apply px-1.5 text-[var(--nj-dataTable-pagination-cell-text)] decoration-0;
+}
+.dg-pagination li.previous a:hover {
+	@apply bg-transparent;
+}
+.dg-pagination li.previous:hover {
+	@apply bg-[var(--nj-dataTable-pagination-cell-bg-hover)];
+}
+.dg-pagination li.previous.disabled:hover {
+	@apply bg-transparent;
+}
+.dg-pagination li.next {
+	@apply m-0 flex items-center justify-center rounded-e-md rounded-s-none border-s border-s-[var(--nj-dataTable-pagination-nexPrev-border)] p-1;
+}
+.dg-pagination li.next a {
+	@apply px-1.5 text-[var(--nj-dataTable-pagination-cell-text)] decoration-0;
+}
+.dg-pagination li.next a:hover {
+	@apply bg-transparent;
+}
+.dg-pagination li.next a:hover {
+	@apply bg-transparent;
+}
+.dg-pagination li.next:hover {
+	@apply bg-[var(--nj-dataTable-pagination-cell-bg-hover)];
+}
+.dg-pagination li.next.disabled:hover {
+	@apply bg-transparent;
+}
+.dg-pagination li.disabled a {
+	@apply cursor-not-allowed border-[var(--nj-dataTable-pagination-cell-border-disabled)] text-[var(--nj-dataTable-pagination-cell-text-disabled)] decoration-0;
+}
+.dg-pagination li.disabled a:hover {
+	@apply bg-transparent;
+}
+.dg-disabled-pagination {
+	@apply pointer-events-none;
+}
+.dg-disabled-pagination li.selected {
+	@apply bg-[var(--nj-dataTable-pagination-cell-bg-selected-disabled)];
+}
+
+/* Paging content */
+.dg-paging-content {
+	color: var(--nj-dataTable-paging-content-text-color);
+	font-size: var(--nj-dataTable-paging-content-text-size) !important;
+	font-weight: var(--nj-dataTable-paging-content-icon-weight) !important;
+}
+
+.dg-paging-container-spacing {
+	@apply px-[var(--nj-dataTable-paging-container-spacing)];
+}
+
+/* #endregion Pagination */
+
+.dg_frozenLeft {
+	@apply z-datagridFrozenColumn sticky left-0;
+}
+.dg_frozenRight {
+	@apply z-datagridFrozenColumn sticky right-0;
+}
+
+/* #region Header */
+
+.dg_Header_Top_Border {
+	border-top: solid var(--nj-dataTable-flat-header-border-top-width) theme('colors.gray.300');
+}
+.dg_Header_Bottom_Border {
+	border-bottom: solid var(--nj-dataTable-flat-header-border-bottom-width) theme('colors.gray.300');
+}
+
+.dg_HeaderColumn {
+	font-size: var(--nj-dataTable-header-text-size);
+	color: var(--nj-dataTable-header-text-color);
+	background-color: var(--nj-dataTable-header-bg);
+	@apply px-[calc(var(--nj-dataTable-content-spacing))] font-[var(--nj-dataTable-header-text-weight)];
+}
+/* #endregion Header */

@@ -1,0 +1,610 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/04 - React Hooks" />
+
+# Using React Hooks
+
+Learn how to use @devkit/api-client hooks to integrate APIs into your React components.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [useApiOnMount](#useapionmount)
+- [useLazyApi](#uselazyapi)
+- [Choosing the Right Hook](#choosing-the-right-hook)
+- [Advanced Patterns](#advanced-patterns)
+
+## Overview
+
+@devkit/api-client provides two main React hooks:
+
+1. **`useApiOnMount`**: Automatically fetches data when component mounts
+2. **`useLazyApi`**: Provides manual control over when to fetch data
+
+Both hooks return the same properties and handle loading/error states automatically.
+
+## useApiOnMount
+
+Automatically fetches data when the component mounts or when dependencies change.
+
+### Basic Usage
+
+```typescript
+import { useApiOnMount } from '@devkit/api-client';
+import { getUserApi } from '../api/users';
+
+function UserProfile({ userId }: { userId: number }) {
+	const { result, isLoading, errors } = useApiOnMount(getUserApi, [userId]);
+
+	if (isLoading) return <div>Loading...</div>;
+	if (errors) return <div>Error: {errors.mapped[0].code}</div>;
+	if (!result) return null;
+
+	return (
+		<div>
+			<h1>{result.name}</h1>
+			<p>{result.email}</p>
+		</div>
+	);
+}
+```
+
+### Signature
+
+```typescript
+function useApiOnMount<TResult, TError>(
+	apiDefinition: APIDefinition<TResult>,
+	dependencies: any[]
+): {
+	result: TResult | undefined;
+	isLoading: boolean;
+	errors: TError | undefined;
+};
+```
+
+### Parameters
+
+- **`apiDefinition`**: The API definition created with `createAPIDefinition`
+- **`dependencies`**: Array of dependencies (like `useEffect`) - API is called when these change
+
+### Return Value
+
+<table>
+	<thead>
+		<tr>
+			<th>Property</th>
+			<th>Type</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>result</code>
+			</td>
+			<td>
+				<code>TResult | undefined</code>
+			</td>
+			<td>The successful response data</td>
+		</tr>
+		<tr>
+			<td>
+				<code>isLoading</code>
+			</td>
+			<td>
+				<code>boolean</code>
+			</td>
+			<td>
+				<code>true</code> while the request is in progress
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>errors</code>
+			</td>
+			<td>
+				<code>TError | undefined</code>
+			</td>
+			<td>Error object if the request failed</td>
+		</tr>
+	</tbody>
+</table>
+
+### Examples
+
+#### Simple GET Request
+
+```typescript
+function UserList() {
+	const { result, isLoading, errors } = useApiOnMount(getUsersApi, []);
+
+	if (isLoading) return <div>Loading users...</div>;
+	if (errors) return <div>Failed to load users</div>;
+
+	return (
+		<ul>
+			{result?.map((user) => (
+				<li key={user.id}>{user.name}</li>
+			))}
+		</ul>
+	);
+}
+```
+
+#### With Dependencies
+
+```typescript
+function UserPosts({ userId }: { userId: number }) {
+	// Re-fetch when userId changes
+	const { result, isLoading } = useApiOnMount(
+		getUserPostsApi,
+		[userId] // Dependency array
+	);
+
+	if (isLoading) return <div>Loading posts...</div>;
+
+	return (
+		<div>
+			{result?.posts.map((post) => (
+				<div key={post.id}>{post.title}</div>
+			))}
+		</div>
+	);
+}
+```
+
+#### With API Options
+
+```typescript
+function DownloadableFile({ fileId }: { fileId: string }) {
+	const [progress, setProgress] = React.useState(0);
+
+	const { result, isLoading } = useApiOnMount(downloadFileApi, [fileId], {
+		onProgress: (event) => {
+			setProgress(event.percentage);
+		},
+	});
+
+	return (
+		<div>
+			{isLoading && <div>Downloading... {progress}%</div>}
+			{result && <img src={result.url} alt="Downloaded" />}
+		</div>
+	);
+}
+```
+
+## useLazyApi
+
+Provides manual control over when to call the API. Perfect for user-triggered actions like button clicks or form
+submissions.
+
+### Basic Usage
+
+```typescript
+import { useLazyApi } from '@devkit/api-client';
+import { createUserApi } from '../api/users';
+
+function CreateUserForm() {
+	const { callApi, result, isLoading, errors } = useLazyApi(createUserApi);
+
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+		const formData = new FormData(event.target);
+
+		await callApi({
+			name: formData.get('name'),
+			email: formData.get('email'),
+		});
+	};
+
+	return (
+		<form onSubmit={handleSubmit}>
+			<input name="name" required />
+			<input name="email" type="email" required />
+			<button disabled={isLoading}>{isLoading ? 'Creating...' : 'Create User'}</button>
+			{errors && <div>Error: {errors.mapped[0].code}</div>}
+			{result && <div>Success! User ID: {result.id}</div>}
+		</form>
+	);
+}
+```
+
+### Signature
+
+```typescript
+function useLazyApi<TResult, TError, TRequest>(
+	apiDefinition: APIDefinition<TResult, TRequest>
+): {
+	callApi: (request?: TRequest, options?: APICallOptions) => Promise<TResult>;
+	result: TResult | undefined;
+	isLoading: boolean;
+	errors: TError | undefined;
+};
+```
+
+### Return Value
+
+<table>
+	<thead>
+		<tr>
+			<th>Property</th>
+			<th>Type</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>callApi</code>
+			</td>
+			<td>
+				<code>function</code>
+			</td>
+			<td>Function to manually trigger the API call</td>
+		</tr>
+		<tr>
+			<td>
+				<code>result</code>
+			</td>
+			<td>
+				<code>TResult | undefined</code>
+			</td>
+			<td>The successful response data</td>
+		</tr>
+		<tr>
+			<td>
+				<code>isLoading</code>
+			</td>
+			<td>
+				<code>boolean</code>
+			</td>
+			<td>
+				<code>true</code> while the request is in progress
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>errors</code>
+			</td>
+			<td>
+				<code>TError | undefined</code>
+			</td>
+			<td>Error object if the request failed</td>
+		</tr>
+	</tbody>
+</table>
+
+### Examples
+
+#### Button Click
+
+```typescript
+function RefreshDataButton() {
+	const { callApi, isLoading } = useLazyApi(refreshDataApi);
+
+	return (
+		<button onClick={() => callApi()} disabled={isLoading}>
+			{isLoading ? 'Refreshing...' : 'Refresh Data'}
+		</button>
+	);
+}
+```
+
+#### Form Submission
+
+```typescript
+function LoginForm() {
+	const { callApi, result, isLoading, errors } = useLazyApi(loginApi);
+	const [email, setEmail] = React.useState('');
+	const [password, setPassword] = React.useState('');
+
+	const handleLogin = async () => {
+		await callApi({
+			email,
+			password,
+		});
+	};
+
+	React.useEffect(() => {
+		if (result?.token) {
+			localStorage.setItem('token', result.token);
+			window.location.href = '/dashboard';
+		}
+	}, [result]);
+
+	return (
+		<div>
+			<input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+			<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+			<button onClick={handleLogin} disabled={isLoading}>
+				{isLoading ? 'Logging in...' : 'Login'}
+			</button>
+			{errors && <div className="error">{errors.mapped[0].code}</div>}
+		</div>
+	);
+}
+```
+
+#### With Progress Tracking
+
+```typescript
+function FileUploader() {
+	const { callApi, isLoading } = useLazyApi(uploadFileApi);
+	const [progress, setProgress] = React.useState(0);
+	const [file, setFile] = React.useState<File | null>(null);
+
+	const handleUpload = async () => {
+		if (!file) return;
+
+		await callApi(
+			{ file },
+			{
+				onProgress: (event) => {
+					setProgress(event.percentage);
+				},
+			}
+		);
+	};
+
+	return (
+		<div>
+			<input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+			<button onClick={handleUpload} disabled={isLoading || !file}>
+				Upload
+			</button>
+			{isLoading && (
+				<div>
+					<progress value={progress} max={100} />
+					<span>{progress}%</span>
+				</div>
+			)}
+		</div>
+	);
+}
+```
+
+#### Multiple Calls
+
+```typescript
+function SearchUsers() {
+	const { callApi, result, isLoading } = useLazyApi(searchUsersApi);
+	const [query, setQuery] = React.useState('');
+
+	const handleSearch = () => {
+		callApi({
+			parameters: {
+				q: query,
+				limit: 10,
+			},
+		});
+	};
+
+	return (
+		<div>
+			<input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users..." />
+			<button onClick={handleSearch}>Search</button>
+			{isLoading && <div>Searching...</div>}
+			{result && (
+				<ul>
+					{result.users.map((user) => (
+						<li key={user.id}>{user.name}</li>
+					))}
+				</ul>
+			)}
+		</div>
+	);
+}
+```
+
+## Choosing the Right Hook
+
+### Use `useApiOnMount` when:
+
+✅ Loading initial data for a page  
+✅ Data depends on route parameters  
+✅ Data needs to refresh when props change  
+✅ Implementing master-detail patterns
+
+```typescript
+// ✅ Good use case
+function ProductDetails({ productId }: { productId: string }) {
+	const { result } = useApiOnMount(getProductApi, [productId]);
+	return <div>{result?.name}</div>;
+}
+```
+
+### Use `useLazyApi` when:
+
+✅ User-triggered actions (button clicks, form submissions)  
+✅ Conditional API calls  
+✅ Multiple sequential API calls  
+✅ Search or filter operations
+
+```typescript
+// ✅ Good use case
+function DeleteButton({ userId }: { userId: string }) {
+	const { callApi, isLoading } = useLazyApi(deleteUserApi);
+
+	return (
+		<button onClick={() => callApi({ parameters: { userId } })}>{isLoading ? 'Deleting...' : 'Delete User'}</button>
+	);
+}
+```
+
+## Advanced Patterns
+
+### Combining Both Hooks
+
+```typescript
+function UserManagement() {
+	// Load initial data
+	const { result: users, isLoading } = useApiOnMount(getUsersApi, []);
+
+	// Manual delete action
+	const { callApi: deleteUser } = useLazyApi(deleteUserApi);
+
+	const handleDelete = async (userId: number) => {
+		await deleteUser({ parameters: { userId } });
+		// Reload users after delete
+		window.location.reload(); // Or use state management
+	};
+
+	return (
+		<div>
+			{isLoading && <div>Loading...</div>}
+			{users?.map((user) => (
+				<div key={user.id}>
+					{user.name}
+					<button onClick={() => handleDelete(user.id)}>Delete</button>
+				</div>
+			))}
+		</div>
+	);
+}
+```
+
+### Error Handling with Toast Notifications
+
+```typescript
+function UserProfile({ userId }: { userId: number }) {
+	const { result, errors } = useApiOnMount(getUserApi, [userId]);
+
+	React.useEffect(() => {
+		if (errors) {
+			toast.error(`Failed to load user: ${errors.mapped[0].code}`);
+		}
+	}, [errors]);
+
+	if (!result) return null;
+
+	return <div>{result.name}</div>;
+}
+```
+
+### Loading States with Skeleton
+
+```typescript
+function UserList() {
+	const { result, isLoading } = useApiOnMount(getUsersApi, []);
+
+	if (isLoading) {
+		return (
+			<div>
+				{[...Array(5)].map((_, i) => (
+					<SkeletonCard key={i} />
+				))}
+			</div>
+		);
+	}
+
+	return (
+		<div>
+			{result?.map((user) => (
+				<UserCard key={user.id} user={user} />
+			))}
+		</div>
+	);
+}
+```
+
+### Streaming Data
+
+```typescript
+function ChatStream() {
+	const { callApi, isLoading } = useLazyApi(chatStreamApi);
+	const [messages, setMessages] = React.useState('');
+
+	const startChat = () => {
+		callApi(
+			{ message: 'Hello!' },
+			{
+				onStreamData: (chunk) => {
+					setMessages(chunk); // Real-time updates
+				},
+			}
+		);
+	};
+
+	return (
+		<div>
+			<button onClick={startChat}>Start Chat</button>
+			{isLoading && <div>Streaming...</div>}
+			<pre>{messages}</pre>
+		</div>
+	);
+}
+```
+
+### Debounced Search
+
+```typescript
+function SearchBox() {
+	const { callApi, result, isLoading } = useLazyApi(searchApi);
+	const [query, setQuery] = React.useState('');
+
+	// Debounce search
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			if (query) {
+				callApi({ parameters: { q: query } });
+			}
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [query]);
+
+	return (
+		<div>
+			<input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search..." />
+			{isLoading && <span>Searching...</span>}
+			{result && <div>{result.total} results</div>}
+		</div>
+	);
+}
+```
+
+### Optimistic Updates
+
+```typescript
+function TodoList() {
+	const { result: todos } = useApiOnMount(getTodosApi, []);
+	const { callApi: toggleTodo } = useLazyApi(updateTodoApi);
+	const [optimisticTodos, setOptimisticTodos] = React.useState(todos);
+
+	React.useEffect(() => {
+		setOptimisticTodos(todos);
+	}, [todos]);
+
+	const handleToggle = async (id: number) => {
+		// Optimistic update
+		setOptimisticTodos((prev) =>
+			prev?.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo))
+		);
+
+		try {
+			await toggleTodo({ parameters: { id } });
+		} catch {
+			// Revert on error
+			setOptimisticTodos(todos);
+		}
+	};
+
+	return (
+		<ul>
+			{optimisticTodos?.map((todo) => (
+				<li key={todo.id}>
+					<input type="checkbox" checked={todo.completed} onChange={() => handleToggle(todo.id)} />
+					{todo.title}
+				</li>
+			))}
+		</ul>
+	);
+}
+```
+
+## Next Steps
+
+- Learn about [Validation](./04-validation.md)
+- Explore [Error Handling](./05-error-handling.md)
+- Understand [Streaming APIs](./07-streaming.md)

@@ -1,0 +1,4 @@
+node = "22.14.0"
+npm = "bundled"
+proto = "0.48.0"
+ruby = "3.2.8"

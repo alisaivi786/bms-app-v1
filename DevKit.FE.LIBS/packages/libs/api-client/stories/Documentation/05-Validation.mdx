@@ -1,0 +1,629 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="API/Documentation/05 - Validation" />
+
+# Request/Response Validation
+
+Learn how to validate API requests and responses using Zod schemas.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Request Validation](#request-validation)
+- [Response Validation](#response-validation)
+- [Validation Modes](#validation-modes)
+- [Custom Validators](#custom-validators)
+- [Best Practices](#best-practices)
+
+## Overview
+
+@devkit/api-client uses [Zod](https://github.com/colinhacks/zod) for runtime type checking and validation. This ensures:
+
+- ✅ Type safety at compile time (TypeScript)
+- ✅ Runtime validation of data
+- ✅ Automatic type inference
+- ✅ Clear validation error messages
+- ✅ Data transformation and coercion
+
+## Request Validation
+
+### Basic Request Schema
+
+```typescript
+import { z } from 'zod';
+import { createAPIDefinition } from '@devkit/api-client';
+
+const createUserApi = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+
+	// Define request schema
+	requestSchema: z.object({
+		name: z.string().min(2, 'Name must be at least 2 characters'),
+		email: z.string().email('Invalid email address'),
+		age: z.number().int().positive().optional(),
+	}),
+
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+	}),
+});
+```
+
+### Using Validated Requests
+
+```typescript
+import { useLazyApi } from '@devkit/api-client';
+
+function CreateUserForm() {
+	const { callApi, errors } = useLazyApi(createUserApi);
+
+	const handleSubmit = async (data: any) => {
+		try {
+			// Request is automatically validated
+			await callApi({
+				name: data.name,
+				email: data.email,
+				age: parseInt(data.age),
+			});
+		} catch (error) {
+			// Validation errors are in errors.mapped
+			console.error(errors);
+		}
+	};
+
+	return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+### Validation Error Handling
+
+```typescript
+function UserForm() {
+	const { callApi, errors } = useLazyApi(createUserApi);
+
+	const handleSubmit = async (formData: FormData) => {
+		await callApi({
+			name: formData.get('name'),
+			email: formData.get('email'),
+			age: formData.get('age') ? parseInt(formData.get('age') as string) : undefined,
+		});
+	};
+
+	// Display validation errors
+	return (
+		<form onSubmit={handleSubmit}>
+			<input name="name" />
+			{errors?.mapped.find((e) => e.field === 'name') && (
+				<span className="error">{errors.mapped.find((e) => e.field === 'name')?.message}</span>
+			)}
+
+			<input name="email" type="email" />
+			{errors?.mapped.find((e) => e.field === 'email') && (
+				<span className="error">{errors.mapped.find((e) => e.field === 'email')?.message}</span>
+			)}
+
+			<button type="submit">Create User</button>
+		</form>
+	);
+}
+```
+
+## Response Validation
+
+### Basic Response Schema
+
+```typescript
+const getUserApi = createAPIDefinition({
+	method: 'GET',
+	url: '/users/:userId',
+
+	// Response is automatically validated
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string().email(),
+		role: z.enum(['user', 'admin', 'moderator']),
+		createdAt: z.string().datetime(),
+	}),
+});
+```
+
+### Nested Response Schemas
+
+```typescript
+const getPostApi = createAPIDefinition({
+	method: 'GET',
+	url: '/posts/:postId',
+
+	responseSchema: z.object({
+		id: z.number(),
+		title: z.string(),
+		content: z.string(),
+		author: z.object({
+			id: z.number(),
+			name: z.string(),
+			avatar: z.string().url(),
+		}),
+		comments: z.array(
+			z.object({
+				id: z.number(),
+				text: z.string(),
+				authorId: z.number(),
+			})
+		),
+		tags: z.array(z.string()),
+	}),
+});
+```
+
+### Optional Fields
+
+```typescript
+const getUserProfileApi = createAPIDefinition({
+	method: 'GET',
+	url: '/users/:userId/profile',
+
+	responseSchema: z.object({
+		id: z.number(),
+		name: z.string(),
+		email: z.string(),
+
+		// Optional fields
+		bio: z.string().optional(),
+		avatar: z.string().url().optional(),
+		phone: z.string().optional(),
+
+		// Optional with default value
+		role: z.string().default('user'),
+		isVerified: z.boolean().default(false),
+	}),
+});
+```
+
+### Array Responses
+
+```typescript
+const getUsersApi = createAPIDefinition({
+	method: 'GET',
+	url: '/users',
+
+	// Array of users
+	responseSchema: z.array(
+		z.object({
+			id: z.number(),
+			name: z.string(),
+			email: z.string(),
+		})
+	),
+});
+```
+
+## Validation Modes
+
+### Strict Mode (Default)
+
+```typescript
+// Fails on unknown properties
+const api = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+
+	requestSchema: z
+		.object({
+			name: z.string(),
+			email: z.string(),
+		})
+		.strict(), // ❌ Rejects { name, email, age }
+});
+```
+
+### Passthrough Mode
+
+```typescript
+// Allows unknown properties
+const api = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+
+	requestSchema: z
+		.object({
+			name: z.string(),
+			email: z.string(),
+		})
+		.passthrough(), // ✅ Accepts { name, email, age }
+});
+```
+
+### Strip Mode
+
+```typescript
+// Removes unknown properties
+const api = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+
+	requestSchema: z
+		.object({
+			name: z.string(),
+			email: z.string(),
+		})
+		.strip(), // Removes 'age' from { name, email, age }
+});
+```
+
+## Advanced Validation
+
+### Custom Validation Rules
+
+```typescript
+const createUserApi = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+
+	requestSchema: z
+		.object({
+			email: z.string().email(),
+			password: z
+				.string()
+				.min(8, 'Password must be at least 8 characters')
+				.regex(/[A-Z]/, 'Password must contain uppercase letter')
+				.regex(/[0-9]/, 'Password must contain number'),
+			confirmPassword: z.string(),
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: 'Passwords do not match',
+			path: ['confirmPassword'],
+		}),
+});
+```
+
+### Conditional Validation
+
+```typescript
+const updateUserApi = createAPIDefinition({
+	method: 'PUT',
+	url: '/users/:userId',
+
+	requestSchema: z
+		.object({
+			type: z.enum(['email', 'phone']),
+			email: z.string().email().optional(),
+			phone: z.string().optional(),
+		})
+		.refine(
+			(data) => {
+				if (data.type === 'email') {
+					return !!data.email;
+				}
+				if (data.type === 'phone') {
+					return !!data.phone;
+				}
+				return true;
+			},
+			{
+				message: 'Email is required when type is email',
+				path: ['email'],
+			}
+		),
+});
+```
+
+### Data Transformation
+
+```typescript
+const createEventApi = createAPIDefinition({
+	method: 'POST',
+	url: '/events',
+
+	requestSchema: z.object({
+		title: z.string(),
+		// Transform string to Date
+		date: z.string().transform((val) => new Date(val)),
+		// Transform string to number
+		attendees: z.string().transform((val) => parseInt(val)),
+		// Trim whitespace
+		description: z.string().transform((val) => val.trim()),
+	}),
+});
+```
+
+### Type Coercion
+
+```typescript
+const searchApi = createAPIDefinition({
+	method: 'GET',
+	url: '/search',
+
+	requestSchema: z.object({
+		// Coerce string to number
+		page: z.coerce.number().int().positive(),
+		// Coerce to boolean
+		includeInactive: z.coerce.boolean(),
+		// Coerce to date
+		after: z.coerce.date(),
+	}),
+});
+
+// Usage - strings are automatically converted
+await callApi({
+	page: '5', // -> 5
+	includeInactive: 'true', // -> true
+	after: '2024-01-01', // -> Date object
+});
+```
+
+## Union Types
+
+### Discriminated Unions
+
+```typescript
+const sendNotificationApi = createAPIDefinition({
+	method: 'POST',
+	url: '/notifications',
+
+	requestSchema: z.discriminatedUnion('type', [
+		z.object({
+			type: z.literal('email'),
+			to: z.string().email(),
+			subject: z.string(),
+			body: z.string(),
+		}),
+		z.object({
+			type: z.literal('sms'),
+			phoneNumber: z.string(),
+			message: z.string(),
+		}),
+		z.object({
+			type: z.literal('push'),
+			deviceToken: z.string(),
+			title: z.string(),
+			body: z.string(),
+		}),
+	]),
+});
+```
+
+### Response Unions
+
+```typescript
+const getResourceApi = createAPIDefinition({
+	method: 'GET',
+	url: '/resources/:id',
+
+	responseSchema: z.union([
+		z.object({
+			type: z.literal('image'),
+			url: z.string().url(),
+			width: z.number(),
+			height: z.number(),
+		}),
+		z.object({
+			type: z.literal('video'),
+			url: z.string().url(),
+			duration: z.number(),
+			thumbnail: z.string().url(),
+		}),
+		z.object({
+			type: z.literal('document'),
+			url: z.string().url(),
+			pages: z.number(),
+		}),
+	]),
+});
+```
+
+## Custom Validators
+
+### Email Domain Validation
+
+```typescript
+const inviteUserApi = createAPIDefinition({
+	method: 'POST',
+	url: '/invites',
+
+	requestSchema: z.object({
+		email: z
+			.string()
+			.email()
+			.refine((email) => email.endsWith('@company.com'), { message: 'Only company emails are allowed' }),
+	}),
+});
+```
+
+### Async Validation
+
+```typescript
+const checkUsernameApi = async (username: string) => {
+	const response = await fetch(`/api/check-username/${username}`);
+	return response.json();
+};
+
+const registerUserApi = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+
+	requestSchema: z.object({
+		username: z
+			.string()
+			.min(3)
+			.refine(
+				async (username) => {
+					const result = await checkUsernameApi(username);
+					return result.available;
+				},
+				{ message: 'Username is already taken' }
+			),
+		email: z.string().email(),
+	}),
+});
+```
+
+### Cross-Field Validation
+
+```typescript
+const scheduleEventApi = createAPIDefinition({
+	method: 'POST',
+	url: '/events',
+
+	requestSchema: z
+		.object({
+			startDate: z.string().datetime(),
+			endDate: z.string().datetime(),
+			title: z.string(),
+		})
+		.refine((data) => new Date(data.endDate) > new Date(data.startDate), {
+			message: 'End date must be after start date',
+			path: ['endDate'],
+		}),
+});
+```
+
+## Reusable Schemas
+
+### Shared Schemas
+
+```typescript
+// schemas/user.ts
+export const UserSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	email: z.string().email(),
+	role: z.enum(['user', 'admin']),
+});
+
+export const CreateUserSchema = UserSchema.omit({ id: true });
+export const UpdateUserSchema = UserSchema.partial().omit({ id: true });
+
+// api/users.ts
+export const getUserApi = createAPIDefinition({
+	method: 'GET',
+	url: '/users/:userId',
+	responseSchema: UserSchema,
+});
+
+export const createUserApi = createAPIDefinition({
+	method: 'POST',
+	url: '/users',
+	requestSchema: CreateUserSchema,
+	responseSchema: UserSchema,
+});
+
+export const updateUserApi = createAPIDefinition({
+	method: 'PUT',
+	url: '/users/:userId',
+	requestSchema: UpdateUserSchema,
+	responseSchema: UserSchema,
+});
+```
+
+### Schema Composition
+
+```typescript
+const AddressSchema = z.object({
+	street: z.string(),
+	city: z.string(),
+	state: z.string(),
+	zip: z.string(),
+});
+
+const UserSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	email: z.string().email(),
+});
+
+const UserWithAddressSchema = UserSchema.extend({
+	address: AddressSchema,
+});
+
+const api = createAPIDefinition({
+	method: 'GET',
+	url: '/users/:userId/profile',
+	responseSchema: UserWithAddressSchema,
+});
+```
+
+## Best Practices
+
+### 1. Define Strict Schemas
+
+```typescript
+// ✅ Good: Strict validation
+requestSchema: z.object({
+	name: z.string().min(2).max(50),
+	email: z.string().email(),
+	age: z.number().int().positive().max(120),
+});
+
+// ❌ Bad: Too lenient
+requestSchema: z.object({
+	name: z.string(),
+	email: z.string(),
+	age: z.number(),
+});
+```
+
+### 2. Use Descriptive Error Messages
+
+```typescript
+// ✅ Good: Clear error messages
+z.string().min(8, 'Password must be at least 8 characters');
+
+// ❌ Bad: Default error message
+z.string().min(8);
+```
+
+### 3. Validate Both Request and Response
+
+```typescript
+// ✅ Good: Both validated
+const api = createAPIDefinition({
+  requestSchema: z.object({ ... }),
+  responseSchema: z.object({ ... }),
+});
+
+// ❌ Bad: Only request validated
+const api = createAPIDefinition({
+  requestSchema: z.object({ ... }),
+  // Missing responseSchema
+});
+```
+
+### 4. Reuse Common Schemas
+
+```typescript
+// ✅ Good: Reuse schemas
+export const UserSchema = z.object({ ... });
+export const CreateUserSchema = UserSchema.omit({ id: true });
+
+// ❌ Bad: Duplicate schemas
+const schema1 = z.object({ name: z.string(), email: z.string() });
+const schema2 = z.object({ name: z.string(), email: z.string() });
+```
+
+### 5. Document Complex Validations
+
+```typescript
+// ✅ Good: Documented
+requestSchema: z.object({
+  // Must be a valid ISO 8601 date string
+  startDate: z.string().datetime(),
+  // End date must be after start date
+  endDate: z.string().datetime(),
+}).refine(...)
+
+// ❌ Bad: No documentation
+requestSchema: z.object({
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+}).refine(...)
+```
+
+## Next Steps
+
+- Learn about [Error Handling](./05-error-handling.md)
+- Explore [TypeScript Best Practices](./13-typescript.md)
+- Understand [API Definitions](./02-api-definitions.md)

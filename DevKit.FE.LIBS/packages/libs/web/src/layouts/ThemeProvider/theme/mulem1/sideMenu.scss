@@ -1,0 +1,31 @@
+:root {
+	/* Start Admin Side Menu Variables */
+	--nj-sideMenu-bg: #001b19;
+	--nj-sideMenu-item-border-width: 1px;
+	--nj-sideMenu-expanded-width: 288px;
+	--nj-sideMenu-collapsed-width: 80px;
+	--nj-sideMenu-item-gap-y: 4px;
+	--nj-sideMenu-item-border-color: theme('colors.gray.200');
+	--nj-sideMenu-item-border-b: 0px;
+	--nj-sideMenu-item-padding-x: 12px;
+	--nj-sideMenu-item-padding-y: 12px;
+
+	--nj-sideMenu-item-text-weight: 500;
+	--nj-sideMenu-item-group-text-size: theme('fontSize.body');
+	--nj-sideMenu-item-child-text-size: theme('fontSize.paragraph');
+
+	--nj-sideMenu-item-unselected-bg: #001b19;
+	--nj-sideMenu-item-unselected-text-color: theme('colors.white');
+	--nj-sideMenu-item-selected-bg: #1a3230;
+	--nj-sideMenu-item-selected-child-bg: theme('colors.brand.50');
+	--nj-sideMenu-item-selected-child-text-color: theme('colors.black');
+	--nj-sideMenu-item-selected-group-text-color: theme('colors.white');
+	--nj-sideMenu-item-selected-group-hover-bg: #1a3230;
+	--nj-sideMenu-item-unselected-hover-bg: #1a3230;
+	--nj-adminHeader-padding-x: 2rem;
+	--nj-sideMenu-shadow: 0 0 #0000;
+
+	--nj-sideMenu-selected-highlight-padding-x: 20px;
+	--nj-sideMenu-selected-highlight-border-radius: 16px;
+	/* End Admin Side Menu Variables */
+}

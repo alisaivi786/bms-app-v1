@@ -1,0 +1,29 @@
+:root {
+	/* Start Fonts Variables */
+	--nj-font-brand-en: 'Ping';
+	--nj-font-brand-ar: 'Ping';
+	/* End Fonts Variables */
+}
+
+/* Start Fonts files importation */
+@font-face {
+	font-family: 'Ping';
+	src: local('PingARLTBold'), url('/fonts/PingARLTBold.otf') format('opentype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Ping';
+	src: local('PingARLTMedium'), url('/fonts/PingARLTMedium.otf') format('opentype');
+	font-weight: 500 699.999;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Ping';
+	src: local('PingARLTRegular'), url('/fonts/PingARLTRegular.otf') format('opentype');
+	font-weight: 0 499.999;
+	font-display: swap;
+}
+/* End Fonts files importation */

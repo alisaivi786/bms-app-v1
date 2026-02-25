@@ -1,0 +1,17 @@
+node_modules
+dist
+storybook-static
+coverage
+.build
+
+.DS_Store
+pack-analyze.txt
+
+*.tgz
+
+release-notes.json
+.jest-test-results.json
+
+internal-apps-sessions-devkit
+
+.nx
