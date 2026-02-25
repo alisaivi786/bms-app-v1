@@ -30,6 +30,16 @@ function makeRuntimeRowKey() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function displayBudgetCategoryName(name) {
+  return String(name || "").trim().toLowerCase() === "credit cards" ? "EMI" : String(name || "");
+}
+
+function normalizeBudgetCategoryForMatch(name) {
+  const normalized = String(name || "").trim().toLowerCase();
+  if (normalized === "emi") return "credit cards";
+  return normalized;
+}
+
 export default function BudgetPage() {
   const { user } = useAuth();
   const currency = usePreferencesStore((state) => state.currency);
@@ -91,16 +101,16 @@ export default function BudgetPage() {
     const match = lookupItems.find(
       (item) => item.typeId === LOOKUP_TYPE_ENUM.BUDGET_CATEGORY && Number(item.id) === id
     );
-    return String(match?.name || fallback);
+    return displayBudgetCategoryName(String(match?.name || fallback));
   };
 
   const resolveCategoryId = (categoryName) => {
-    const normalized = String(categoryName || "").trim().toLowerCase();
+    const normalized = normalizeBudgetCategoryForMatch(categoryName);
     if (!normalized) return 0;
     const match = lookupItems.find(
       (item) =>
         item.typeId === LOOKUP_TYPE_ENUM.BUDGET_CATEGORY &&
-        String(item.name || "").trim().toLowerCase() === normalized
+        normalizeBudgetCategoryForMatch(item.name) === normalized
     );
     return Number(match?.id) || 0;
   };
@@ -542,7 +552,7 @@ export default function BudgetPage() {
   const categories = useMemo(() => {
     const lookupCategories = lookupItems
       .filter((item) => item.typeId === LOOKUP_TYPE_ENUM.BUDGET_CATEGORY)
-      .map((item) => item.name.trim())
+      .map((item) => displayBudgetCategoryName(item.name.trim()))
       .filter(Boolean);
     const dynamicByResolvedId = [
       ...new Set(
@@ -551,7 +561,7 @@ export default function BudgetPage() {
           .filter((name) => name && !/^Category\s+\d+$/i.test(name))
       )
     ];
-    const merged = [...DEFAULT_BUDGET_CATEGORY_LOOKUPS];
+    const merged = DEFAULT_BUDGET_CATEGORY_LOOKUPS.map((name) => displayBudgetCategoryName(name));
     lookupCategories.forEach((name) => {
       if (!merged.includes(name)) merged.push(name);
     });

@@ -112,3 +112,4 @@ Phase Date: 2026-02-25
 - Added guard against deleting in-use budget categories.
 - Standardized month names to `Jan..Dec` in relevant filters/displays.
 - Enhancement: Updated Budget right-side `Category Totals` to show monthly `Estimated` totals (and `Total Estimated`) instead of actuals for planning-focused monthly budgeting.
+- Enhancement: Budget UI category label updated from `Credit Cards` to `EMI` for clearer user-facing terminology (display label change).
