@@ -1,0 +1,18 @@
+{
+  "name": "@bms/app-core",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.jsx"
+  },
+  "peerDependencies": {
+    "firebase": "^11.7.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^6.30.1",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.3"
+  }
+}

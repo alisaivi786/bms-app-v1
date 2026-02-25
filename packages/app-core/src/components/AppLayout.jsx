@@ -137,14 +137,14 @@ export default function AppLayout() {
             displayName: user.displayName || "",
             photoURL: user.photoURL || "",
             role: data.role || (isAdminEmail(user.email) ? "admin" : "user"),
-            tier: data.tier || (isAdminEmail(user.email) ? "pro" : "basic"),
+            tier: data.tier || (isAdminEmail(user.email) ? "pro" : "free"),
             isAdmin: data.isAdmin ?? isAdminEmail(user.email),
             currency: adminUser ? null : data.currency || null,
             accountBalance: adminUser ? null : data.accountBalance ?? data.initialBalance ?? null,
             permissions: normalizePermissions(
               data.role || (isAdminEmail(user.email) ? "admin" : "user"),
               data.permissions,
-              data.tier || (isAdminEmail(user.email) ? "pro" : "basic")
+              data.tier || (isAdminEmail(user.email) ? "pro" : "free")
             ),
             authProviders: (user.providerData || [])
               .map((provider) => provider.providerId)
@@ -169,11 +169,11 @@ export default function AppLayout() {
       setOnboardingChecked(true);
       setAccess({
         role: data.role || (isAdminEmail(user.email) ? "admin" : "user"),
-        tier: data.tier || (isAdminEmail(user.email) ? "pro" : "basic"),
+        tier: data.tier || (isAdminEmail(user.email) ? "pro" : "free"),
         permissions: normalizePermissions(
           data.role || (isAdminEmail(user.email) ? "admin" : "user"),
           data.permissions,
-          data.tier || (isAdminEmail(user.email) ? "pro" : "basic")
+          data.tier || (isAdminEmail(user.email) ? "pro" : "free")
         )
       });
       setAccountBalanceForUser(user.uid, Number(data.accountBalance ?? data.initialBalance ?? 0));

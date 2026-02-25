@@ -4,25 +4,20 @@ import PermissionRoute from "./components/PermissionRoute";
 import HomeRedirect from "./components/HomeRedirect";
 import AppLayout from "./components/AppLayout";
 import LoginPage from "./pages/LoginPage";
-import DashboardPage from "./pages/DashboardPage";
-import IncomePage from "./pages/IncomePage";
-import BudgetPage from "./pages/BudgetPage";
-import EmiPage from "./pages/EmiPage";
 import ThemePage from "./pages/ThemePage";
 import ProfilePage from "./pages/ProfilePage";
-import CurrencyPage from "./pages/CurrencyPage";
 import UsersPage from "./pages/UsersPage";
 import UserCreatePage from "./pages/UserCreatePage";
+import UserDetailPage from "./pages/UserDetailPage";
+import RolesPage from "./pages/RolesPage";
+import RoleDetailPage from "./pages/RoleDetailPage";
 import SystemConfigPage from "./pages/SystemConfigPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { PERMISSIONS } from "./constants/access";
-import RolesPage from "./pages/RolesPage";
-import RoleDetailPage from "./pages/RoleDetailPage";
-import UserDetailPage from "./pages/UserDetailPage";
 import OnboardingPage from "./pages/OnboardingPage";
 
-export default function App() {
+export default function AppAdmin() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -34,47 +29,12 @@ export default function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<HomeRedirect />} />
         <Route
-          index
-          element={<HomeRedirect />}
-        />
-        <Route
-          path="dashboard-home"
+          path="admin"
           element={
-            <PermissionRoute permission={PERMISSIONS.VIEW_DASHBOARD}>
-              <DashboardPage />
-            </PermissionRoute>
-          }
-        />
-        <Route
-          path="income"
-          element={
-            <PermissionRoute permission={PERMISSIONS.MANAGE_INCOME}>
-              <IncomePage />
-            </PermissionRoute>
-          }
-        />
-        <Route
-          path="budget"
-          element={
-            <PermissionRoute permission={PERMISSIONS.MANAGE_BUDGET}>
-              <BudgetPage />
-            </PermissionRoute>
-          }
-        />
-        <Route
-          path="emi"
-          element={
-            <PermissionRoute permission={PERMISSIONS.MANAGE_EMI}>
-              <EmiPage />
-            </PermissionRoute>
-          }
-        />
-        <Route
-          path="system-config"
-          element={
-            <PermissionRoute permission={PERMISSIONS.VIEW_SYSTEM_CONFIG}>
-              <SystemConfigPage />
+            <PermissionRoute permission={PERMISSIONS.VIEW_ADMIN_DASHBOARD}>
+              <AdminDashboardPage />
             </PermissionRoute>
           }
         />
@@ -127,10 +87,10 @@ export default function App() {
           }
         />
         <Route
-          path="admin"
+          path="system-config"
           element={
-            <PermissionRoute permission={PERMISSIONS.VIEW_ADMIN_DASHBOARD}>
-              <AdminDashboardPage />
+            <PermissionRoute permission={PERMISSIONS.VIEW_SYSTEM_CONFIG}>
+              <SystemConfigPage />
             </PermissionRoute>
           }
         />
@@ -139,14 +99,6 @@ export default function App() {
           element={
             <PermissionRoute permission={PERMISSIONS.VIEW_THEME}>
               <ThemePage />
-            </PermissionRoute>
-          }
-        />
-        <Route
-          path="currency"
-          element={
-            <PermissionRoute permission={PERMISSIONS.VIEW_THEME}>
-              <CurrencyPage />
             </PermissionRoute>
           }
         />

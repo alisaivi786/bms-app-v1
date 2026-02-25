@@ -1,4 +1,30 @@
-# BMS (React + Firebase)
+# BMS Monorepo (React + Firebase)
+
+## Workspace Structure
+
+- `apps/bms-portal` -> Portal application
+- `apps/bms-admin` -> Admin application
+- `packages/app-core` -> Shared core (pages/components/state/utils/firebase)
+
+## Run (Monorepo)
+
+From repo root:
+
+```bash
+pnpm dev:portal
+pnpm dev:admin
+```
+
+## Build (Monorepo)
+
+```bash
+pnpm build:portal
+pnpm build:admin
+```
+
+---
+
+# Legacy Notes (Before Monorepo Split)
 
 This app includes:
 - Google login with Firebase Auth
@@ -21,10 +47,11 @@ This project uses 3 Vite env files:
 - `.env.uat` (UAT)
 - `.env.production` (PROD)
 
-Development is configured to always use DEV env values through:
+Development (portal/admin) uses app-local env files:
 
 ```bash
-pnpm dev
+pnpm dev:portal
+pnpm dev:admin
 ```
 
 Your provided DEV Firebase credentials are already added to `.env.development`.
@@ -57,14 +84,13 @@ service cloud.firestore {
 ## 5) Run
 
 ```bash
-pnpm dev
+pnpm dev:portal
 ```
 
 Optional:
 
 ```bash
-pnpm dev:uat
-pnpm dev:prod
-pnpm build:uat
-pnpm build
+pnpm dev:admin
+pnpm build:portal
+pnpm build:admin
 ```
