@@ -111,4 +111,4 @@ Phase Date: 2026-02-25
 - Fixed lookup overwrite path that could remove income source lookups.
 - Added guard against deleting in-use budget categories.
 - Standardized month names to `Jan..Dec` in relevant filters/displays.
-
+- Enhancement: Updated Budget right-side `Category Totals` to show monthly `Estimated` totals (and `Total Estimated`) instead of actuals for planning-focused monthly budgeting.

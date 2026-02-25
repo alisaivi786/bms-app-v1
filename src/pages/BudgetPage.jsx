@@ -583,10 +583,10 @@ export default function BudgetPage() {
     () =>
       categories.map((category) => {
         const rows = itemsWithCategoryName.filter((item) => item.categoryName === category);
-        const actual = rows.reduce((sum, row) => sum + (toNumber(row.actualAmount) || 0), 0);
+        const estimated = rows.reduce((sum, row) => sum + (toNumber(row.estimatedAmount) || 0), 0);
         return {
           category,
-          actual
+          estimated
         };
       }),
     [categories, itemsWithCategoryName]
@@ -594,7 +594,7 @@ export default function BudgetPage() {
 
   const totals = useMemo(
     () => ({
-      actual: summaryRows.reduce((sum, row) => sum + row.actual, 0)
+      estimated: summaryRows.reduce((sum, row) => sum + row.estimated, 0)
     }),
     [summaryRows]
   );
@@ -716,18 +716,18 @@ export default function BudgetPage() {
 
         <aside className="table-card budget-summary">
           <h3 className="budget-summary-title">Category Totals</h3>
-          <p className="budget-summary-subtitle">Actual spend by category for selected month.</p>
+          <p className="budget-summary-subtitle">Estimated spend by category for selected month.</p>
           <div className="budget-summary-list">
             {summaryRows.map((row) => (
               <div className="budget-summary-item" key={row.category}>
                 <strong>{row.category}</strong>
-                <span>{currency} {row.actual.toFixed(2)}</span>
+                <span>{currency} {row.estimated.toFixed(2)}</span>
               </div>
             ))}
           </div>
           <div className="budget-total">
-            <strong>Total Actual</strong>
-            <p>{currency} {totals.actual.toFixed(2)}</p>
+            <strong>Total Estimated</strong>
+            <p>{currency} {totals.estimated.toFixed(2)}</p>
           </div>
         </aside>
       </div>
