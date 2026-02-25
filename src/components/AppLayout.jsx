@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   collection,
   doc,
@@ -23,6 +23,7 @@ import { useAccessStore } from "../state/accessStore";
 
 export default function AppLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [logoVisible, setLogoVisible] = useState(true);
@@ -31,6 +32,8 @@ export default function AppLayout() {
   const [dataOpen, setDataOpen] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(isAdminEmail(user?.email));
+  const [onboardingCompleted, setOnboardingCompleted] = useState(true);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   const setAccountBalanceForUser = useFinanceStore((state) => state.setAccountBalanceForUser);
   const setIncomesForUser = useFinanceStore((state) => state.setIncomesForUser);
   const currency = usePreferencesStore((state) => state.currency);
@@ -55,6 +58,7 @@ export default function AppLayout() {
     location.pathname.startsWith("/emi");
   const userMgmtActive = location.pathname.startsWith("/roles") || location.pathname.startsWith("/users");
   const settingActive = location.pathname.startsWith("/system-config");
+  const isOnboardingRoute = location.pathname === "/onboarding";
 
   useEffect(() => {
     if (dataActive) {
@@ -146,6 +150,8 @@ export default function AppLayout() {
               .map((provider) => provider.providerId)
               .filter(Boolean),
             lookupItems: adminUser ? lookupItems : mergedLookupItems,
+            onboardingCompleted:
+              data.onboardingCompleted === false ? false : true,
             updatedAt: serverTimestamp()
           },
           { merge: true }
@@ -160,6 +166,8 @@ export default function AppLayout() {
     const unsubUser = onSnapshot(userRef, (snapshot) => {
       const data = snapshot.exists() ? snapshot.data() : {};
       setIsAdmin(Boolean(data.isAdmin) || isAdminEmail(user.email));
+      setOnboardingCompleted(Boolean(data.onboardingCompleted));
+      setOnboardingChecked(true);
       setAccess({
         role: data.role || (isAdminEmail(user.email) ? "admin" : "user"),
         tier: data.tier || (isAdminEmail(user.email) ? "pro" : "basic"),
@@ -196,6 +204,17 @@ export default function AppLayout() {
     };
   }, [setAccess, setCurrency, setIncomesForUser, setAccountBalanceForUser, setMode, setTheme, user.email, user.uid]);
 
+  useEffect(() => {
+    if (!onboardingChecked) return;
+    if (!onboardingCompleted && !isOnboardingRoute) {
+      navigate("/onboarding", { replace: true });
+      return;
+    }
+    if (onboardingCompleted && isOnboardingRoute) {
+      navigate("/", { replace: true });
+    }
+  }, [isOnboardingRoute, navigate, onboardingChecked, onboardingCompleted]);
+
   const handleCurrencyChange = async (nextCurrency) => {
     setCurrency(nextCurrency);
     try {
@@ -231,6 +250,16 @@ export default function AppLayout() {
       console.error("Could not save theme mode", err);
     }
   };
+
+  if (isOnboardingRoute) {
+    return (
+      <main className="content onboarding-content-only">
+        <div className="content-body onboarding-content-body">
+          <Outlet />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <div className={`layout ${sidebarOpen ? "sidebar-open" : "sidebar-collapsed"}`}>

@@ -20,6 +20,7 @@ import { PERMISSIONS } from "./constants/access";
 import RolesPage from "./pages/RolesPage";
 import RoleDetailPage from "./pages/RoleDetailPage";
 import UserDetailPage from "./pages/UserDetailPage";
+import OnboardingPage from "./pages/OnboardingPage";
 
 export default function App() {
   return (
@@ -157,6 +158,7 @@ export default function App() {
             </PermissionRoute>
           }
         />
+        <Route path="onboarding" element={<OnboardingPage />} />
       </Route>
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
