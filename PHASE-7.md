@@ -23,11 +23,12 @@ Last Updated: 2026-02-25
 - Added profile flag support:
   - `users/{uid}.onboardingCompleted`
   - `users/{uid}.onboardingCompletedAt`
+- User bootstrap now defaults `onboardingCompleted` to `false` when missing.
 - Completing or skipping onboarding updates user profile with merge write.
 
 ### 2.3 Existing User Behavior
-- Existing users with flag explicitly set to `false` are now forced to onboarding after login.
-- Users with missing/undefined onboarding flag are treated as completed by default (no forced interruption).
+- Existing users with flag explicitly set to `false` are forced to onboarding after login.
+- Users with missing/undefined onboarding flag are now treated as `false` (forced onboarding), then updated to `true` after completion.
 
 ### 2.4 Onboarding Content and UX
 - Implemented multi-step journey with:
@@ -86,3 +87,4 @@ Last Updated: 2026-02-25
 - Enhancement: Added Lookup-focused onboarding step for `Income Source` and `Budget Category`.
 - Enhancement: Upgraded onboarding visual background with larger, faster, multi-color animated bubbles.
 - Enhancement: Improved onboarding with richer UI mock previews to demonstrate real BMS workflow.
+- Hotfix: Corrected onboarding bootstrap logic so missing flag defaults to `false`, ensuring onboarding is shown and completion updates the flag to `true`.

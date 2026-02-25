@@ -150,8 +150,7 @@ export default function AppLayout() {
               .map((provider) => provider.providerId)
               .filter(Boolean),
             lookupItems: adminUser ? lookupItems : mergedLookupItems,
-            onboardingCompleted:
-              data.onboardingCompleted === false ? false : true,
+            onboardingCompleted: data.onboardingCompleted ?? false,
             updatedAt: serverTimestamp()
           },
           { merge: true }
