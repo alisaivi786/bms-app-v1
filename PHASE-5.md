@@ -112,18 +112,65 @@ Last Updated: 2026-02-25
 
 ## 4. Firestore Rules Update (Phase 5)
 
-If EMI create/update/remove fails with permission errors, ensure this subcollection rule exists under `users/{userId}`:
+### 4.1 EMI Rule Added
+- Added EMI subcollection access under each user document:
 
 ```txt
-match /emis/{emiId} {
-  allow read, write: if signedIn() && (request.auth.uid == userId || isAdmin());
+match /users/{userId} {
+  ...
+  match /emis/{emiId} {
+    allow read, write: if signedIn() && (request.auth.uid == userId || isAdmin());
+  }
 }
 ```
 
-Recommended full user subtree alignment now includes:
-- `/incomes`
-- `/budgets`
-- `/emis`
+### 4.2 Why This Was Required
+- EMI module now performs:
+  - create EMI records
+  - update EMI paid/completed values
+  - delete EMI records
+  - sync with budget rows
+- Without `/emis` rule, app shows permission errors like:
+  - `Missing or insufficient permissions`
+  - `Could not create EMI`
+  - `Could not remove EMI`
+
+### 4.3 Recommended Full Rules (Phase 5 Baseline)
+
+```txt
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow update: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+
+      match /incomes/{incomeId} {
+        allow read, write: if signedIn() && (request.auth.uid == userId || isAdmin());
+      }
+
+      match /budgets/{budgetId} {
+        allow read, write: if signedIn() && (request.auth.uid == userId || isAdmin());
+      }
+
+      match /emis/{emiId} {
+        allow read, write: if signedIn() && (request.auth.uid == userId || isAdmin());
+      }
+    }
+  }
+}
+```
 
 ---
 
