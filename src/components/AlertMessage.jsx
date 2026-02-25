@@ -1,9 +1,16 @@
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
+
 export default function AlertMessage({ type = "success", message }) {
-  if (!message) return null;
-  const className = type === "error" ? "alert alert-error" : "alert alert-success";
-  return (
-    <div className={className} role="alert" aria-live="polite">
-      {message}
-    </div>
-  );
+  useEffect(() => {
+    if (!message) return;
+    const toastId = `${type}:${message}`;
+    if (type === "error") {
+      toast.error(message, { id: toastId });
+      return;
+    }
+    toast.success(message, { id: toastId });
+  }, [message, type]);
+
+  return null;
 }

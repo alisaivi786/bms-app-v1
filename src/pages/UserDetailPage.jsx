@@ -54,7 +54,7 @@ export default function UserDetailPage() {
             <tr><th>Email</th><td>{data.email || "-"}</td></tr>
             <tr><th>Role</th><td>{data.role || (data.isAdmin ? "admin" : "user")}</td></tr>
             <tr><th>Currency</th><td>{data.currency || "USD"}</td></tr>
-            <tr><th>Initial Balance</th><td>{data.initialBalance ?? 0}</td></tr>
+            <tr><th>Account Balance</th><td>{data.accountBalance ?? data.initialBalance ?? 0}</td></tr>
             <tr><th>Providers</th><td>{(data.authProviders || []).join(", ") || "-"}</td></tr>
           </tbody>
         </table>

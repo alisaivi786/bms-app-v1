@@ -131,7 +131,7 @@ export default function UsersPage() {
                 <th>Tier</th>
                 <th>Action</th>
                 <th>Currency</th>
-                <th>Initial Balance</th>
+                <th>Account Balance</th>
               </tr>
             </thead>
             <tbody>
@@ -232,7 +232,7 @@ export default function UsersPage() {
                       </Link>
                     </td>
                     <td>{isLockedAdmin ? "-" : user.currency || "USD"}</td>
-                    <td>{isLockedAdmin ? "-" : user.initialBalance ?? 0}</td>
+                    <td>{isLockedAdmin ? "-" : user.accountBalance ?? user.initialBalance ?? 0}</td>
                   </tr>
                 );
               })}

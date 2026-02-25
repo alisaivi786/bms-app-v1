@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { deleteField, doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteField,
+  doc,
+  getDocs,
+  onSnapshot,
+  serverTimestamp,
+  setDoc
+} from "firebase/firestore";
 import { z } from "zod";
 import { db } from "../firebase";
 import { useAuth } from "../state/AuthContext";
@@ -10,6 +18,7 @@ import {
   getLookupTypeByKey
 } from "../constants/lookupTypes";
 import AlertMessage from "../components/AlertMessage";
+import CustomSelect from "../components/CustomSelect";
 
 const lookupSchema = z.object({
   name: z.string().trim().min(2, "Lookup name must be at least 2 characters.")
@@ -168,6 +177,27 @@ export default function SystemConfigPage() {
 
   const deleteLookup = async (id) => {
     try {
+      const target = lookupItems.find((item) => item.id === id);
+      if (target?.typeId === LOOKUP_TYPE_ENUM.BUDGET_CATEGORY) {
+        const budgetDocs = await getDocs(collection(db, "users", user.uid, "budgets"));
+        const isInUse = budgetDocs.docs.some((row) => {
+          const data = row.data() || {};
+          const items = Array.isArray(data.items) ? data.items : [];
+          return items.some(
+            (budgetItem) =>
+              Number(budgetItem?.categoryId) === Number(target.id) ||
+              String(budgetItem?.category || "").trim().toLowerCase() ===
+                String(target.name || "").trim().toLowerCase()
+          );
+        });
+        if (isInUse) {
+          setError(
+            "You cannot delete this category. It is associated with other records."
+          );
+          return;
+        }
+      }
+
       const next = lookupItems.filter((item) => item.id !== id);
       await persistLookupItems(next);
       setStatus("Lookup deleted.");
@@ -193,17 +223,14 @@ export default function SystemConfigPage() {
           <h2>Add Lookup</h2>
           <div className="field">
             <label htmlFor="lookupType">Lookup Type</label>
-            <select
-              id="lookupType"
+            <CustomSelect
               value={selectedTypeId}
-              onChange={(event) => setSelectedTypeId(Number(event.target.value))}
-            >
-              {LOOKUP_TYPES.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setSelectedTypeId(Number(value))}
+              options={LOOKUP_TYPES.map((type) => ({
+                value: type.id,
+                label: type.label
+              }))}
+            />
           </div>
           <div className="field">
             <label htmlFor="lookupName">Lookup Name</label>

@@ -22,7 +22,7 @@ const PERMISSION_GROUPS = [
   },
   {
     title: "Data",
-    items: [PERMISSIONS.MANAGE_INCOME]
+    items: [PERMISSIONS.MANAGE_INCOME, PERMISSIONS.MANAGE_BUDGET]
   },
   {
     title: "User Management",

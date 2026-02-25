@@ -90,7 +90,7 @@ export default function UserCreatePage() {
           isAdmin: role === "admin",
           permissions,
           currency: role === "admin" ? null : null,
-          initialBalance: role === "admin" ? null : null,
+          accountBalance: role === "admin" ? null : null,
           mustChangePassword: true,
           authProviders: ["password"],
           createdBy: user.uid,

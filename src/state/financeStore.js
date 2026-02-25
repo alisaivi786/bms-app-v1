@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 const emptyUserData = {
-  initialBalance: 0,
+  accountBalance: 0,
   incomes: []
 };
 
@@ -10,13 +10,13 @@ export const useFinanceStore = create(
   persist(
     (set, get) => ({
       userDataByUid: {},
-      setInitialBalanceForUser: (uid, initialBalance) =>
+      setAccountBalanceForUser: (uid, accountBalance) =>
         set((state) => ({
           userDataByUid: {
             ...state.userDataByUid,
             [uid]: {
               ...(state.userDataByUid[uid] || emptyUserData),
-              initialBalance: Number(initialBalance || 0)
+              accountBalance: Number(accountBalance || 0)
             }
           }
         })),

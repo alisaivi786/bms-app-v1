@@ -6,6 +6,7 @@ import AppLayout from "./components/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import IncomePage from "./pages/IncomePage";
+import BudgetPage from "./pages/BudgetPage";
 import ThemePage from "./pages/ThemePage";
 import ProfilePage from "./pages/ProfilePage";
 import CurrencyPage from "./pages/CurrencyPage";
@@ -48,6 +49,14 @@ export default function App() {
           element={
             <PermissionRoute permission={PERMISSIONS.MANAGE_INCOME}>
               <IncomePage />
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="budget"
+          element={
+            <PermissionRoute permission={PERMISSIONS.MANAGE_BUDGET}>
+              <BudgetPage />
             </PermissionRoute>
           }
         />

@@ -31,7 +31,7 @@ export default function AppLayout() {
   const [dataOpen, setDataOpen] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(isAdminEmail(user?.email));
-  const setInitialBalanceForUser = useFinanceStore((state) => state.setInitialBalanceForUser);
+  const setAccountBalanceForUser = useFinanceStore((state) => state.setAccountBalanceForUser);
   const setIncomesForUser = useFinanceStore((state) => state.setIncomesForUser);
   const currency = usePreferencesStore((state) => state.currency);
   const setCurrency = usePreferencesStore((state) => state.setCurrency);
@@ -49,7 +49,8 @@ export default function AppLayout() {
     (user.email ? user.email.split("@")[0] : "User");
   const profileEmail = user.email || "No email";
   const profileAvatar = user.photoURL || "/default-avatar.svg";
-  const dataActive = location.pathname.startsWith("/income");
+  const dataActive =
+    location.pathname.startsWith("/income") || location.pathname.startsWith("/budget");
   const userMgmtActive = location.pathname.startsWith("/roles") || location.pathname.startsWith("/users");
   const settingActive = location.pathname.startsWith("/system-config");
 
@@ -85,9 +86,42 @@ export default function AppLayout() {
         const snap = await getDoc(userRef);
         const data = snap.exists() ? snap.data() : {};
         const adminUser = isAdminEmail(user.email);
-        const hasLookupItems = Array.isArray(data.lookupItems) && data.lookupItems.length > 0;
-        const hasLegacyLookups =
-          Array.isArray(data.incomeSourceLookups) && data.incomeSourceLookups.length > 0;
+        const lookupItems = Array.isArray(data.lookupItems) ? data.lookupItems : [];
+        const legacyIncome = Array.isArray(data.incomeSourceLookups) ? data.incomeSourceLookups : [];
+        const hasLookupItems = lookupItems.length > 0;
+        const hasLegacyLookups = legacyIncome.length > 0;
+
+        let mergedLookupItems = lookupItems;
+        if (!adminUser) {
+          if (hasLegacyLookups) {
+            const maxId = lookupItems.reduce(
+              (max, item) => (Number.isInteger(Number(item?.id)) ? Math.max(max, Number(item.id)) : max),
+              0
+            );
+            let nextId = maxId;
+            const next = [...lookupItems];
+            legacyIncome.forEach((name) => {
+              const normalized = String(name || "").trim();
+              if (!normalized) return;
+              const exists = next.some(
+                (item) =>
+                  Number(item?.typeId) === 1 &&
+                  String(item?.name || "").trim().toLowerCase() === normalized.toLowerCase()
+              );
+              if (!exists) {
+                nextId += 1;
+                next.push({
+                  id: nextId,
+                  typeId: 1,
+                  name: normalized
+                });
+              }
+            });
+            mergedLookupItems = next;
+          } else if (!hasLookupItems) {
+            mergedLookupItems = buildDefaultLookupItems();
+          }
+        }
 
         await setDoc(
           userRef,
@@ -100,7 +134,7 @@ export default function AppLayout() {
             tier: data.tier || (isAdminEmail(user.email) ? "pro" : "basic"),
             isAdmin: data.isAdmin ?? isAdminEmail(user.email),
             currency: adminUser ? null : data.currency || null,
-            initialBalance: adminUser ? null : data.initialBalance ?? null,
+            accountBalance: adminUser ? null : data.accountBalance ?? data.initialBalance ?? null,
             permissions: normalizePermissions(
               data.role || (isAdminEmail(user.email) ? "admin" : "user"),
               data.permissions,
@@ -109,11 +143,7 @@ export default function AppLayout() {
             authProviders: (user.providerData || [])
               .map((provider) => provider.providerId)
               .filter(Boolean),
-            lookupItems: adminUser
-              ? data.lookupItems || []
-              : hasLookupItems || hasLegacyLookups
-              ? data.lookupItems || []
-              : buildDefaultLookupItems(),
+            lookupItems: adminUser ? lookupItems : mergedLookupItems,
             updatedAt: serverTimestamp()
           },
           { merge: true }
@@ -137,7 +167,7 @@ export default function AppLayout() {
           data.tier || (isAdminEmail(user.email) ? "pro" : "basic")
         )
       });
-      setInitialBalanceForUser(user.uid, Number(data.initialBalance || 0));
+      setAccountBalanceForUser(user.uid, Number(data.accountBalance ?? data.initialBalance ?? 0));
       if (data.currency) {
         setCurrency(data.currency);
       }
@@ -162,7 +192,7 @@ export default function AppLayout() {
       unsubUser();
       unsubIncomes();
     };
-  }, [setAccess, setCurrency, setIncomesForUser, setInitialBalanceForUser, setMode, setTheme, user.email, user.uid]);
+  }, [setAccess, setCurrency, setIncomesForUser, setAccountBalanceForUser, setMode, setTheme, user.email, user.uid]);
 
   const handleCurrencyChange = async (nextCurrency) => {
     setCurrency(nextCurrency);
@@ -225,7 +255,7 @@ export default function AppLayout() {
               Admin Dashboard
             </NavLink>
           ) : null}
-          {can(PERMISSIONS.MANAGE_INCOME) ? (
+          {can(PERMISSIONS.MANAGE_INCOME) || can(PERMISSIONS.MANAGE_BUDGET) ? (
             <div className="menu-group">
               <button
                 className={`menu-group-toggle ${dataActive ? "active" : ""}`}
@@ -240,9 +270,18 @@ export default function AppLayout() {
                 <span>{dataOpen ? "▾" : "▸"}</span>
               </button>
               {dataOpen ? (
-                <NavLink to="/income" className="menu-sublink">
-                  Income
-                </NavLink>
+                <>
+                  {can(PERMISSIONS.MANAGE_INCOME) ? (
+                    <NavLink to="/income" className="menu-sublink">
+                      Income
+                    </NavLink>
+                  ) : null}
+                  {can(PERMISSIONS.MANAGE_BUDGET) ? (
+                    <NavLink to="/budget" className="menu-sublink">
+                      Budget
+                    </NavLink>
+                  ) : null}
+                </>
               ) : null}
             </div>
           ) : null}
