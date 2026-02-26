@@ -6,6 +6,7 @@ import AppLayout from "./components/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import IncomePage from "./pages/IncomePage";
+import IncomeReportPage from "./pages/IncomeReportPage";
 import BudgetPage from "./pages/BudgetPage";
 import EmiPage from "./pages/EmiPage";
 import ThemePage from "./pages/ThemePage";
@@ -34,6 +35,14 @@ export default function AppPortal() {
           element={
             <PermissionRoute permission={PERMISSIONS.VIEW_DASHBOARD}>
               <DashboardPage />
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="reports/income"
+          element={
+            <PermissionRoute permission={PERMISSIONS.VIEW_INCOME_REPORT}>
+              <IncomeReportPage />
             </PermissionRoute>
           }
         />

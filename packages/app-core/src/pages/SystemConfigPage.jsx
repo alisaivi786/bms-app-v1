@@ -20,12 +20,15 @@ import {
 import AlertMessage from "../components/AlertMessage";
 import CustomSelect from "../components/CustomSelect";
 import { isAdminEmail } from "../constants/admin";
+import GridToolbar from "../components/GridToolbar";
+import GridPageSizeSelect from "../components/GridPageSizeSelect";
 
 const lookupSchema = z.object({
   name: z.string().trim().min(2, "Lookup name must be at least 2 characters.")
 });
 
 export default function SystemConfigPage() {
+  const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100];
   const { user } = useAuth();
   const [lookupItems, setLookupItems] = useState([]);
   const [selectedTypeId, setSelectedTypeId] = useState(LOOKUP_TYPE_ENUM.INCOME_SOURCE);
@@ -35,6 +38,8 @@ export default function SystemConfigPage() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
 
   useEffect(() => {
     const userRef = doc(db, "users", user.uid);
@@ -212,6 +217,17 @@ export default function SystemConfigPage() {
   };
 
   const filteredLookups = lookupItems.filter((item) => item.typeId === selectedTypeId);
+  const totalPages = Math.max(1, Math.ceil(filteredLookups.length / pageSize));
+  const pageStart = (page - 1) * pageSize;
+  const pagedLookups = filteredLookups.slice(pageStart, pageStart + pageSize);
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedTypeId, pageSize]);
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
 
   return (
     <section>
@@ -273,7 +289,16 @@ export default function SystemConfigPage() {
 
       {!isAdmin ? (
         <div className="table-card">
-          <h3>Lookup Data Grid</h3>
+          <GridToolbar
+            left={
+              <GridPageSizeSelect
+                id="lookup-page-size"
+                value={pageSize}
+                onChange={setPageSize}
+                options={PAGE_SIZE_OPTIONS}
+              />
+            }
+          />
           {filteredLookups.length === 0 ? (
             <p className="muted">No lookups added yet.</p>
           ) : (
@@ -286,7 +311,7 @@ export default function SystemConfigPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredLookups.map((item) => (
+                {pagedLookups.map((item) => (
                   <tr key={item.id}>
                     <td>{getLookupTypeById(item.typeId)?.label || String(item.typeId)}</td>
                     <td>
@@ -329,6 +354,29 @@ export default function SystemConfigPage() {
               </tbody>
             </table>
           )}
+          {filteredLookups.length > 0 ? (
+            <div className="grid-pagination">
+              <button
+                className="btn btn-inline btn-outline"
+                type="button"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Prev
+              </button>
+              <span>
+                Page {page} of {totalPages}
+              </span>
+              <button
+                className="btn btn-inline btn-outline"
+                type="button"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

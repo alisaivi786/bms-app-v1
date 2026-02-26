@@ -26,10 +26,14 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 900 : false
+  );
   const [logoVisible, setLogoVisible] = useState(true);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
   const [dataOpen, setDataOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(isAdminEmail(user?.email));
   const [onboardingCompleted, setOnboardingCompleted] = useState(true);
@@ -57,28 +61,58 @@ export default function AppLayout() {
     location.pathname.startsWith("/budget") ||
     location.pathname.startsWith("/emi");
   const userMgmtActive = location.pathname.startsWith("/roles") || location.pathname.startsWith("/users");
+  const reportActive = location.pathname.startsWith("/reports");
   const settingActive = location.pathname.startsWith("/system-config");
   const isOnboardingRoute = location.pathname === "/onboarding";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const mediaQuery = window.matchMedia("(max-width: 900px)");
+    const apply = () => setIsMobile(mediaQuery.matches);
+    apply();
+    mediaQuery.addEventListener("change", apply);
+    return () => mediaQuery.removeEventListener("change", apply);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+      setProfileMenuOpen(false);
+    }
+  }, [isMobile, location.pathname]);
 
   useEffect(() => {
     if (dataActive) {
       setDataOpen(true);
       setUserMgmtOpen(false);
+      setReportOpen(false);
+      setSettingOpen(false);
+    } else if (reportActive) {
+      setDataOpen(false);
+      setReportOpen(true);
+      setUserMgmtOpen(false);
       setSettingOpen(false);
     } else if (userMgmtActive) {
       setDataOpen(false);
+      setReportOpen(false);
       setUserMgmtOpen(true);
       setSettingOpen(false);
     } else if (settingActive) {
       setDataOpen(false);
+      setReportOpen(false);
       setSettingOpen(true);
       setUserMgmtOpen(false);
     } else {
       setDataOpen(false);
+      setReportOpen(false);
       setUserMgmtOpen(false);
       setSettingOpen(false);
     }
-  }, [dataActive, settingActive, userMgmtActive]);
+  }, [dataActive, reportActive, settingActive, userMgmtActive]);
 
   useEffect(() => {
     const userRef = doc(db, "users", user.uid);
@@ -263,6 +297,7 @@ export default function AppLayout() {
   return (
     <div className={`layout ${sidebarOpen ? "sidebar-open" : "sidebar-collapsed"}`}>
       <aside className={`sidebar ${sidebarOpen ? "show" : "hide"}`}>
+        <div className="sidebar-head">
         <Link className="brand brand-wrap" to="/">
           {logoVisible ? (
             <img
@@ -274,14 +309,25 @@ export default function AppLayout() {
           ) : null}
           <span className="brand-text">BMS</span>
         </Link>
+          {isMobile ? (
+            <button
+              className="profile-menu-btn mobile-sidebar-close"
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setSidebarOpen(false)}
+            >
+              ✕
+            </button>
+          ) : null}
+        </div>
         <nav className="menu">
           {can(PERMISSIONS.VIEW_DASHBOARD) ? (
-            <NavLink to="/dashboard-home" className="menu-link">
+            <NavLink to="/dashboard-home" className="menu-link" onClick={() => isMobile && setSidebarOpen(false)}>
               Dashboard
             </NavLink>
           ) : null}
           {can(PERMISSIONS.VIEW_ADMIN_DASHBOARD) ? (
-            <NavLink to="/admin" className="menu-link">
+            <NavLink to="/admin" className="menu-link" onClick={() => isMobile && setSidebarOpen(false)}>
               Admin Dashboard
             </NavLink>
           ) : null}
@@ -294,6 +340,7 @@ export default function AppLayout() {
                 type="button"
                 onClick={() => {
                   setDataOpen((v) => !v);
+                  setReportOpen(false);
                   setUserMgmtOpen(false);
                   setSettingOpen(false);
                 }}
@@ -304,21 +351,43 @@ export default function AppLayout() {
               {dataOpen ? (
                 <>
                   {can(PERMISSIONS.MANAGE_INCOME) ? (
-                    <NavLink to="/income" className="menu-sublink">
+                    <NavLink to="/income" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
                       Income
                     </NavLink>
                   ) : null}
                   {can(PERMISSIONS.MANAGE_BUDGET) ? (
-                    <NavLink to="/budget" className="menu-sublink">
+                    <NavLink to="/budget" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
                       Budget
                     </NavLink>
                   ) : null}
                   {can(PERMISSIONS.MANAGE_EMI) ? (
-                    <NavLink to="/emi" className="menu-sublink">
+                    <NavLink to="/emi" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
                       EMI
                     </NavLink>
                   ) : null}
                 </>
+              ) : null}
+            </div>
+          ) : null}
+          {can(PERMISSIONS.VIEW_INCOME_REPORT) ? (
+            <div className="menu-group">
+              <button
+                className={`menu-group-toggle ${reportActive ? "active" : ""}`}
+                type="button"
+                onClick={() => {
+                  setReportOpen((v) => !v);
+                  setDataOpen(false);
+                  setUserMgmtOpen(false);
+                  setSettingOpen(false);
+                }}
+              >
+                <span>Report</span>
+                <span>{reportOpen ? "▾" : "▸"}</span>
+              </button>
+              {reportOpen ? (
+                <NavLink to="/reports/income" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
+                  Income Report
+                </NavLink>
               ) : null}
             </div>
           ) : null}
@@ -329,6 +398,7 @@ export default function AppLayout() {
                 type="button"
                 onClick={() => {
                   setUserMgmtOpen((v) => !v);
+                  setReportOpen(false);
                   setSettingOpen(false);
                 }}
               >
@@ -338,13 +408,13 @@ export default function AppLayout() {
               {userMgmtOpen ? (
                 <>
                   {can(PERMISSIONS.MANAGE_ROLES) ? (
-                    <NavLink to="/roles" className="menu-sublink">
-                      Role
+                    <NavLink to="/roles" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
+                      Roles and Permission
                     </NavLink>
                   ) : null}
                   {isAdmin && can(PERMISSIONS.VIEW_USERS) ? (
-                    <NavLink to="/users" className="menu-sublink">
-                      User
+                    <NavLink to="/users" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
+                      User List
                     </NavLink>
                   ) : null}
                 </>
@@ -358,6 +428,7 @@ export default function AppLayout() {
                 type="button"
                 onClick={() => {
                   setSettingOpen((v) => !v);
+                  setReportOpen(false);
                   setUserMgmtOpen(false);
                 }}
               >
@@ -365,7 +436,7 @@ export default function AppLayout() {
                 <span>{settingOpen ? "▾" : "▸"}</span>
               </button>
               {settingOpen ? (
-                <NavLink to="/system-config" className="menu-sublink">
+                <NavLink to="/system-config" className="menu-sublink" onClick={() => isMobile && setSidebarOpen(false)}>
                   System Configuration
                 </NavLink>
               ) : null}
@@ -423,6 +494,14 @@ export default function AppLayout() {
           ) : null}
         </div>
       </aside>
+      {isMobile && sidebarOpen ? (
+        <button
+          type="button"
+          className="mobile-sidebar-backdrop"
+          aria-label="Close menu overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      ) : null}
       <main className="content">
         <header className="top-header">
           <button

@@ -5,11 +5,30 @@ export default function AlertMessage({ type = "success", message }) {
   useEffect(() => {
     if (!message) return;
     const toastId = `${type}:${message}`;
-    if (type === "error") {
-      toast.error(message, { id: toastId });
-      return;
-    }
-    toast.success(message, { id: toastId });
+
+    toast.custom(
+      () => (
+        <div className={`alert ${type === "error" ? "alert-error" : "alert-success"}`}>
+          <div>{message}</div>
+          <button
+            className="alert-close-btn"
+            type="button"
+            aria-label="Close alert"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              toast.dismiss(toastId);
+            }}
+          >
+            x
+          </button>
+        </div>
+      ),
+      {
+        id: toastId,
+        duration: type === "error" ? 5000 : 3500
+      }
+    );
   }, [message, type]);
 
   return null;

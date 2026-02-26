@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function CustomSelect({
+  id,
   options,
   value,
   onChange,
@@ -25,9 +26,12 @@ export default function CustomSelect({
   return (
     <div className={`custom-select ${className}`.trim()} ref={rootRef}>
       <button
+        id={id}
         type="button"
         className="custom-select-trigger"
         onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
       >
         <span>{selected ? selected.label : placeholder}</span>
         <span className="custom-select-caret">{open ? "▴" : "▾"}</span>

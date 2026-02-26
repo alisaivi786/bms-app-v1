@@ -25,6 +25,10 @@ const PERMISSION_GROUPS = [
     items: [PERMISSIONS.MANAGE_INCOME, PERMISSIONS.MANAGE_BUDGET, PERMISSIONS.MANAGE_EMI]
   },
   {
+    title: "Report",
+    items: [PERMISSIONS.VIEW_INCOME_REPORT]
+  },
+  {
     title: "User Management",
     items: [PERMISSIONS.VIEW_USERS, PERMISSIONS.MANAGE_USERS, PERMISSIONS.MANAGE_ROLES]
   },
@@ -49,6 +53,8 @@ export default function RoleDetailPage() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const isAdminRole = roleName === "admin" || roleInput === "admin";
+  const isPresetRole = Boolean(!isCreateMode && ROLE_PRESETS[roleName]);
+  const canEditRoleName = isCreateMode || (!isPresetRole && roleName !== "admin");
 
   useEffect(() => {
     const adminRef = doc(db, "users", user.uid);
@@ -94,7 +100,13 @@ export default function RoleDetailPage() {
     }
     try {
       const normalized = [...new Set(selectedPerms)];
-      const existing = customRoles.filter((r) => r.name !== normalizedRoleName);
+      const targetToReplace = isCreateMode ? "" : String(roleName || "").trim().toLowerCase();
+      const existing = customRoles.filter((r) => {
+        const current = String(r.name || "").trim().toLowerCase();
+        if (current === normalizedRoleName) return false;
+        if (targetToReplace && current === targetToReplace) return false;
+        return true;
+      });
       const nextRoles = [...existing, { name: normalizedRoleName, permissions: normalized }];
       await setDoc(
         doc(db, "users", user.uid),
@@ -102,19 +114,30 @@ export default function RoleDetailPage() {
         { merge: true }
       );
 
-      const usersByRole = await getDocs(
-        query(collection(db, "users"), where("role", "==", normalizedRoleName))
+      let propagated = 0;
+      try {
+        const usersByRole = await getDocs(
+          query(collection(db, "users"), where("role", "==", normalizedRoleName))
+        );
+        await Promise.all(
+          usersByRole.docs.map(async (row) => {
+            await setDoc(
+              doc(db, "users", row.id),
+              { permissions: normalized, updatedAt: serverTimestamp() },
+              { merge: true }
+            );
+            propagated += 1;
+          })
+        );
+      } catch (propagationErr) {
+        console.warn("Role saved but could not propagate permissions to assigned users.", propagationErr);
+      }
+
+      setStatus(
+        propagated > 0
+          ? "Role permissions saved and applied to assigned users."
+          : "Role permissions saved."
       );
-      await Promise.all(
-        usersByRole.docs.map((row) =>
-          setDoc(
-            doc(db, "users", row.id),
-            { permissions: normalized, updatedAt: serverTimestamp() },
-            { merge: true }
-          )
-        )
-      );
-      setStatus("Role permissions saved and applied to assigned users.");
       if (isCreateMode) {
         navigate(`/roles/${normalizedRoleName}`, { replace: true });
       }
@@ -139,7 +162,7 @@ export default function RoleDetailPage() {
           <input
             value={roleInput}
             onChange={(e) => setRoleInput(e.target.value)}
-            disabled={!isCreateMode}
+            disabled={!canEditRoleName}
           />
         </div>
       </div>

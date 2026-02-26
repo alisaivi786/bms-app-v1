@@ -7,6 +7,7 @@ import { useFinanceStore } from "../state/financeStore";
 import { usePreferencesStore } from "../state/preferencesStore";
 import { formatCurrency } from "../utils/currency";
 import { MONTH_OPTIONS, monthLabel } from "../constants/months";
+import { formatAsGstDateTime } from "../utils/dateTime";
 
 const now = new Date();
 const currentMonth = now.getMonth() + 1;
@@ -418,6 +419,7 @@ export default function DashboardPage() {
                 <th>Year</th>
                 <th>Source</th>
                 <th>Amount</th>
+                <th>CreateOn</th>
               </tr>
             </thead>
             <tbody>
@@ -427,6 +429,7 @@ export default function DashboardPage() {
                   <td>{item.year}</td>
                   <td>{item.source}</td>
                   <td>{formatCurrency(Number(item.amount), currency)}</td>
+                  <td>{formatAsGstDateTime(item.createdAt || item.updatedAt)}</td>
                 </tr>
               ))}
             </tbody>

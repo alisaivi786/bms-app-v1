@@ -5,15 +5,31 @@ import { db } from "../firebase";
 import { useAuth } from "../state/AuthContext";
 import { ROLE_PRESETS } from "../constants/access";
 import AlertMessage from "../components/AlertMessage";
+import GridToolbar from "../components/GridToolbar";
+import GridPageSizeSelect from "../components/GridPageSizeSelect";
+import CustomSearchForm from "../components/CustomSearchForm";
+import { OneYearDatePickerComponent } from "../components/OneYearDateRangePicker";
+import { formatAsGstDateTime, parseDateValue } from "../utils/dateTime";
 
 export default function RolesPage() {
-  const PAGE_SIZE = 8;
+  const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100];
   const { user } = useAuth();
   const [customRoles, setCustomRoles] = useState([]);
-  const [filter, setFilter] = useState("");
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState(null);
+  const [searchValues, setSearchValues] = useState({
+    roleName: "",
+    operationDateRange: { fromDate: "", toDate: "" }
+  });
+  const defaultSearchValues = {
+    roleName: "",
+    operationDateRange: { fromDate: "", toDate: "" }
+  };
+  const [appliedFilter, setAppliedFilter] = useState("");
+  const [appliedDateRange, setAppliedDateRange] = useState(defaultSearchValues.operationDateRange);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
 
   useEffect(() => {
     const ref = doc(db, "users", user.uid);
@@ -21,6 +37,7 @@ export default function RolesPage() {
       const data = snap.exists() ? snap.data() : {};
       const roles = Array.isArray(data.customRoles) ? data.customRoles : [];
       setCustomRoles(roles);
+      setProfileUpdatedAt(data.updatedAt || null);
     });
     return unsub;
   }, [user.uid]);
@@ -46,16 +63,35 @@ export default function RolesPage() {
     return merged.sort((a, b) => a.name.localeCompare(b.name));
   }, [customRoles, presetNames]);
 
-  const filteredRoles = allRoles.filter((role) =>
-    role.name.toLowerCase().includes(filter.trim().toLowerCase())
-  );
-  const totalPages = Math.max(1, Math.ceil(filteredRoles.length / PAGE_SIZE));
-  const pageStart = (page - 1) * PAGE_SIZE;
-  const pagedRoles = filteredRoles.slice(pageStart, pageStart + PAGE_SIZE);
+  const filteredRoles = allRoles.filter((role) => {
+    const nameOk = role.name.toLowerCase().includes(appliedFilter.trim().toLowerCase());
+    const fromTime = appliedDateRange?.fromDate
+      ? new Date(`${appliedDateRange.fromDate}T00:00:00`).getTime()
+      : null;
+    const toTime = appliedDateRange?.toDate
+      ? new Date(`${appliedDateRange.toDate}T23:59:59`).getTime()
+      : null;
+    if (fromTime == null && toTime == null) return nameOk;
+
+    const rowDate = parseDateValue(role.createdAt || role.updatedAt || profileUpdatedAt);
+    const rowTime = rowDate?.getTime() ?? null;
+    const dateOk =
+      rowTime != null &&
+      (fromTime == null || rowTime >= fromTime) &&
+      (toTime == null || rowTime <= toTime);
+    return nameOk && dateOk;
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredRoles.length / pageSize));
+  const pageStart = (page - 1) * pageSize;
+  const pagedRoles = filteredRoles.slice(pageStart, pageStart + pageSize);
 
   useEffect(() => {
     setPage(1);
-  }, [filter]);
+  }, [appliedFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -81,26 +117,72 @@ export default function RolesPage() {
     }
   };
 
+  const handleApplyFilter = (event) => {
+    event.preventDefault();
+    setAppliedFilter(searchValues.roleName.trim());
+    setAppliedDateRange({
+      fromDate: String(searchValues.operationDateRange?.fromDate || ""),
+      toDate: String(searchValues.operationDateRange?.toDate || "")
+    });
+  };
+
+  const handleResetFilter = () => {
+    setSearchValues(defaultSearchValues);
+    setAppliedFilter("");
+    setAppliedDateRange(defaultSearchValues.operationDateRange);
+  };
+
+  const formBox = {
+    values: searchValues,
+    setFieldValue: (field, value) => setSearchValues((prev) => ({ ...prev, [field]: value }))
+  };
+
   return (
     <section className="role-page">
       <div className="section-head">
         <h1>Role Management</h1>
-        <p className="muted">Filter roles and open role form for create/edit.</p>
+        <p className="muted">Manage role catalog, permissions, and assignment policy.</p>
       </div>
       <AlertMessage type="error" message={error} />
       <AlertMessage type="success" message={status} />
 
-      <div className="table-card role-table-card">
-        <div className="role-grid-toolbar">
-          <input
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter by role name"
-          />
-          <Link className="btn btn-inline" to="/roles/new">
-            Add Role
-          </Link>
+      <CustomSearchForm
+        values={searchValues}
+        defaultValues={defaultSearchValues}
+        onSubmit={handleApplyFilter}
+        onReset={handleResetFilter}
+      >
+        <div className="form-grid">
+          {OneYearDatePickerComponent({
+            form: formBox,
+            field: "operationDateRange",
+            label: "Application Creation Date",
+            hasTimePicker: true,
+            isRequired: false
+          })}
+          <div className="field">
+            <label htmlFor="role-name-filter">Role Name</label>
+            <input
+              id="role-name-filter"
+              value={searchValues.roleName}
+              onChange={(event) =>
+                setSearchValues((prev) => ({ ...prev, roleName: event.target.value }))
+              }
+              placeholder="Enter role name (e.g. user)"
+            />
+          </div>
         </div>
+      </CustomSearchForm>
+
+      <div className="table-card role-table-card">
+        <GridToolbar
+          left={<GridPageSizeSelect id="roles-page-size" value={pageSize} onChange={setPageSize} options={PAGE_SIZE_OPTIONS} />}
+          right={
+            <Link className="btn btn-inline" to="/roles/new">
+              Add Role
+            </Link>
+          }
+        />
 
         {filteredRoles.length === 0 ? (
           <p className="muted">No roles found.</p>
@@ -110,6 +192,7 @@ export default function RolesPage() {
               <tr>
                 <th>Role</th>
                 <th>Permissions</th>
+                <th>CreateOn</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -120,6 +203,7 @@ export default function RolesPage() {
                     <strong>{role.name}</strong>
                   </td>
                   <td className="role-perm-cell">{(role.permissions || []).join(", ")}</td>
+                  <td>{formatAsGstDateTime(role.createdAt || role.updatedAt || profileUpdatedAt)}</td>
                   <td>
                     <Link className="btn btn-inline" to={`/roles/${role.name}`}>
                       View

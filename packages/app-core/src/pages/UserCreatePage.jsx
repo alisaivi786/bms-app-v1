@@ -6,8 +6,9 @@ import { db } from "../firebase";
 import { useAuth } from "../state/AuthContext";
 import { CreateUser } from "../utils/CreateUser";
 import { isAdminEmail } from "../constants/admin";
-import { ROLE_PRESETS, TIER_OPTIONS, normalizePermissions } from "../constants/access";
+import { ROLE_PRESETS, TIER_OPTIONS, defaultPermissionsFor, normalizePermissions } from "../constants/access";
 import AlertMessage from "../components/AlertMessage";
+import CustomSelect from "../components/CustomSelect";
 
 const emailSchema = z.string().email("Enter a valid email address.");
 
@@ -46,15 +47,24 @@ export default function UserCreatePage() {
     loadAdminContext();
   }, [user.email, user.uid]);
 
-  const roleOptions = useMemo(
-    () => [...Object.keys(ROLE_PRESETS), ...customRoles.map((item) => item.name)],
-    [customRoles]
-  );
+  const roleOptions = useMemo(() => {
+    const seen = new Set();
+    const ordered = [...Object.keys(ROLE_PRESETS), ...customRoles.map((item) => String(item.name || "").trim())];
+    return ordered
+      .filter((name) => name)
+      .filter((name) => {
+        const key = name.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .map((name) => ({ value: name, label: name }));
+  }, [customRoles]);
 
   const getRolePermissions = (roleName) => {
-    if (ROLE_PRESETS[roleName]) return normalizePermissions(roleName, [], tier);
+    if (ROLE_PRESETS[roleName]) return defaultPermissionsFor(roleName, tier);
     const custom = customRoles.find((item) => item.name === roleName);
-    return normalizePermissions("user", custom?.permissions || [], tier);
+    return normalizePermissions("user", custom?.permissions, tier);
   };
 
   const handleSubmit = async (event) => {
@@ -67,7 +77,7 @@ export default function UserCreatePage() {
       setError(parsedEmail.error.issues[0]?.message || "Invalid email.");
       return;
     }
-    if (!roleOptions.includes(role)) {
+    if (!roleOptions.some((item) => item.value === role)) {
       setError("Invalid role selected.");
       return;
     }
@@ -105,7 +115,7 @@ export default function UserCreatePage() {
       setDisplayName("");
       setRole("user");
       setTier("basic");
-      setTimeout(() => navigate("/users"), 700);
+      navigate("/users");
     } catch (err) {
       const code = err?.code || "";
       if (code === "auth/email-already-in-use") {
@@ -169,31 +179,16 @@ export default function UserCreatePage() {
           </div>
           <div className="field">
             <label htmlFor="new-user-role">Role</label>
-            <select
-              id="new-user-role"
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-            >
-              {roleOptions.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+            <CustomSelect id="new-user-role" value={role} onChange={(value) => setRole(String(value))} options={roleOptions} />
           </div>
           <div className="field">
             <label htmlFor="new-user-tier">Tier</label>
-            <select
+            <CustomSelect
               id="new-user-tier"
               value={tier}
-              onChange={(event) => setTier(event.target.value)}
-            >
-              {TIER_OPTIONS.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setTier(String(value))}
+              options={TIER_OPTIONS.map((item) => ({ value: item, label: item }))}
+            />
           </div>
           <div className="row-field">
             <button className="btn" type="submit" disabled={saving}>

@@ -18,6 +18,9 @@ import { LOOKUP_TYPE_ENUM, getLookupTypeByKey } from "../constants/lookupTypes";
 import CustomSelect from "../components/CustomSelect";
 import AlertMessage from "../components/AlertMessage";
 import { MONTH_OPTIONS } from "../constants/months";
+import GridToolbar from "../components/GridToolbar";
+import GridPageSizeSelect from "../components/GridPageSizeSelect";
+import { formatAsGstDateTime } from "../utils/dateTime";
 
 const yearOptions = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - 2 + i);
 const incomeSchema = z.object({
@@ -31,7 +34,7 @@ const accountBalanceSchema = z.coerce
   .min(0, "Account balance must be 0 or greater.");
 
 export default function IncomePage() {
-  const PAGE_SIZE = 8;
+  const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100];
   const { user } = useAuth();
   const userData = useFinanceStore((state) => state.userDataByUid[user.uid]);
   const setAccountBalanceForUser = useFinanceStore((state) => state.setAccountBalanceForUser);
@@ -52,10 +55,11 @@ export default function IncomePage() {
   const [incomeSourceOptions, setIncomeSourceOptions] = useState([]);
   const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const incomes = userData?.incomes || [];
-  const totalPages = Math.max(1, Math.ceil(incomes.length / PAGE_SIZE));
-  const pageStart = (page - 1) * PAGE_SIZE;
-  const pagedIncomes = incomes.slice(pageStart, pageStart + PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(incomes.length / pageSize));
+  const pageStart = (page - 1) * pageSize;
+  const pagedIncomes = incomes.slice(pageStart, pageStart + pageSize);
 
   useEffect(() => {
     if (userData?.accountBalance !== undefined) {
@@ -66,6 +70,10 @@ export default function IncomePage() {
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [page, totalPages]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize]);
 
   useEffect(() => {
     const userRef = doc(db, "users", user.uid);
@@ -244,7 +252,18 @@ export default function IncomePage() {
       </div>
 
       <div className="table-card">
-        <h3>Income Details</h3>
+        <GridToolbar
+          left={
+            <>
+              <GridPageSizeSelect
+                id="income-page-size"
+                value={pageSize}
+                onChange={setPageSize}
+                options={PAGE_SIZE_OPTIONS}
+              />
+            </>
+          }
+        />
         {incomes.length === 0 ? (
           <p className="muted">No income records yet.</p>
         ) : (
@@ -255,6 +274,7 @@ export default function IncomePage() {
                 <th>Year</th>
                 <th>Source</th>
                 <th>Amount</th>
+                <th>CreateOn</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -265,6 +285,7 @@ export default function IncomePage() {
                   <td>{item.year}</td>
                   <td>{item.source}</td>
                   <td>{item.amount}</td>
+                  <td>{formatAsGstDateTime(item.createdAt || item.updatedAt)}</td>
                   <td>
                     <button
                       className="btn btn-inline btn-outline"

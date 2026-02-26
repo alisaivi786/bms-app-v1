@@ -62,6 +62,8 @@ export default function BudgetPage() {
   const [predefinedMonths, setPredefinedMonths] = useState([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [isWorking, setIsWorking] = useState(false);
+  const [workingMessage, setWorkingMessage] = useState("");
   const seededBudgetCategoriesRef = useRef(false);
   const [lookupLoaded, setLookupLoaded] = useState(false);
 
@@ -360,8 +362,10 @@ export default function BudgetPage() {
 
       setStatus(nextStatus);
       setError("");
+      return true;
     } catch (err) {
       setError(err?.message || "Could not save budget.");
+      return false;
     }
   };
 
@@ -389,9 +393,17 @@ export default function BudgetPage() {
       actualAmount: String(parsed.data.actualAmount)
     };
 
+    setShowAddModal(false);
+    setIsWorking(true);
+    setWorkingMessage(isPredefined ? "Saving predefined budget..." : "Saving budget...");
+
+    let isSuccess = false;
     if (isPredefined) {
       if (predefinedMonths.length === 0) {
         setError("Select at least one month for predefined budget.");
+        setShowAddModal(true);
+        setIsWorking(false);
+        setWorkingMessage("");
         return;
       }
       try {
@@ -420,9 +432,9 @@ export default function BudgetPage() {
         }
         setStatus("Predefined budget saved for selected months.");
         setError("");
+        isSuccess = true;
       } catch (err) {
         setError("Could not save predefined budget.");
-        return;
       }
     } else {
       const next = [
@@ -431,16 +443,21 @@ export default function BudgetPage() {
           ...newItem
         }
       ];
-      await saveItems(next, "Budget row added.");
+      isSuccess = await saveItems(next, "Budget row added.");
     }
 
-    setNewName("");
-    setNewEstimatedAmount("");
-    setNewActualAmount("");
-    setIsPredefined(false);
-    setPredefinedYear(currentYear);
-    setPredefinedMonths([]);
-    setShowAddModal(false);
+    if (isSuccess) {
+      setNewName("");
+      setNewEstimatedAmount("");
+      setNewActualAmount("");
+      setIsPredefined(false);
+      setPredefinedYear(currentYear);
+      setPredefinedMonths([]);
+    } else {
+      setShowAddModal(true);
+    }
+    setIsWorking(false);
+    setWorkingMessage("");
   };
 
   const availablePredefinedMonths = useMemo(() => {
@@ -484,6 +501,9 @@ export default function BudgetPage() {
       setError("Category already exists.");
       return;
     }
+    setShowCategoryModal(false);
+    setIsWorking(true);
+    setWorkingMessage("Saving category...");
     try {
       const latestLookupItems = await loadLatestLookupItems();
       const maxId = latestLookupItems.reduce(
@@ -509,11 +529,14 @@ export default function BudgetPage() {
       );
       setNewCategory(trimmed);
       setNewCategoryName("");
-      setShowCategoryModal(false);
       setStatus("Budget category added.");
       setError("");
     } catch (err) {
       setError("Could not add category.");
+      setShowCategoryModal(true);
+    } finally {
+      setIsWorking(false);
+      setWorkingMessage("");
     }
   };
 
@@ -859,6 +882,15 @@ export default function BudgetPage() {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isWorking ? (
+        <div className="budget-modal-backdrop">
+          <div className="form-card budget-modal-card budget-modal-shell">
+            <h2>{workingMessage || "Processing..."}</h2>
+            <p className="muted">Please wait while we complete this action.</p>
           </div>
         </div>
       ) : null}
